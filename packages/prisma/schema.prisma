@@ -36,6 +36,7 @@ model User {
   createdAt     DateTime           @default(now())
   SensitiveInfo UserSensitiveInfo?
   Memberships   Membership[]
+  Sessions      Session[]
 }
 
 model UserSensitiveInfo {
@@ -44,6 +45,14 @@ model UserSensitiveInfo {
   password String? @db.VarChar(80)
 
   @@map("usi")
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }
 
 model Membership {
