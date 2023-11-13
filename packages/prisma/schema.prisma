@@ -7,3 +7,71 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Organization {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String       @db.VarChar(50)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  Domains     Domain[]
+  Memberships Membership[]
+  Roles       Role[]
+
+  @@map("org")
+}
+
+model Domain {
+  domain    String       @db.VarChar(50)
+  orgId     String       @db.Uuid
+  Org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@id([domain, orgId])
+}
+
+model User {
+  id            String             @id @default(uuid()) @db.Uuid
+  name          String             @db.VarChar(50)
+  email         String             @unique @db.VarChar(255)
+  createdAt     DateTime           @default(now())
+  SensitiveInfo UserSensitiveInfo?
+  Memberships   Membership[]
+}
+
+model UserSensitiveInfo {
+  userId   String  @id @db.Uuid
+  User     User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  password String? @db.VarChar(80)
+
+  @@map("usi")
+}
+
+model Membership {
+  userId    String       @db.Uuid
+  User      User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orgId     String       @db.Uuid
+  Org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  roleType  RoleType     @default(custom)
+  roleId    String?      @db.Uuid
+  Role      Role?        @relation(fields: [roleId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+
+  @@id([userId, orgId])
+}
+
+enum RoleType {
+  owner
+  custom
+}
+
+model Role {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String       @db.VarChar(50)
+  permissions Json         @default("[]")
+  orgId       String       @db.Uuid
+  Org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Memberships Membership[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
