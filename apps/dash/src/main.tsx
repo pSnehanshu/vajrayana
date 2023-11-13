@@ -6,21 +6,33 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { trpc } from "./utils/trpc";
 import { Routes } from "./routes.tsx";
 import "./index.css";
+import { useStore } from "./store.ts";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function App() {
-  const [queryClient] = useState(() => new QueryClient());
+  const org = useStore((s) => s.org);
+
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 30 * 1000,
+          },
+        },
+      }),
+  );
   const [trpcClient] = useState(() =>
     trpc.createClient({
       transformer: superjson,
       links: [
         httpBatchLink({
           url: "/api/trpc",
-          // async headers() {
-          //   return {
-          //     authorization: getAuthCookie(),
-          //   };
-          // },
+          headers() {
+            return {
+              "x-org-id": org?.id ?? "",
+            };
+          },
         }),
       ],
     }),

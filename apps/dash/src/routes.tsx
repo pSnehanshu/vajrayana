@@ -7,12 +7,25 @@ import {
 import { useStore } from "./store";
 import LoginPage from "./pages/auth/Login";
 import HomePage from "./pages/Home";
+import { trpc } from "./utils/trpc";
+import { useEffect } from "react";
 
 export function Routes() {
-  const [isLoggedIn, setLoggedIn] = useStore((s) => [
-    s.isLoggedIn,
-    s.setLoggedIn,
-  ]);
+  const isLoggedIn = useStore((s) => s.isLoggedIn);
+  const setOrg = useStore((s) => s.setOrg);
+
+  const lookupQuery = trpc.org.lookup.useQuery({
+    domain: window.location.hostname,
+  });
+
+  useEffect(() => {
+    if (lookupQuery.data) {
+      setOrg(lookupQuery.data);
+    }
+  }, [lookupQuery.data, setOrg]);
+
+  if (lookupQuery.isLoading) return <h1>Wait...</h1>;
+  if (lookupQuery.isError) return <h1>Failed to lookup the org</h1>;
 
   return (
     <Router>
@@ -32,8 +45,6 @@ export function Routes() {
           </Route>
         </Switch>
       )}
-
-      <button onClick={() => setLoggedIn(!isLoggedIn)}>Toggle signin</button>
     </Router>
   );
 }
