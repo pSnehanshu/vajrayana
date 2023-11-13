@@ -2,17 +2,18 @@ import { create } from "zustand";
 import { RouterOutputs } from "./utils/trpc";
 
 type Org = RouterOutputs["org"]["lookup"];
+type User = RouterOutputs["auth"]["whoAmI"];
 
 type AppStore = {
-  isLoggedIn: boolean;
-  setLoggedIn: (v: boolean) => void;
+  user: User | null;
+  setUser: (user: User) => void;
   org: Org | null;
   setOrg: (org: Org) => void;
 };
 
 export const useStore = create<AppStore>((set) => ({
-  isLoggedIn: false,
-  setLoggedIn: (val) => set(() => ({ isLoggedIn: val })),
+  user: null,
+  setUser: (user) => set(() => ({ user })),
   org: null,
   setOrg: (org) => set(() => ({ org })),
 }));

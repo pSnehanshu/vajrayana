@@ -11,25 +11,45 @@ import { trpc } from "./utils/trpc";
 import { useEffect } from "react";
 
 export function Routes() {
-  const isLoggedIn = useStore((s) => s.isLoggedIn);
+  const user = useStore((s) => s.user);
+  const setUser = useStore((s) => s.setUser);
   const setOrg = useStore((s) => s.setOrg);
 
-  const lookupQuery = trpc.org.lookup.useQuery({
-    domain: window.location.hostname,
+  const lookupQuery = trpc.org.lookup.useQuery(
+    { domain: window.location.hostname },
+    {
+      retry(failureCount, error) {
+        if (error.data?.code === "NOT_FOUND") return false;
+        if (failureCount > 3) return false;
+        return true;
+      },
+    },
+  );
+
+  const whoamiQuery = trpc.auth.whoAmI.useQuery(undefined, {
+    retry(failureCount, error) {
+      if (error.data?.code === "UNAUTHORIZED") return false;
+      if (failureCount > 3) return false;
+      return true;
+    },
   });
 
   useEffect(() => {
     if (lookupQuery.data) {
       setOrg(lookupQuery.data);
     }
-  }, [lookupQuery.data, setOrg]);
 
-  if (lookupQuery.isLoading) return <h1>Wait...</h1>;
+    if (whoamiQuery.data) {
+      setUser(whoamiQuery.data);
+    }
+  }, [lookupQuery.data, whoamiQuery.data, setOrg, setUser]);
+
+  if (lookupQuery.isLoading || whoamiQuery.isLoading) return <h1>Wait...</h1>;
   if (lookupQuery.isError) return <h1>Failed to lookup the org</h1>;
 
   return (
     <Router>
-      {isLoggedIn ? (
+      {user ? (
         <Switch>
           <Route path="/">
             <HomePage />

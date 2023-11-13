@@ -1,5 +1,6 @@
 import { useState } from "react";
 import superjson from "superjson";
+import { Toaster } from "react-hot-toast";
 import { httpBatchLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useStore } from "./store";
@@ -35,10 +36,18 @@ export default function App() {
     }),
   );
 
+  if (typeof org?.isActive === "boolean" && !org.isActive)
+    return (
+      <h1 className="text-4xl m-4 text-red-500 text-center">
+        Your organization has been blocked! Contact admin for more information.
+      </h1>
+    );
+
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <Routes />
+        <Toaster position="top-center" />
       </QueryClientProvider>
     </trpc.Provider>
   );
