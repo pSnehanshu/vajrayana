@@ -5,8 +5,7 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "dev:web": "yarn workspace @vajrayana/web dev",
-    "dev:b": "yarn workspace @vajrayana/backend dev",
+    "dev:b": "yarn workspace @vajrayana/be dev",
     "prisma": "yarn workspace @vajrayana/prisma prisma",
     "pretty": "prettier . -w",
     "lint": "eslint ."
@@ -20,7 +19,9 @@
     "@typescript-eslint/experimental-utils": "^5.62.0",
     "@typescript-eslint/parser": "^6.5.0",
     "eslint": "^8.48.0",
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "tsx": "^4.1.1",
+    "typescript": "^5.2.2"
   },
   "packageManager": "yarn@3.6.3"
 }
