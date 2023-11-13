@@ -5,6 +5,7 @@ import { httpBatchLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { trpc } from "./utils/trpc";
 import { Routes } from "./routes.tsx";
+import "./index.css";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function App() {
