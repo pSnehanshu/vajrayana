@@ -103,6 +103,13 @@ const orgMiddleware = authMiddleware.unstable_pipe(async ({ ctx, next }) => {
     });
   }
 
+  if (!org.isActive) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: `Org ${org.name} is inactive`,
+    });
+  }
+
   // Check the available permissions
   let availablePermissions: Permissions[] = [];
 
