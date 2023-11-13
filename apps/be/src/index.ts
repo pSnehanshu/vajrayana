@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { appRouter } from "./routers";
-import { createContext } from "./context";
+import { createContext } from "./trpc";
 
 const app = express();
 const port = parseInt(process.env.PORT ?? "22281", 10);
