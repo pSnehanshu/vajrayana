@@ -9,9 +9,10 @@ import LoginPage from "./pages/auth/Login";
 import HomePage from "./pages/Home";
 import { trpc } from "./utils/trpc";
 import { useEffect } from "react";
+import { TopBar } from "./components/layout/topbar";
+import { SideBar } from "./components/layout/sidebar";
 
 export function Routes() {
-  const user = useStore((s) => s.user);
   const setUser = useStore((s) => s.setUser);
   const setOrg = useStore((s) => s.setOrg);
 
@@ -49,12 +50,21 @@ export function Routes() {
 
   return (
     <Router>
-      {user ? (
-        <Switch>
-          <Route path="/">
-            <HomePage />
-          </Route>
-        </Switch>
+      {whoamiQuery.data ? (
+        <>
+          <TopBar />
+          <SideBar />
+
+          <div className="antialiased bg-gray-50 dark:bg-gray-900">
+            <main className="p-4 md:ml-64 h-auto pt-20">
+              <Switch>
+                <Route path="/">
+                  <HomePage />
+                </Route>
+              </Switch>
+            </main>
+          </div>
+        </>
       ) : (
         <Switch>
           <Route path="/auth/login">

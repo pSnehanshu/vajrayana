@@ -9,7 +9,7 @@ const port = parseInt(process.env.PORT ?? "22281", 10);
 
 if (process.env.NODE_ENV !== "production") {
   app.use((_req, _res, next) => {
-    setTimeout(() => next(), 5000);
+    setTimeout(() => next(), 2000);
   });
 }
 
