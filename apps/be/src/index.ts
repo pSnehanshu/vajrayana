@@ -5,7 +5,7 @@ import { appRouter } from "./routers";
 import { createContext } from "./context";
 
 const app = express();
-const port = parseInt(process.env.PORT ?? "22280", 10);
+const port = parseInt(process.env.PORT ?? "22281", 10);
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
