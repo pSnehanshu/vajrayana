@@ -1,0 +1,19 @@
+{
+  "name": "@vajrayana/prisma",
+  "version": "1.0.0",
+  "author": "Snehanshu Phukon",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "build": "tsc && cpy schema.prisma migrations build",
+    "prisma": "prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.3.1",
+    "prisma": "^5.3.1"
+  },
+  "devDependencies": {
+    "cpy-cli": "^5.0.0",
+    "typescript": "^5.2.2"
+  }
+}

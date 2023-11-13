@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "outDir": "build",
+    "strict": true,
+    "lib": ["ES2021"],
+    "target": "ES2021",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "skipLibCheck": true
+  },
+  "ts-node": {
+    "files": true
+  },
+  "include": ["*/**/*.ts", "*.ts"]
+}

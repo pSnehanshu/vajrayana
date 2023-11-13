@@ -1,0 +1,26 @@
+{
+  "name": "vajrayana",
+  "version": "1.0.0",
+  "author": "Snehanshu Phukon",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "dev:web": "yarn workspace @vajrayana/web dev",
+    "dev:b": "yarn workspace @vajrayana/backend dev",
+    "prisma": "yarn workspace @vajrayana/prisma prisma",
+    "pretty": "prettier . -w",
+    "lint": "eslint ."
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/experimental-utils": "^5.62.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint": "^8.48.0",
+    "prettier": "^3.0.3"
+  },
+  "packageManager": "yarn@3.6.3"
+}
