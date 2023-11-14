@@ -90,6 +90,14 @@ export function Routes() {
                   <h1 className="dark:text-white">Reports!</h1>
                 </Route>
 
+                <Route path="/settings">
+                  <h1 className="dark:text-white">Settings!</h1>
+                </Route>
+
+                <Route path="/account">
+                  <h1 className="dark:text-white">My account!</h1>
+                </Route>
+
                 <Route path="/">
                   <Redirect to="/dashboard" />
                 </Route>
