@@ -1,6 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import Logo from "../../assets/img/vajrayana-logo.png";
+import Logo from "../../assets/img/zigbolt-logo.png";
 import { trpc } from "../../utils/trpc";
 
 export default function LoginPage() {

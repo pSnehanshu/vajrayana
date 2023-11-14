@@ -1,7 +1,7 @@
 import { z } from "zod";
 import cookie from "cookie";
 import superjson from "superjson";
-import { prisma } from "@vajrayana/prisma";
+import { prisma } from "@zigbolt/prisma";
 import { type inferAsyncReturnType, initTRPC, TRPCError } from "@trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 

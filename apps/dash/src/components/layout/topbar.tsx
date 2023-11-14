@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { IoHelpCircle } from "react-icons/io5";
 import { HiMenuAlt1 } from "react-icons/hi";
 import { UserButton } from "./user-button";
-import Logo from "../../assets/img/vajrayana-logo.png";
+import Logo from "../../assets/img/zigbolt-logo.png";
 import { useStore } from "../../store";
 
 export function TopBar() {

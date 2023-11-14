@@ -1,14 +1,14 @@
 {
-  "name": "vajrayana",
+  "name": "zigbolt",
   "version": "1.0.0",
   "author": "Snehanshu Phukon",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "dev:b": "yarn workspace @vajrayana/be dev",
-    "dev:d": "yarn workspace @vajrayana/dash dev",
+    "dev:b": "yarn workspace @zigbolt/be dev",
+    "dev:d": "yarn workspace @zigbolt/dash dev",
     "dev": "run-p dev:b dev:d",
-    "prisma": "yarn workspace @vajrayana/prisma prisma",
+    "prisma": "yarn workspace @zigbolt/prisma prisma",
     "pretty": "prettier . -w",
     "lint": "eslint ."
   },

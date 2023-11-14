@@ -1159,16 +1159,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vajrayana/be@workspace:apps/be":
+"@vitejs/plugin-react@npm:^4.0.3":
+  version: 4.1.1
+  resolution: "@vitejs/plugin-react@npm:4.1.1"
+  dependencies:
+    "@babel/core": ^7.23.2
+    "@babel/plugin-transform-react-jsx-self": ^7.22.5
+    "@babel/plugin-transform-react-jsx-source": ^7.22.5
+    "@types/babel__core": ^7.20.3
+    react-refresh: ^0.14.0
+  peerDependencies:
+    vite: ^4.2.0
+  checksum: 275132ab1e4c227326396aeee93084f20bbe5f0fbe92d45813f3eacd0766eb6e8cd83ee222f90411aefad1ce60fbd31766a8e4725e7bb36914f2bba37afbdebf
+  languageName: node
+  linkType: hard
+
+"@zigbolt/be@workspace:apps/be":
   version: 0.0.0-use.local
-  resolution: "@vajrayana/be@workspace:apps/be"
+  resolution: "@zigbolt/be@workspace:apps/be"
   dependencies:
     "@trpc/server": ^10.43.3
     "@types/bcryptjs": ^2.4.6
     "@types/cookie": ^0.5.4
     "@types/cookie-parser": ^1.4.6
     "@types/express": ^4.17.21
-    "@vajrayana/prisma": "*"
+    "@zigbolt/prisma": "*"
     bcryptjs: ^2.4.3
     cookie: ^0.6.0
     dotenv: ^16.3.1
@@ -1178,9 +1193,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@vajrayana/dash@workspace:apps/dash":
+"@zigbolt/dash@workspace:apps/dash":
   version: 0.0.0-use.local
-  resolution: "@vajrayana/dash@workspace:apps/dash"
+  resolution: "@zigbolt/dash@workspace:apps/dash"
   dependencies:
     "@tanstack/react-query": ^4.0.0
     "@trpc/client": ^10.43.3
@@ -1211,9 +1226,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@vajrayana/prisma@*, @vajrayana/prisma@workspace:packages/prisma":
+"@zigbolt/prisma@*, @zigbolt/prisma@workspace:packages/prisma":
   version: 0.0.0-use.local
-  resolution: "@vajrayana/prisma@workspace:packages/prisma"
+  resolution: "@zigbolt/prisma@workspace:packages/prisma"
   dependencies:
     "@prisma/client": ^5.3.1
     cpy-cli: ^5.0.0
@@ -1221,21 +1236,6 @@ __metadata:
     typescript: ^5.2.2
   languageName: unknown
   linkType: soft
-
-"@vitejs/plugin-react@npm:^4.0.3":
-  version: 4.1.1
-  resolution: "@vitejs/plugin-react@npm:4.1.1"
-  dependencies:
-    "@babel/core": ^7.23.2
-    "@babel/plugin-transform-react-jsx-self": ^7.22.5
-    "@babel/plugin-transform-react-jsx-source": ^7.22.5
-    "@types/babel__core": ^7.20.3
-    react-refresh: ^0.14.0
-  peerDependencies:
-    vite: ^4.2.0
-  checksum: 275132ab1e4c227326396aeee93084f20bbe5f0fbe92d45813f3eacd0766eb6e8cd83ee222f90411aefad1ce60fbd31766a8e4725e7bb36914f2bba37afbdebf
-  languageName: node
-  linkType: hard
 
 "abbrev@npm:^2.0.0":
   version: 2.0.0
@@ -5352,24 +5352,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vajrayana@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "vajrayana@workspace:."
-  dependencies:
-    "@typescript-eslint/eslint-plugin": ^6.5.0
-    "@typescript-eslint/experimental-utils": ^5.62.0
-    "@typescript-eslint/parser": ^6.5.0
-    date-fns: ^2.30.0
-    eslint: ^8.48.0
-    lodash-es: ^4.17.21
-    npm-run-all: ^4.1.5
-    prettier: ^3.0.3
-    superjson: ^1.13.3
-    tsx: ^4.1.1
-    zod: ^3.22.4
-  languageName: unknown
-  linkType: soft
-
 "validate-npm-package-license@npm:^3.0.1":
   version: 3.0.4
   resolution: "validate-npm-package-license@npm:3.0.4"
@@ -5549,6 +5531,24 @@ __metadata:
   checksum: f77b3d8d00310def622123df93d4ee654fc6a0096182af8bd60679ddcdfb3474c56c6c7190817c84a2785648cdee9d721c0154eb45698c62176c322fb46fc700
   languageName: node
   linkType: hard
+
+"zigbolt@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "zigbolt@workspace:."
+  dependencies:
+    "@typescript-eslint/eslint-plugin": ^6.5.0
+    "@typescript-eslint/experimental-utils": ^5.62.0
+    "@typescript-eslint/parser": ^6.5.0
+    date-fns: ^2.30.0
+    eslint: ^8.48.0
+    lodash-es: ^4.17.21
+    npm-run-all: ^4.1.5
+    prettier: ^3.0.3
+    superjson: ^1.13.3
+    tsx: ^4.1.1
+    zod: ^3.22.4
+  languageName: unknown
+  linkType: soft
 
 "zod@npm:^3.22.4":
   version: 3.22.4

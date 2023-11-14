@@ -1,5 +1,5 @@
 {
-  "name": "@vajrayana/be",
+  "name": "@zigbolt/be",
   "version": "1.0.0",
   "author": "Snehanshu Phukon",
   "license": "UNLICENSED",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@trpc/server": "^10.43.3",
-    "@vajrayana/prisma": "*",
+    "@zigbolt/prisma": "*",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.6.0",
     "dotenv": "^16.3.1",
