@@ -56,10 +56,42 @@ export function Routes() {
           <SideBar />
 
           <div className="antialiased bg-gray-50 dark:bg-gray-900">
-            <main className="p-4 md:ml-64 h-auto pt-20">
+            <main className="p-4 md:ml-64 h-auto min-h-screen pt-20">
               <Switch>
-                <Route path="/">
+                <Route path="/dashboard">
                   <HomePage />
+                </Route>
+
+                <Route path="/cs">
+                  <h1 className="dark:text-white">CS!</h1>
+                </Route>
+
+                <Route path="/sessions">
+                  <h1 className="dark:text-white">Sessions!</h1>
+                </Route>
+
+                <Route path="/tarrif">
+                  <h1 className="dark:text-white">Tarrif!</h1>
+                </Route>
+
+                <Route path="/customers">
+                  <h1 className="dark:text-white">Customers!</h1>
+                </Route>
+
+                <Route path="/revenue">
+                  <h1 className="dark:text-white">Revenue!</h1>
+                </Route>
+
+                <Route path="/ext-platforms">
+                  <h1 className="dark:text-white">External platforms!</h1>
+                </Route>
+
+                <Route path="/reports">
+                  <h1 className="dark:text-white">Reports!</h1>
+                </Route>
+
+                <Route path="/">
+                  <Redirect to="/dashboard" />
                 </Route>
               </Switch>
             </main>
@@ -70,6 +102,7 @@ export function Routes() {
           <Route path="/auth/login">
             <LoginPage />
           </Route>
+
           <Route path="/">
             <Redirect to="/auth/login" />
           </Route>
