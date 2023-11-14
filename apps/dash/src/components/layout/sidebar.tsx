@@ -1,7 +1,22 @@
+import { useRef } from "react";
+import classNames from "classnames";
+import { useOnClickOutside } from "usehooks-ts";
+import { useStore } from "../../store";
+
 export function SideBar() {
+  const mobileSideBarVisible = useStore((s) => s.mobileSideBarVisible);
+  const setMobileSideBarVisible = useStore((s) => s.setMobileSideBarVisible);
+
+  const ref = useRef(null);
+  useOnClickOutside(ref, () => setMobileSideBarVisible(false));
+
   return (
     <aside
-      className="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+      ref={ref}
+      className={classNames(
+        mobileSideBarVisible ? "transform-none" : "-translate-x-full",
+        "fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700",
+      )}
       aria-label="Sidenav"
       id="drawer-navigation"
     >
