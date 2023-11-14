@@ -7,7 +7,8 @@ import { PiCaretDownBold } from "react-icons/pi";
 import { IoPieChartSharp, IoSettingsSharp } from "react-icons/io5";
 import { MdElectricCar, MdAttachMoney } from "react-icons/md";
 import { FaPlugCircleBolt, FaMoneyBillTrendUp } from "react-icons/fa6";
-import { FaChargingStation, FaBoxes, FaDotCircle } from "react-icons/fa";
+import { FaChargingStation, FaDotCircle } from "react-icons/fa";
+import { RiOrganizationChart } from "react-icons/ri";
 import { useStore } from "../../store";
 
 type MenuItem = {
@@ -54,7 +55,7 @@ const menu: MenuItem[] = [
   },
   {
     title: "External platforms",
-    icon: <FaBoxes />,
+    icon: <RiOrganizationChart />,
     link: "/ext-platforms",
   },
   {
