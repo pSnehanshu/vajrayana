@@ -5,7 +5,10 @@ import { prisma } from "@zigbolt/prisma";
 import { type inferAsyncReturnType, initTRPC, TRPCError } from "@trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 
-enum Permissions {
+/**
+ * List of available permissions
+ */
+export enum Permissions {
   read = "read",
   write = "write",
   delete = "delete",
@@ -131,9 +134,29 @@ const orgMiddleware = authMiddleware.unstable_pipe(async ({ ctx, next }) => {
   });
 });
 
+const permissionMiddleware = (
+  permissions: Permissions[] = [],
+  mode: "every" | "some" = "every",
+) =>
+  orgMiddleware.unstable_pipe(({ ctx, next }) => {
+    const hasPermission = permissions[mode]((p) => ctx.permissions.includes(p));
+
+    if (hasPermission) {
+      return next({ ctx });
+    }
+
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Not enough permission",
+    });
+  });
+
 /* Procedures */
 
 export const router = t.router;
 export const publicProcedure = t.procedure;
 export const authProcedure = t.procedure.use(authMiddleware);
-export const orgProcedure = t.procedure.use(orgMiddleware);
+export const orgProcedure = (
+  permissions: Permissions[] = [],
+  mode: "every" | "some" = "every",
+) => t.procedure.use(permissionMiddleware(permissions, mode));

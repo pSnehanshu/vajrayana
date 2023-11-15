@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { publicProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { Permissions, orgProcedure, publicProcedure, router } from "../trpc";
 
 export const orgRouter = router({
   lookup: publicProcedure
@@ -26,5 +26,17 @@ export const orgRouter = router({
       }
 
       return domain.Org;
+    }),
+  update: orgProcedure([Permissions.write])
+    .input(
+      z.object({
+        name: z.string().trim().min(1),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.organization.update({
+        where: { id: ctx.org.id },
+        data: input,
+      });
     }),
 });

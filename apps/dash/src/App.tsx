@@ -8,8 +8,6 @@ import { trpc } from "./utils/trpc";
 import { Routes } from "./routes";
 
 export default function App() {
-  const org = useStore((s) => s.org);
-
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -28,20 +26,13 @@ export default function App() {
           url: "/api/trpc",
           headers() {
             return {
-              "x-org-id": org?.id ?? "",
+              "x-org-id": useStore.getState().org?.id ?? "",
             };
           },
         }),
       ],
     }),
   );
-
-  if (typeof org?.isActive === "boolean" && !org.isActive)
-    return (
-      <h1 className="text-4xl m-4 text-red-500 text-center">
-        Your organization has been blocked! Contact admin for more information.
-      </h1>
-    );
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>

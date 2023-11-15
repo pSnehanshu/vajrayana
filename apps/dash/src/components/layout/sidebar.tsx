@@ -27,16 +27,7 @@ const menu: MenuItem[] = [
   {
     title: "Charging stations",
     icon: <FaChargingStation />,
-    children: [
-      {
-        title: "Locations",
-        link: "/cs/locations",
-      },
-      {
-        title: "EVSEs",
-        link: "/cs/evse",
-      },
-    ],
+    link: "/cs",
   },
   {
     title: "Charging sessions",

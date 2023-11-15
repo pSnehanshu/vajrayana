@@ -49,6 +49,13 @@ export function Routes() {
   if (lookupQuery.isLoading || whoamiQuery.isLoading) return <h1>Wait...</h1>;
   if (lookupQuery.isError) return <h1>Failed to lookup the org</h1>;
 
+  if (!lookupQuery.data.isActive)
+    return (
+      <h1 className="text-4xl m-4 text-red-500 text-center">
+        Your organization has been blocked! Contact admin for more information.
+      </h1>
+    );
+
   return (
     <Router>
       {whoamiQuery.data ? (
