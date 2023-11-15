@@ -4,9 +4,11 @@ import superjson from "superjson";
 import { prisma } from "@zigbolt/prisma";
 import { type inferAsyncReturnType, initTRPC, TRPCError } from "@trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
-import { AllPermissions, Permissions } from "./enums/permissions.enum";
-
-const permissionSchema = z.nativeEnum(Permissions).array();
+import {
+  AllPermissions,
+  UserPermissions,
+  permissionSchema,
+} from "@zigbolt/shared";
 
 /* Context */
 
@@ -106,7 +108,7 @@ const orgMiddleware = authMiddleware.unstable_pipe(async ({ ctx, next }) => {
   }
 
   // Check the available permissions
-  let availablePermissions: Permissions[] = [];
+  let availablePermissions: UserPermissions[] = [];
 
   if (orgMembership.roleType === "owner") {
     // Set all permissions
@@ -128,7 +130,7 @@ const orgMiddleware = authMiddleware.unstable_pipe(async ({ ctx, next }) => {
 });
 
 const permissionMiddleware = (
-  permissions: Permissions[] = [],
+  permissions: UserPermissions[] = [],
   mode: "every" | "some" = "every",
 ) =>
   orgMiddleware.unstable_pipe(({ ctx, next }) => {
@@ -150,6 +152,6 @@ export const router = t.router;
 export const publicProcedure = t.procedure;
 export const authProcedure = t.procedure.use(authMiddleware);
 export const orgProcedure = (
-  permissions: Permissions[] = [],
+  permissions: UserPermissions[] = [],
   mode: "every" | "some" = "every",
 ) => t.procedure.use(permissionMiddleware(permissions, mode));

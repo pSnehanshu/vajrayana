@@ -2,25 +2,20 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { Prisma } from "@zigbolt/prisma";
 import { orgProcedure, router } from "../trpc";
-import { Permissions } from "../enums/permissions.enum";
+import { UserPermissions } from "@zigbolt/shared";
+import { paginationSchema } from "../utils/schemas";
 
 export const membersRouter = router({
-  list: orgProcedure([Permissions["MEMBER:READ"]])
-    .input(
-      z.object({
-        take: z.number().int().min(1).max(20).default(20),
-        page: z.number().int().min(1).default(1),
-        search: z.string().trim().optional(),
-      }),
-    )
+  list: orgProcedure([UserPermissions["MEMBER:READ"]])
+    .input(paginationSchema)
     .query(async ({ input, ctx }) => {
       const where: Prisma.MembershipWhereInput = { orgId: ctx.org.id };
 
       if (input.search) {
         where.User = {
           OR: [
-            { name: { contains: input.search } },
-            { email: { contains: input.search } },
+            { name: { contains: input.search, mode: "insensitive" } },
+            { email: { contains: input.search, mode: "insensitive" } },
           ],
         };
       }
@@ -43,7 +38,7 @@ export const membersRouter = router({
 
       return { members, total };
     }),
-  invite: orgProcedure([Permissions["MEMBER:ADD"]])
+  invite: orgProcedure([UserPermissions["MEMBER:ADD"]])
     .input(
       z.object({
         name: z.string().trim().optional(),

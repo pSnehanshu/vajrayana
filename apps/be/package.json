@@ -14,6 +14,7 @@
   "dependencies": {
     "@trpc/server": "^10.43.3",
     "@zigbolt/prisma": "*",
+    "@zigbolt/shared": "*",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.6.0",
     "dotenv": "^16.3.1",
