@@ -4,8 +4,12 @@ import { format } from "date-fns";
 import ReactPaginate from "react-paginate";
 import { PiCaretLeft, PiCaretRight } from "react-icons/pi";
 import { HiUserPlus } from "react-icons/hi2";
+import * as Yup from "yup";
 import { trpc } from "../../utils/trpc";
 import { Button } from "../../components/elements/button";
+import { Modal } from "../../components/elements/modal";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import toast from "react-hot-toast";
 
 export default function MemberSettingsPage() {
   const [pageNum, setPageNum] = useState(1);
@@ -25,6 +29,8 @@ export default function MemberSettingsPage() {
   const total = membersQuery.data?.total ?? 0;
   const endSN = itemsReceived > 0 ? startSN + total - 1 : 0;
   const pageCount = Math.ceil(itemsReceived / itemsPerPage);
+
+  const [memberModalVisible, setMemberModalVisible] = useState(false);
 
   return (
     <section className="lg:ml-8">
@@ -71,7 +77,7 @@ export default function MemberSettingsPage() {
             type="button"
             className="mb-2 lg:mb-0 lg:ml-2"
             icon={<HiUserPlus className="mr-2 text-lg" />}
-            onClick={() => alert("Add member!")}
+            onClick={() => setMemberModalVisible(true)}
           />
         </div>
 
@@ -165,6 +171,165 @@ export default function MemberSettingsPage() {
           />
         </nav>
       </div>
+
+      <Modal
+        visible={memberModalVisible}
+        title="Invite new member"
+        onCloseAttempt={() => setMemberModalVisible(false)}
+      >
+        <InviteMember
+          onOK={() => {
+            membersQuery.refetch();
+            setMemberModalVisible(false);
+          }}
+        />
+      </Modal>
     </section>
+  );
+}
+
+type InviteMemberProps = {
+  onOK: () => void;
+};
+
+function InviteMember({ onOK }: InviteMemberProps) {
+  const rolesQuery = trpc.roles.list.useQuery({});
+  const inviteMutation = trpc.members.invite.useMutation();
+
+  return (
+    <Formik
+      initialValues={{
+        email: "",
+        name: "",
+        role: "",
+        isOwner: false,
+      }}
+      validationSchema={Yup.object().shape({
+        email: Yup.string().email().required(),
+        name: Yup.string(),
+        role: Yup.string().uuid("Invalid role selected"),
+        isOwner: Yup.boolean().default(false),
+      })}
+      onSubmit={async (values, { setSubmitting }) => {
+        try {
+          await inviteMutation.mutateAsync({
+            email: values.email,
+            role: values.isOwner ? "owner" : { id: values.role },
+            name: values.name,
+          });
+
+          toast.success("Invitation sent!");
+          onOK();
+        } catch (error) {
+          console.error(error);
+          toast.error("Failed to invite");
+        } finally {
+          setSubmitting(false);
+        }
+      }}
+    >
+      {(opts) => (
+        <Form className="p-4">
+          <div className="mb-4">
+            <label
+              htmlFor="name"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Email
+            </label>
+
+            <Field
+              type="email"
+              name="email"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            />
+
+            <ErrorMessage
+              name="email"
+              render={(msg) => <p className="text-red-500 py-2">{msg}</p>}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="name"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Name (optional)
+            </label>
+
+            <Field
+              type="text"
+              name="name"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            />
+
+            <ErrorMessage
+              name="name"
+              render={(msg) => <p className="text-red-500 py-2">{msg}</p>}
+            />
+          </div>
+
+          <div className="flex my-4">
+            <div className="flex items-center h-5">
+              <Field
+                id="is-owner"
+                name="isOwner"
+                type="checkbox"
+                className="rounded-md w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+            </div>
+            <div className="ms-2 text-sm">
+              <label
+                htmlFor="is-owner"
+                className="font-medium text-gray-900 dark:text-gray-300"
+              >
+                Invite as owner
+              </label>
+              <p className="text-xs font-normal text-gray-500 dark:text-gray-300">
+                As an owner, this member will have unrestricted access to your
+                organization
+              </p>
+            </div>
+          </div>
+
+          {!opts.values.isOwner && (
+            <div className="mb-4">
+              <label
+                htmlFor="role"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Role
+              </label>
+
+              <Field
+                as="select"
+                name="role"
+                id="role"
+                className="w-full dark:text-gray-900 text-sm rounded-sm p-1"
+              >
+                <option value="">Select role</option>
+                {rolesQuery.data?.roles.map((role) => (
+                  <option value={role.id}>{role.name}</option>
+                ))}
+              </Field>
+
+              <ErrorMessage
+                name="role"
+                render={(msg) => <p className="text-red-500 py-2">{msg}</p>}
+              />
+            </div>
+          )}
+
+          <div className="flex flex-row-reverse">
+            <Button
+              label="Send invitation"
+              isLoading={opts.isSubmitting}
+              disabled={!opts.isValid || !opts.dirty}
+            />
+          </div>
+        </Form>
+      )}
+    </Formik>
   );
 }
