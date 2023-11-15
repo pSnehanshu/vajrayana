@@ -75,7 +75,7 @@ export default function SettingsPage() {
         </ul>
       </aside>
 
-      <div className="border-t-2 lg:border-0 border-gray-200 dark:border-gray-700 lg:flex-grow p-4 py-8">
+      <div className="border-t-2 lg:border-0 border-gray-200 dark:border-gray-700 lg:flex-grow p-4 py-8 overflow-x-auto">
         <Switch>
           <Route path={`${match.url}/org`} component={OrgSettingsPage} />
           <Route path={`${match.url}/members`} component={MemberSettingsPage} />

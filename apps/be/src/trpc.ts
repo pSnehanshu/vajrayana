@@ -122,6 +122,7 @@ const orgMiddleware = authMiddleware.unstable_pipe(async ({ ctx, next }) => {
       ...ctx,
       org,
       permissions: availablePermissions,
+      membership: orgMembership,
     },
   });
 });

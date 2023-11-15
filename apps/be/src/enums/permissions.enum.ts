@@ -3,10 +3,11 @@
  */
 export enum Permissions {
   "ORG:READ" = 1,
-  "ORG:UPDATE",
-  "MEMBER:ADD",
-  "MEMBER:REMOVE",
-  "MEMBER:CHANGE-ROLE",
+  "ORG:UPDATE" = 2,
+  "MEMBER:READ" = 3,
+  "MEMBER:ADD" = 4,
+  "MEMBER:REMOVE" = 5,
+  "MEMBER:CHANGE-ROLE" = 6,
 }
 
 /** Array of all the permissions */

@@ -899,6 +899,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-paginate@npm:^7.1.4":
+  version: 7.1.4
+  resolution: "@types/react-paginate@npm:7.1.4"
+  dependencies:
+    "@types/react": "*"
+  checksum: 3dbada2ab364307382adce1283220c83b743bfb056508dac6c513cfc1ce6b703e98129717abb052739106ae02eaab847b8b7037e7ca6b666eba86c9879e70d74
+  languageName: node
+  linkType: hard
+
 "@types/react-router-dom@npm:^5":
   version: 5.3.3
   resolution: "@types/react-router-dom@npm:5.3.3"
@@ -1213,6 +1222,7 @@ __metadata:
     "@trpc/server": ^10.43.3
     "@types/react": ^18.2.15
     "@types/react-dom": ^18.2.7
+    "@types/react-paginate": ^7.1.4
     "@types/react-router-dom": ^5
     "@typescript-eslint/eslint-plugin": ^6.0.0
     "@typescript-eslint/parser": ^6.0.0
@@ -1229,6 +1239,7 @@ __metadata:
     react-hook-form: ^7.48.2
     react-hot-toast: ^2.4.1
     react-icons: ^4.11.0
+    react-paginate: ^8.2.0
     react-router-dom: ^5
     tailwindcss: ^3.3.5
     typescript: ^5.2.2
@@ -4286,7 +4297,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.2":
+"prop-types@npm:^15, prop-types@npm:^15.6.2":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -4409,6 +4420,17 @@ __metadata:
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: f7a19ac3496de32ca9ae12aa030f00f14a3d45374f1ceca0af707c831b2a6098ef0d6bdae51bd437b0a306d7f01d4677fcc8de7c0d331eb47ad0f46130e53c5f
+  languageName: node
+  linkType: hard
+
+"react-paginate@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "react-paginate@npm:8.2.0"
+  dependencies:
+    prop-types: ^15
+  peerDependencies:
+    react: ^16 || ^17 || ^18
+  checksum: a0969b4ef27be466ef3e052e2c7c61fca60af24e0d10c76770ebd9953ad6131206a276dfc335e61cf35aa494ff3aacc2610682e3192d7f2ee9541928edb46721
   languageName: node
   linkType: hard
 
