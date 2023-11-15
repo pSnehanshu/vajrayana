@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import { format } from "date-fns";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import ReactPaginate from "react-paginate";
+import {
+  AllPermissions,
+  PermissionDescriptions,
+  UserPermissions,
+  permissionSchema,
+} from "@zigbolt/shared";
 import { PiCaretLeft, PiCaretRight } from "react-icons/pi";
 import { HiUserPlus } from "react-icons/hi2";
+import * as Yup from "yup";
 import { trpc } from "../../utils/trpc";
 import { Button } from "../../components/elements/button";
-import { UserPermissions, permissionSchema } from "@zigbolt/shared";
+import { Modal } from "../../components/elements/modal";
+import toast from "react-hot-toast";
 
 export default function RoleSettingsPage() {
   const [pageNum, setPageNum] = useState(1);
@@ -26,6 +35,9 @@ export default function RoleSettingsPage() {
   const total = rolesQuery.data?.total ?? 0;
   const endSN = itemsReceived > 0 ? startSN + total - 1 : 0;
   const pageCount = Math.ceil(itemsReceived / itemsPerPage);
+
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const createRoleMutation = trpc.roles.create.useMutation();
 
   return (
     <section className="lg:ml-8">
@@ -72,7 +84,7 @@ export default function RoleSettingsPage() {
             type="button"
             className="mb-2 lg:mb-0 lg:ml-2"
             icon={<HiUserPlus className="mr-2 text-lg" />}
-            onClick={() => alert("Add role!")}
+            onClick={() => setCreateModalVisible(true)}
           />
         </div>
 
@@ -96,7 +108,7 @@ export default function RoleSettingsPage() {
                 const permParsed = permissionSchema.safeParse(role.permissions);
                 const permissions = permParsed.success ? permParsed.data : null;
                 const permissionNames = permissions?.map(
-                  (p) => UserPermissions[p],
+                  (p) => [p, UserPermissions[p]] as const,
                 );
 
                 return (
@@ -111,12 +123,13 @@ export default function RoleSettingsPage() {
                       {role.name}
                     </th>
                     <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {permissionNames?.map((pn) => (
+                      {permissionNames?.map(([p, pname]) => (
                         <span
-                          key={pn}
-                          className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400"
+                          key={pname}
+                          title={PermissionDescriptions[p]}
+                          className="bg-blue-100 cursor-help text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400"
                         >
-                          {pn}
+                          {pname}
                         </span>
                       )) ?? "N/A"}
                     </td>
@@ -161,6 +174,112 @@ export default function RoleSettingsPage() {
           />
         </nav>
       </div>
+
+      <Modal
+        visible={createModalVisible}
+        title="Create new role"
+        onCloseAttempt={() => setCreateModalVisible(false)}
+      >
+        <Formik
+          className="p-4 md:p-5"
+          initialValues={{
+            name: "",
+            permissions: [] as UserPermissions[],
+          }}
+          validationSchema={Yup.object().shape({
+            name: Yup.string().trim().min(1).required(),
+            permissions: Yup.array().of(Yup.number().oneOf(AllPermissions)),
+          })}
+          onSubmit={async (values, { setSubmitting }) => {
+            try {
+              await createRoleMutation.mutateAsync({
+                name: values.name,
+                permissions: values.permissions.map((p) => Number(p)),
+              });
+
+              rolesQuery.refetch();
+              setCreateModalVisible(false);
+              toast.success(`Role ${values.name} created!`);
+            } catch (error) {
+              console.error(error);
+              toast.error("Failed to create role!");
+            } finally {
+              setSubmitting(false);
+            }
+          }}
+        >
+          {({ isSubmitting, dirty, isValid }) => (
+            <Form className="p-4">
+              <div className="mb-4">
+                <label
+                  htmlFor="name"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Name
+                </label>
+
+                <Field
+                  type="text"
+                  name="name"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="e.g. Editor, Viewer, Sales etc."
+                />
+
+                <ErrorMessage
+                  name="name"
+                  render={(msg) => <p className="text-red-500 py-2">{msg}</p>}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Permissions
+                </label>
+
+                <ul>
+                  {AllPermissions.map((perm) => (
+                    <li className="flex my-4" key={perm}>
+                      <div className="flex items-center h-5">
+                        <Field
+                          id={`perm-${perm}`}
+                          name="permissions"
+                          type="checkbox"
+                          value={perm.toString()}
+                          className="rounded-md w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                      </div>
+                      <div className="ms-2 text-sm">
+                        <label
+                          htmlFor={`perm-${perm}`}
+                          className="font-medium text-gray-900 dark:text-gray-300"
+                        >
+                          {UserPermissions[perm]}
+                        </label>
+                        <p className="text-xs font-normal text-gray-500 dark:text-gray-300">
+                          {PermissionDescriptions[perm]}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <ErrorMessage
+                  name="permissions"
+                  render={(msg) => <p className="text-red-500 py-2">{msg}</p>}
+                />
+              </div>
+
+              <div className="flex flex-row-reverse">
+                <Button
+                  label="Create role"
+                  isLoading={isSubmitting}
+                  disabled={!isValid || !dirty}
+                />
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
     </section>
   );
 }

@@ -846,6 +846,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash-es@npm:^4.17.11":
+  version: 4.17.11
+  resolution: "@types/lodash-es@npm:4.17.11"
+  dependencies:
+    "@types/lodash": "*"
+  checksum: bd8f3cd65fb1b2b54f18269a44847b159bbb8dd0a3ff33d26f06b68fca727d4cc079cf734e1d5dbf140563cc00e11f91c5a9d6c36ac1e66087875ae090b60b06
+  languageName: node
+  linkType: hard
+
+"@types/lodash@npm:*":
+  version: 4.14.201
+  resolution: "@types/lodash@npm:4.14.201"
+  checksum: 484be655298e9b2dc2d218ea934071b2ea31e4a531c561dd220dbda65237e8d08c20dc2d457ac24f29be7fe167415bf7bb9360ea0d80bdb8b0f0ec8d8db92fae
+  languageName: node
+  linkType: hard
+
 "@types/mime@npm:*":
   version: 3.0.4
   resolution: "@types/mime@npm:3.0.4"
@@ -5673,6 +5689,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "zigbolt@workspace:."
   dependencies:
+    "@types/lodash-es": ^4.17.11
     "@typescript-eslint/eslint-plugin": ^6.5.0
     "@typescript-eslint/experimental-utils": ^5.62.0
     "@typescript-eslint/parser": ^6.5.0

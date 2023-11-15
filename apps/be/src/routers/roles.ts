@@ -1,5 +1,7 @@
+import { z } from "zod";
+import { uniq } from "lodash-es";
 import { Prisma } from "@zigbolt/prisma";
-import { UserPermissions } from "@zigbolt/shared";
+import { UserPermissions, permissionSchema } from "@zigbolt/shared";
 import { orgProcedure, router } from "../trpc";
 import { paginationSchema } from "../utils/schemas";
 
@@ -29,5 +31,23 @@ export const rolesRouter = router({
       ]);
 
       return { roles, total };
+    }),
+  create: orgProcedure([UserPermissions["ROLE:WRITE"]])
+    .input(
+      z.object({
+        name: z.string().trim().min(1),
+        permissions: permissionSchema.transform((v) => uniq(v)),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const role = await ctx.prisma.role.create({
+        data: {
+          name: input.name,
+          permissions: input.permissions,
+          orgId: ctx.org.id,
+        },
+      });
+
+      return { role };
     }),
 });
