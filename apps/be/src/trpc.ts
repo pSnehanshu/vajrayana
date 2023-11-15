@@ -4,15 +4,7 @@ import superjson from "superjson";
 import { prisma } from "@zigbolt/prisma";
 import { type inferAsyncReturnType, initTRPC, TRPCError } from "@trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
-
-/**
- * List of available permissions
- */
-export enum Permissions {
-  read = "read",
-  write = "write",
-  delete = "delete",
-}
+import { AllPermissions, Permissions } from "./enums/permissions.enum";
 
 const permissionSchema = z.nativeEnum(Permissions).array();
 
@@ -118,7 +110,7 @@ const orgMiddleware = authMiddleware.unstable_pipe(async ({ ctx, next }) => {
 
   if (orgMembership.roleType === "owner") {
     // Set all permissions
-    availablePermissions = Object.values(Permissions);
+    availablePermissions = AllPermissions;
   } else {
     // Check what permissions are assigned to the role
     const parsedPerms = permissionSchema.safeParse(role?.permissions);
