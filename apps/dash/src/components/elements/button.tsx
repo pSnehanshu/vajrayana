@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import classNames from "classnames";
 
 type ButtonProps = {
@@ -6,6 +7,8 @@ type ButtonProps = {
   isLoading?: boolean;
   type?: HTMLButtonElement["type"];
   className?: string;
+  icon?: ReactNode;
+  onClick?: () => void;
 };
 
 export function Button({
@@ -14,6 +17,8 @@ export function Button({
   isLoading = false,
   type = "submit",
   className = "",
+  onClick,
+  icon,
 }: ButtonProps) {
   return (
     <button
@@ -23,6 +28,7 @@ export function Button({
         className,
         "disabled:opacity-70 disabled:cursor-not-allowed flex justify-center text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800",
       )}
+      onClick={onClick}
     >
       {isLoading ? (
         <svg
@@ -45,7 +51,9 @@ export function Button({
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           ></path>
         </svg>
-      ) : null}
+      ) : (
+        icon
+      )}
 
       <span>{label}</span>
     </button>
