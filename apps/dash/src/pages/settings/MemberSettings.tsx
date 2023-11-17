@@ -8,12 +8,14 @@ import { PiCaretLeft, PiCaretRight } from "react-icons/pi";
 import { HiUserPlus } from "react-icons/hi2";
 import { IoMdCheckmark } from "react-icons/io";
 import { PiCaretDownBold } from "react-icons/pi";
+import classNames from "classnames";
 import { trpc } from "../../utils/trpc";
 import { Button } from "../../components/elements/button";
 import { Modal } from "../../components/elements/modal";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import toast from "react-hot-toast";
 import { Listbox } from "@headlessui/react";
+import { useStore } from "../../store";
 
 export default function MemberSettingsPage() {
   const [pageNum, setPageNum] = useState(1);
@@ -27,6 +29,8 @@ export default function MemberSettingsPage() {
     take: itemsPerPage,
     search,
   });
+
+  const loggedInUser = useStore((s) => s.user);
 
   const itemsReceived = membersQuery.data?.members.length ?? 0;
   const startSN = itemsReceived > 0 ? (pageNum - 1) * itemsPerPage + 1 : 0;
@@ -120,7 +124,18 @@ export default function MemberSettingsPage() {
                       )}&rounded=true&bold=true`}
                       alt={member.User.name}
                     />
-                    {member.User.name}
+                    <span
+                      className={classNames({
+                        "italic mr-1": member.userId === loggedInUser?.id,
+                      })}
+                    >
+                      {member.User.name}
+                    </span>
+                    {member.userId === loggedInUser?.id ? (
+                      <span className="opacity-70">(you)</span>
+                    ) : (
+                      ""
+                    )}
                   </th>
                   <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     <a
