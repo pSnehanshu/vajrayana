@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { ZodError, z } from "zod";
 import cookie from "cookie";
 import superjson from "superjson";
 import { prisma } from "@zigbolt/prisma";
@@ -22,7 +22,25 @@ export type Context = inferAsyncReturnType<typeof createContext>;
 
 /* Initialize tRPC */
 
-const t = initTRPC.context<Context>().create({ transformer: superjson });
+const t = initTRPC.context<Context>().create({
+  transformer: superjson,
+  errorFormatter(opts) {
+    const { shape, error } = opts;
+
+    let customErrorMessage = shape.message;
+
+    if (error.code === "BAD_REQUEST" && error.cause instanceof ZodError) {
+      customErrorMessage = error.cause.errors
+        .map((e) => e.message)
+        .join("; \n");
+    }
+
+    return {
+      ...shape,
+      message: customErrorMessage,
+    };
+  },
+});
 
 /* Middlewares */
 
