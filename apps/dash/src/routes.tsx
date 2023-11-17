@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { TopBar } from "./components/layout/topbar";
 import { SideBar } from "./components/layout/sidebar";
 import SettingsPage from "./pages/settings";
+import { FullPageLoading } from "./components/full-page-loading";
 
 export function Routes() {
   const setUser = useStore((s) => s.setUser);
@@ -46,7 +47,9 @@ export function Routes() {
     }
   }, [lookupQuery.data, whoamiQuery.data, setOrg, setUser]);
 
-  if (lookupQuery.isLoading || whoamiQuery.isLoading) return <h1>Wait...</h1>;
+  if (lookupQuery.isLoading || whoamiQuery.isLoading)
+    return <FullPageLoading />;
+
   if (lookupQuery.isError) return <h1>Failed to lookup the org</h1>;
 
   if (!lookupQuery.data.isActive)
