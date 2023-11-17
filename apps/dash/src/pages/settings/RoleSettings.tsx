@@ -30,7 +30,7 @@ export default function RoleSettingsPage() {
     search,
   });
 
-  const itemsReceived = rolesQuery.data?.roles.length ?? 0;
+  const itemsReceived = rolesQuery.data?.roles.size ?? 0;
   const startSN = itemsReceived > 0 ? (pageNum - 1) * itemsPerPage + 1 : 0;
   const total = rolesQuery.data?.total ?? 0;
   const endSN = itemsReceived > 0 ? startSN + total - 1 : 0;
@@ -104,41 +104,46 @@ export default function RoleSettingsPage() {
               </tr>
             </thead>
             <tbody>
-              {rolesQuery.data?.roles.map((role) => {
-                const permParsed = permissionSchema.safeParse(role.permissions);
-                const permissions = permParsed.success ? permParsed.data : null;
-                const permissionNames = permissions?.map(
-                  (p) => [p, UserPermissions[p]] as const,
-                );
+              {rolesQuery.data?.roles &&
+                Array.from(rolesQuery.data?.roles).map(([, role]) => {
+                  const permParsed = permissionSchema.safeParse(
+                    role.permissions,
+                  );
+                  const permissions = permParsed.success
+                    ? permParsed.data
+                    : null;
+                  const permissionNames = permissions?.map(
+                    (p) => [p, UserPermissions[p]] as const,
+                  );
 
-                return (
-                  <tr
-                    key={role.id}
-                    className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <th
-                      scope="row"
-                      className="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  return (
+                    <tr
+                      key={role.id}
+                      className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
-                      {role.name}
-                    </th>
-                    <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {permissionNames?.map(([p, pname]) => (
-                        <span
-                          key={pname}
-                          title={PermissionDescriptions[p]}
-                          className="bg-blue-100 cursor-help text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400"
-                        >
-                          {pname}
-                        </span>
-                      )) ?? "N/A"}
-                    </td>
-                    <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {format(role.createdAt, "do LLL yyy, hh:mm aaa")}
-                    </td>
-                  </tr>
-                );
-              })}
+                      <th
+                        scope="row"
+                        className="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                      >
+                        {role.name}
+                      </th>
+                      <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        {permissionNames?.map(([p, pname]) => (
+                          <span
+                            key={pname}
+                            title={PermissionDescriptions[p]}
+                            className="bg-blue-100 cursor-help text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400"
+                          >
+                            {pname}
+                          </span>
+                        )) ?? "N/A"}
+                      </td>
+                      <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        {format(role.createdAt, "do LLL yyy, hh:mm aaa")}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
