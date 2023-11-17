@@ -71,7 +71,7 @@ export const membersRouter = router({
         },
       });
 
-      if (user.Memberships) {
+      if (user.Memberships.length > 0) {
         // Already a member, don't invite again
         return null;
       }
