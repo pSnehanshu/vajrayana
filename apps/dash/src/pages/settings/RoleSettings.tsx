@@ -17,6 +17,7 @@ import { Button } from "../../components/elements/button";
 import { Modal } from "../../components/elements/modal";
 import toast from "react-hot-toast";
 import { TRPCClientError } from "@trpc/client";
+import { usePermissions } from "../../store";
 
 export default function RoleSettingsPage() {
   const [pageNum, setPageNum] = useState(1);
@@ -39,6 +40,8 @@ export default function RoleSettingsPage() {
 
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const createRoleMutation = trpc.roles.create.useMutation();
+
+  const permissions = usePermissions();
 
   return (
     <section className="lg:ml-8">
@@ -80,13 +83,15 @@ export default function RoleSettingsPage() {
             )}
           </div>
 
-          <Button
-            label="Create role"
-            type="button"
-            className="mb-2 lg:mb-0 lg:ml-2"
-            icon={<HiUserPlus className="mr-2 text-lg" />}
-            onClick={() => setCreateModalVisible(true)}
-          />
+          {permissions.includes(UserPermissions["ROLE:WRITE"]) && (
+            <Button
+              label="Create role"
+              type="button"
+              className="mb-2 lg:mb-0 lg:ml-2"
+              icon={<HiUserPlus className="mr-2 text-lg" />}
+              onClick={() => setCreateModalVisible(true)}
+            />
+          )}
         </div>
 
         <div className="overflow-x-auto">

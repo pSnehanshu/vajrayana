@@ -41,7 +41,9 @@ const authMiddleware = t.middleware(async ({ ctx, next }) => {
     include: {
       User: {
         include: {
-          Memberships: true,
+          Memberships: {
+            include: { Role: true },
+          },
         },
       },
     },
@@ -80,18 +82,10 @@ const orgMiddleware = authMiddleware.unstable_pipe(async ({ ctx, next }) => {
     });
   }
 
-  const [org, role] = await Promise.all([
-    ctx.prisma.organization.findUnique({
-      where: { id: orgMembership.orgId },
-    }),
-    orgMembership.roleId
-      ? ctx.prisma.role.findUnique({
-          where: {
-            id: orgMembership.roleId,
-          },
-        })
-      : null,
-  ]);
+  const role = orgMembership.Role;
+  const org = await ctx.prisma.organization.findUnique({
+    where: { id: orgMembership.orgId },
+  });
 
   if (!org) {
     throw new TRPCError({

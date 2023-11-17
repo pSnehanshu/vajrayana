@@ -15,7 +15,8 @@ import { Modal } from "../../components/elements/modal";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import toast from "react-hot-toast";
 import { Listbox } from "@headlessui/react";
-import { useStore } from "../../store";
+import { usePermissions, useStore } from "../../store";
+import { UserPermissions } from "@zigbolt/shared";
 
 export default function MemberSettingsPage() {
   const [pageNum, setPageNum] = useState(1);
@@ -39,6 +40,8 @@ export default function MemberSettingsPage() {
   const pageCount = Math.ceil(itemsReceived / itemsPerPage);
 
   const [memberModalVisible, setMemberModalVisible] = useState(false);
+
+  const permissions = usePermissions();
 
   return (
     <section className="lg:ml-8">
@@ -80,13 +83,15 @@ export default function MemberSettingsPage() {
             )}
           </div>
 
-          <Button
-            label="Invite member"
-            type="button"
-            className="mb-2 lg:mb-0 lg:ml-2"
-            icon={<HiUserPlus className="mr-2 text-lg" />}
-            onClick={() => setMemberModalVisible(true)}
-          />
+          {permissions.includes(UserPermissions["MEMBER:ADD"]) && (
+            <Button
+              label="Invite member"
+              type="button"
+              className="mb-2 lg:mb-0 lg:ml-2"
+              icon={<HiUserPlus className="mr-2 text-lg" />}
+              onClick={() => setMemberModalVisible(true)}
+            />
+          )}
         </div>
 
         <div className="overflow-x-auto">
