@@ -199,16 +199,18 @@ export default function RoleSettingsPage() {
                       >
                         {role.name}
                       </th>
-                      <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                        {permissionNames?.map(([p, pname]) => (
-                          <span
-                            key={pname}
-                            title={PermissionDescriptions[p]}
-                            className="bg-blue-100 cursor-help text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400"
-                          >
-                            {pname}
-                          </span>
-                        )) ?? "N/A"}
+                      <td className="max-w-xl">
+                        <div className="flex flex-wrap px-4 py-2 w-full">
+                          {permissionNames?.map(([p, pname]) => (
+                            <div
+                              key={pname}
+                              title={PermissionDescriptions[p]}
+                              className="bg-blue-100 cursor-help my-2 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400"
+                            >
+                              {pname}
+                            </div>
+                          )) ?? "N/A"}
+                        </div>
                       </td>
                       <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         {format(role.createdAt, "do LLL yyy, hh:mm aaa")}
