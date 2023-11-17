@@ -5,6 +5,8 @@ import { UserPermissions, permissionSchema } from "@zigbolt/shared";
 import { orgProcedure, router } from "../trpc";
 import { paginationSchema } from "../utils/schemas";
 
+type ArrayElement<T> = T extends (infer U)[] ? U : never;
+
 export const rolesRouter = router({
   list: orgProcedure([UserPermissions["ROLE:READ"]])
     .input(paginationSchema)
@@ -30,7 +32,10 @@ export const rolesRouter = router({
         ctx.prisma.role.count({ where }),
       ]);
 
-      return { roles, total };
+      const RoleMap = new Map<string, ArrayElement<typeof roles>>();
+      roles.forEach((role) => RoleMap.set(role.id, role));
+
+      return { roles: RoleMap, total };
     }),
   create: orgProcedure([UserPermissions["ROLE:WRITE"]])
     .input(
