@@ -1,12 +1,13 @@
-import { ReactNode, useRef } from "react";
-import { useOnClickOutside } from "usehooks-ts";
 import { MdClose } from "react-icons/md";
+import { useOnClickOutside } from "usehooks-ts";
+import { Transition } from "@headlessui/react";
+import { Fragment, ReactNode, useRef } from "react";
 
 type ModalProps = {
   visible?: boolean;
   children?: ReactNode;
   title?: string;
-  onCloseAttempt?: () => void;
+  onCloseAttempt: () => void;
   closeOnBackdropClick?: boolean;
 };
 
@@ -18,6 +19,7 @@ export function Modal({
   onCloseAttempt,
 }: ModalProps) {
   const ref = useRef(null);
+
   useOnClickOutside(ref, () => {
     if (closeOnBackdropClick) {
       onCloseAttempt?.();
@@ -26,41 +28,54 @@ export function Modal({
 
   // TODO Close on escape
 
-  if (!visible) return null;
+  // if (!visible) return null;
 
   return (
-    <div
-      tabIndex={-1}
-      aria-hidden={!visible}
-      className="overflow-y-auto overflow-x-hidden fixed flex top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-screen backdrop-blur-sm"
+    <Transition
+      appear
+      show={visible}
+      as={Fragment}
+      enter="transition-transform duration-150 ease-in-out"
+      enterFrom="-translate-y-full"
+      enterTo="translate-y-0"
+      leave="transition-all duration-150 ease-in-out"
+      leaveFrom="translate-y-0"
+      leaveTo="translate-y-full"
     >
       <div
-        ref={ref}
-        className="relative w-full max-w-md shadow-xl max-h-[calc(80vh)]"
+        tabIndex={-1}
+        aria-hidden={!visible}
+        className="overflow-y-auto overflow-x-hidden fixed flex top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-screen backdrop-blur-sm"
       >
-        {/* Modal content */}
-        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-          {/* Modal header */}
-          <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {title}
-            </h3>
-            {onCloseAttempt && (
-              <button
-                type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={onCloseAttempt}
-                title="Close"
-              >
-                <MdClose className="text-2xl" />
-                <span className="sr-only">Close modal</span>
-              </button>
-            )}
+        <div
+          ref={ref}
+          className="relative w-full max-w-md shadow-xl max-h-[calc(80vh)]"
+        >
+          {/* Modal content */}
+          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            {/* Modal header */}
+            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {title}
+              </h1>
+
+              {onCloseAttempt && (
+                <button
+                  type="button"
+                  className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                  onClick={onCloseAttempt}
+                  title="Close"
+                >
+                  <MdClose className="text-2xl" />
+                  <span className="sr-only">Close modal</span>
+                </button>
+              )}
+            </div>
+            {/* Modal body */}
+            {children}
           </div>
-          {/* Modal body */}
-          {children}
         </div>
       </div>
-    </div>
+    </Transition>
   );
 }

@@ -302,17 +302,24 @@ function InviteMember({ onOK }: InviteMemberProps) {
                 Role
               </label>
 
-              <Field
-                as="select"
-                name="role"
-                id="role"
-                className="w-full dark:text-gray-900 text-sm rounded-sm p-1"
-              >
-                <option value="">Select role</option>
-                {rolesQuery.data?.roles.map((role) => (
-                  <option value={role.id}>{role.name}</option>
-                ))}
-              </Field>
+              {rolesQuery.data ? (
+                <Field
+                  as="select"
+                  name="role"
+                  id="role"
+                  className="w-full dark:text-gray-900 text-sm rounded-sm p-1"
+                >
+                  <option value="">Select role</option>
+
+                  {rolesQuery.data.roles.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </Field>
+              ) : (
+                <p role="loading">Fetching roles...</p>
+              )}
 
               <ErrorMessage
                 name="role"
