@@ -1,7 +1,7 @@
 import { useState } from "react";
 import superjson from "superjson";
 import { Toaster } from "react-hot-toast";
-import { httpBatchLink } from "@trpc/client";
+import { httpBatchLink, loggerLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useStore } from "./store";
 import { trpc } from "./utils/trpc";
@@ -22,6 +22,9 @@ export default function App() {
     trpc.createClient({
       transformer: superjson,
       links: [
+        loggerLink({
+          enabled: () => process.env.NODE_ENV !== "production",
+        }),
         httpBatchLink({
           url: "/api/trpc",
           headers() {
