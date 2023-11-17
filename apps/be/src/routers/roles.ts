@@ -84,4 +84,27 @@ export const rolesRouter = router({
 
       return { role: updatedRole };
     }),
+  delete: orgProcedure([UserPermissions["ROLE:DELETE"]])
+    .input(z.object({ roleId: z.string().uuid() }))
+    .mutation(async ({ input, ctx }) => {
+      const role = await ctx.prisma.role.findUnique({
+        where: { id: input.roleId },
+      });
+
+      if (!role) {
+        // Assume it was already deleted
+        return null;
+      }
+
+      if (role.orgId !== ctx.org.id) {
+        // Cannot delete another org's role
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      await ctx.prisma.role.delete({
+        where: { id: input.roleId },
+      });
+
+      return null;
+    }),
 });

@@ -14,6 +14,7 @@ import { PiCaretLeft, PiCaretRight } from "react-icons/pi";
 import { LuPen } from "react-icons/lu";
 import { HiUserPlus } from "react-icons/hi2";
 import { HiOutlineDotsVertical } from "react-icons/hi";
+import { MdDelete } from "react-icons/md";
 import { RouterOutputs, trpc } from "../../utils/trpc";
 import { Button } from "../../components/elements/button";
 import { Modal } from "../../components/elements/modal";
@@ -51,6 +52,8 @@ const RoleFormSchema = z.object({
 type RoleFormValues = z.infer<typeof RoleFormSchema>;
 
 export default function RoleSettingsPage() {
+  const permissions = usePermissions();
+
   const [pageNum, setPageNum] = useState(1);
   const [itemsPerPage] = useState(20);
 
@@ -62,6 +65,9 @@ export default function RoleSettingsPage() {
     take: itemsPerPage,
     search,
   });
+  const createRoleMutation = trpc.roles.create.useMutation();
+  const updateRoleMutation = trpc.roles.update.useMutation();
+  const deleteRoleMutation = trpc.roles.delete.useMutation();
 
   const itemsReceived = rolesQuery.data?.roles.size ?? 0;
   const startSN = itemsReceived > 0 ? (pageNum - 1) * itemsPerPage + 1 : 0;
@@ -81,11 +87,6 @@ export default function RoleSettingsPage() {
       }
     : undefined;
 
-  const createRoleMutation = trpc.roles.create.useMutation();
-  const updateRoleMutation = trpc.roles.update.useMutation();
-
-  const permissions = usePermissions();
-
   const roleActions = useMemo<MenuItem[]>(() => {
     const actions: MenuItem[] = [];
 
@@ -100,8 +101,32 @@ export default function RoleSettingsPage() {
       });
     }
 
+    if (permissions.includes(UserPermissions["ROLE:DELETE"])) {
+      actions.push({
+        title: "Delete",
+        icon: <MdDelete className="mr-2 h-5 w-5" aria-hidden="true" />,
+        onClick(role) {
+          if (
+            confirm(
+              `Are you sure you want to delete the ${role.name} role?
+Deleting this role will render any members currently assigned to it role-less.
+Consequently, they will lose access to the dashboard unless assigned another role.`,
+            )
+          ) {
+            toast
+              .promise(deleteRoleMutation.mutateAsync({ roleId: role.id }), {
+                loading: "Deleting the role...",
+                success: "Role deleted successfully",
+                error: "Failed to delete role!",
+              })
+              .then(() => rolesQuery.refetch());
+          }
+        },
+      });
+    }
+
     return actions;
-  }, [permissions]);
+  }, [deleteRoleMutation, permissions, rolesQuery]);
 
   return (
     <section className="lg:ml-8">
