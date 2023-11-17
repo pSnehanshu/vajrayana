@@ -2,6 +2,7 @@ import { useState } from "react";
 import * as Yup from "yup";
 import { useDebounce } from "usehooks-ts";
 import { format } from "date-fns";
+import { TRPCClientError } from "@trpc/client";
 import ReactPaginate from "react-paginate";
 import { PiCaretLeft, PiCaretRight } from "react-icons/pi";
 import { HiUserPlus } from "react-icons/hi2";
@@ -229,8 +230,12 @@ function InviteMember({ onOK }: InviteMemberProps) {
           toast.success("Invitation sent!");
           onOK();
         } catch (error) {
-          console.error(error);
-          toast.error("Failed to invite");
+          if (error instanceof TRPCClientError) {
+            toast.error(error.message);
+          } else {
+            toast.error("Something went wrong :(");
+            console.error(error);
+          }
         } finally {
           setSubmitting(false);
         }

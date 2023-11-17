@@ -16,6 +16,7 @@ import { trpc } from "../../utils/trpc";
 import { Button } from "../../components/elements/button";
 import { Modal } from "../../components/elements/modal";
 import toast from "react-hot-toast";
+import { TRPCClientError } from "@trpc/client";
 
 export default function RoleSettingsPage() {
   const [pageNum, setPageNum] = useState(1);
@@ -206,8 +207,12 @@ export default function RoleSettingsPage() {
               setCreateModalVisible(false);
               toast.success(`Role ${values.name} created!`);
             } catch (error) {
-              console.error(error);
-              toast.error("Failed to create role!");
+              if (error instanceof TRPCClientError) {
+                toast.error(error.message);
+              } else {
+                console.error(error);
+                toast.error("Failed to create role!");
+              }
             } finally {
               setSubmitting(false);
             }
