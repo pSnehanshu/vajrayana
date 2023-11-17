@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { create } from "zustand";
 import { RouterOutputs } from "./utils/trpc";
 import {
@@ -32,18 +33,23 @@ export const useStore = create<AppStore>((set) => ({
 }));
 
 /** Get all the permissions this user has on this org */
-export const usePermissions = (): UserPermissions[] => {
-  return useStore((s) => {
-    const membership = s.user?.Memberships.find((m) => m.orgId === s.org?.id);
-    if (!membership) return [];
+export function usePermissions(): UserPermissions[] {
+  const membership = useStore(
+    (s) => s.user?.Memberships.find((m) => m.orgId === s.org?.id),
+  );
 
-    if (membership.roleType === "owner") {
+  const permissions = useMemo<UserPermissions[]>(() => {
+    if (membership?.roleType === "owner") {
       // Owners have all the permissions
       return AllPermissions;
     }
 
-    const perms = permissionSchema.safeParse(membership.Role?.permissions);
+    // Parse and return
+    const perms = permissionSchema.safeParse(membership?.Role?.permissions);
 
+    // Check if success or failure
     return perms.success ? perms.data : [];
-  });
-};
+  }, [membership?.Role?.permissions, membership?.roleType]);
+
+  return permissions;
+}

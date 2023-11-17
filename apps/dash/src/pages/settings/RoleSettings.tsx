@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, ReactNode, useMemo, useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import { format } from "date-fns";
 import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
@@ -11,9 +11,10 @@ import {
   permissionSchema,
 } from "@zigbolt/shared";
 import { PiCaretLeft, PiCaretRight } from "react-icons/pi";
+import { LuPen } from "react-icons/lu";
 import { HiUserPlus } from "react-icons/hi2";
-import * as Yup from "yup";
-import { trpc } from "../../utils/trpc";
+import { HiOutlineDotsVertical } from "react-icons/hi";
+import { RouterOutputs, trpc } from "../../utils/trpc";
 import { Button } from "../../components/elements/button";
 import { Modal } from "../../components/elements/modal";
 import toast from "react-hot-toast";
@@ -21,6 +22,33 @@ import { TRPCClientError } from "@trpc/client";
 import { usePermissions } from "../../store";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { z } from "zod";
+import { Menu, Transition } from "@headlessui/react";
+
+type RoleType = RouterOutputs["roles"]["list"]["roles"] extends Map<
+  string,
+  infer I
+>
+  ? I
+  : never;
+
+type MenuItem = {
+  title: string;
+  icon: ReactNode;
+  onClick?: (role: RoleType) => void;
+};
+
+const RoleFormSchema = z.object({
+  name: z.string(),
+  permissions: z
+    .string()
+    .refine(
+      (val) => AllPermissionNames.includes(val),
+      (val) => ({ message: `${val} is not a valid permission` }),
+    )
+    .array(),
+});
+
+type RoleFormValues = z.infer<typeof RoleFormSchema>;
 
 export default function RoleSettingsPage() {
   const [pageNum, setPageNum] = useState(1);
@@ -41,10 +69,39 @@ export default function RoleSettingsPage() {
   const endSN = itemsReceived > 0 ? startSN + total - 1 : 0;
   const pageCount = Math.ceil(itemsReceived / itemsPerPage);
 
-  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [isRoleFormVisible, setRoleFormVisible] = useState(false);
+
+  const [role2edit, setRole2edit] = useState<RoleType>();
+  const formInitialValues: RoleFormValues | undefined = role2edit
+    ? {
+        name: role2edit.name,
+        permissions: permissionSchema
+          .parse(role2edit.permissions)
+          .map((perm) => UserPermissions[perm]),
+      }
+    : undefined;
+
   const createRoleMutation = trpc.roles.create.useMutation();
+  const updateRoleMutation = trpc.roles.update.useMutation();
 
   const permissions = usePermissions();
+
+  const roleActions = useMemo<MenuItem[]>(() => {
+    const actions: MenuItem[] = [];
+
+    if (permissions.includes(UserPermissions["ROLE:WRITE"])) {
+      actions.push({
+        title: "Edit",
+        icon: <LuPen className="mr-2 h-5 w-5" aria-hidden="true" />,
+        onClick(role) {
+          setRole2edit(role);
+          setRoleFormVisible(true);
+        },
+      });
+    }
+
+    return actions;
+  }, [permissions]);
 
   return (
     <section className="lg:ml-8">
@@ -92,7 +149,10 @@ export default function RoleSettingsPage() {
               type="button"
               className="mb-2 lg:mb-0 lg:ml-2"
               icon={<HiUserPlus className="mr-2 text-lg" />}
-              onClick={() => setCreateModalVisible(true)}
+              onClick={() => {
+                setRole2edit(undefined);
+                setRoleFormVisible(true);
+              }}
             />
           )}
         </div>
@@ -109,6 +169,9 @@ export default function RoleSettingsPage() {
                 </th>
                 <th scope="col" className="px-4 py-3">
                   Created at
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  <span className="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
@@ -150,6 +213,55 @@ export default function RoleSettingsPage() {
                       <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         {format(role.createdAt, "do LLL yyy, hh:mm aaa")}
                       </td>
+                      <td>
+                        {roleActions.length > 0 && (
+                          <Menu
+                            as="div"
+                            className="relative inline-block text-left"
+                          >
+                            <div>
+                              <Menu.Button className="text-violet-200 hover:text-violet-100 p-2 my-1 border border-transparent hover:border-gray-400 hover:bg-gray-500 rounded-full">
+                                <HiOutlineDotsVertical
+                                  aria-hidden="true"
+                                  className="text-2xl h-5 w-5 "
+                                />
+                              </Menu.Button>
+                            </div>
+
+                            <Transition
+                              as={Fragment}
+                              enter="transition ease-out duration-100"
+                              enterFrom="transform opacity-0 scale-95"
+                              enterTo="transform opacity-100 scale-100"
+                              leave="transition ease-in duration-75"
+                              leaveFrom="transform opacity-100 scale-100"
+                              leaveTo="transform opacity-0 scale-95"
+                            >
+                              <Menu.Items className="z-10 absolute right-0 mt-0 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                                <div className="p-1">
+                                  {roleActions.map((act) => (
+                                    <Menu.Item key={act.title}>
+                                      {({ active }) => (
+                                        <button
+                                          className={`${
+                                            active
+                                              ? "bg-violet-500 text-white"
+                                              : "text-gray-900"
+                                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                          onClick={() => act.onClick?.(role)}
+                                        >
+                                          {act.icon}
+                                          {act.title}
+                                        </button>
+                                      )}
+                                    </Menu.Item>
+                                  ))}
+                                </div>
+                              </Menu.Items>
+                            </Transition>
+                          </Menu>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
@@ -190,40 +302,46 @@ export default function RoleSettingsPage() {
       </div>
 
       <Modal
-        visible={createModalVisible}
-        title="Create new role"
-        onCloseAttempt={() => setCreateModalVisible(false)}
+        visible={isRoleFormVisible}
+        title={formInitialValues ? "Update role" : "Create new role"}
+        onCloseAttempt={() => {
+          setRole2edit(undefined);
+          setRoleFormVisible(false);
+        }}
       >
         <RoleForm
           onSubmit={async (values) => {
-            await createRoleMutation.mutateAsync({
-              name: values.name,
-              permissions: values.permissions.map(
-                (p) => UserPermissions[p as keyof typeof UserPermissions],
-              ),
-            });
+            if (role2edit) {
+              // Edit
+              await updateRoleMutation.mutateAsync({
+                roleId: role2edit.id,
+                name: values.name,
+                permissions: values.permissions.map(
+                  (pn) => UserPermissions[pn as keyof typeof UserPermissions],
+                ),
+              });
+            } else {
+              // Create new
+              await createRoleMutation.mutateAsync({
+                name: values.name,
+                permissions: values.permissions.map(
+                  (p) => UserPermissions[p as keyof typeof UserPermissions],
+                ),
+              });
+            }
+
             rolesQuery.refetch();
-            setCreateModalVisible(false);
+            setRoleFormVisible(false);
+            setRole2edit(undefined);
+
             toast.success(`Role ${values.name} created!`);
           }}
+          initialValues={formInitialValues}
         />
       </Modal>
     </section>
   );
 }
-
-const RoleFormSchema = z.object({
-  name: z.string(),
-  permissions: z
-    .string()
-    .refine(
-      (val) => AllPermissionNames.includes(val),
-      (val) => ({ message: `${val} is not a valid permission` }),
-    )
-    .array(),
-});
-
-type RoleFormValues = z.infer<typeof RoleFormSchema>;
 
 type RoleFormProps = {
   onSubmit: (values: RoleFormValues) => Promise<void>;

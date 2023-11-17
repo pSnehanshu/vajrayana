@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { uniq } from "lodash-es";
-import { Prisma } from "@zigbolt/prisma";
+import { Prisma, prisma } from "@zigbolt/prisma";
 import { UserPermissions, permissionSchema } from "@zigbolt/shared";
 import { orgProcedure, router } from "../trpc";
 import { paginationSchema } from "../utils/schemas";
+import { TRPCError } from "@trpc/server";
 
 type ArrayElement<T> = T extends (infer U)[] ? U : never;
 
@@ -54,5 +55,33 @@ export const rolesRouter = router({
       });
 
       return { role };
+    }),
+  update: orgProcedure([UserPermissions["ROLE:WRITE"]])
+    .input(
+      z.object({
+        roleId: z.string().uuid(),
+        name: z.string().trim().min(1).optional(),
+        permissions: permissionSchema.transform((v) => uniq(v)).optional(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const role = await ctx.prisma.role.findUnique({
+        where: { id: input.roleId },
+      });
+
+      if (!role || role.orgId !== ctx.org.id) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      // Update
+      const updatedRole = await ctx.prisma.role.update({
+        where: { id: role.id },
+        data: {
+          name: input.name,
+          permissions: input.permissions,
+        },
+      });
+
+      return { role: updatedRole };
     }),
 });
