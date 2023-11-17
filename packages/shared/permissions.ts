@@ -24,6 +24,16 @@ Object.entries(UserPermissions).forEach(([_name, val]) => {
   }
 });
 
+/** Array of all permission names */
+export const AllPermissionNames: string[] = [];
+
+Object.values(UserPermissions).forEach((ev) => {
+  if (typeof ev === "string") {
+    AllPermissionNames.push(ev);
+  }
+});
+
+/** Schema to validate array of permssions */
 export const permissionSchema = z.nativeEnum(UserPermissions).array();
 
 export const PermissionDescriptions: Record<UserPermissions, string> = {

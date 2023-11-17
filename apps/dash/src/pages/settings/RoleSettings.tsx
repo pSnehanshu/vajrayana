@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import { format } from "date-fns";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import ReactPaginate from "react-paginate";
 import {
+  AllPermissionNames,
   AllPermissions,
   PermissionDescriptions,
   UserPermissions,
@@ -18,6 +19,8 @@ import { Modal } from "../../components/elements/modal";
 import toast from "react-hot-toast";
 import { TRPCClientError } from "@trpc/client";
 import { usePermissions } from "../../store";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import { z } from "zod";
 
 export default function RoleSettingsPage() {
   const [pageNum, setPageNum] = useState(1);
@@ -191,110 +194,143 @@ export default function RoleSettingsPage() {
         title="Create new role"
         onCloseAttempt={() => setCreateModalVisible(false)}
       >
-        <Formik
-          className="p-4 md:p-5"
-          initialValues={{
-            name: "",
-            permissions: [] as UserPermissions[],
+        <RoleForm
+          onSubmit={async (values) => {
+            await createRoleMutation.mutateAsync({
+              name: values.name,
+              permissions: values.permissions.map(
+                (p) => UserPermissions[p as keyof typeof UserPermissions],
+              ),
+            });
+            rolesQuery.refetch();
+            setCreateModalVisible(false);
+            toast.success(`Role ${values.name} created!`);
           }}
-          validationSchema={Yup.object().shape({
-            name: Yup.string().trim().min(1).required(),
-            permissions: Yup.array().of(Yup.number().oneOf(AllPermissions)),
-          })}
-          onSubmit={async (values, { setSubmitting }) => {
-            try {
-              await createRoleMutation.mutateAsync({
-                name: values.name,
-                permissions: values.permissions.map((p) => Number(p)),
-              });
-
-              rolesQuery.refetch();
-              setCreateModalVisible(false);
-              toast.success(`Role ${values.name} created!`);
-            } catch (error) {
-              if (error instanceof TRPCClientError) {
-                toast.error(error.message);
-              } else {
-                console.error(error);
-                toast.error("Failed to create role!");
-              }
-            } finally {
-              setSubmitting(false);
-            }
-          }}
-        >
-          {({ isSubmitting, dirty, isValid }) => (
-            <Form className="p-4">
-              <div className="mb-4">
-                <label
-                  htmlFor="name"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Name
-                </label>
-
-                <Field
-                  type="text"
-                  name="name"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="e.g. Editor, Viewer, Sales etc."
-                />
-
-                <ErrorMessage
-                  name="name"
-                  render={(msg) => <p className="text-red-500 py-2">{msg}</p>}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Permissions
-                </label>
-
-                <ul>
-                  {AllPermissions.map((perm) => (
-                    <li className="flex my-4" key={perm}>
-                      <div className="flex items-center h-5">
-                        <Field
-                          id={`perm-${perm}`}
-                          name="permissions"
-                          type="checkbox"
-                          value={perm.toString()}
-                          className="rounded-md w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                        />
-                      </div>
-                      <div className="ms-2 text-sm">
-                        <label
-                          htmlFor={`perm-${perm}`}
-                          className="font-medium text-gray-900 dark:text-gray-300"
-                        >
-                          {UserPermissions[perm]}
-                        </label>
-                        <p className="text-xs font-normal text-gray-500 dark:text-gray-300">
-                          {PermissionDescriptions[perm]}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-
-                <ErrorMessage
-                  name="permissions"
-                  render={(msg) => <p className="text-red-500 py-2">{msg}</p>}
-                />
-              </div>
-
-              <div className="flex flex-row-reverse">
-                <Button
-                  label="Create role"
-                  isLoading={isSubmitting}
-                  disabled={!isValid || !dirty}
-                />
-              </div>
-            </Form>
-          )}
-        </Formik>
+        />
       </Modal>
     </section>
+  );
+}
+
+const RoleFormSchema = z.object({
+  name: z.string(),
+  permissions: z
+    .string()
+    .refine(
+      (val) => AllPermissionNames.includes(val),
+      (val) => ({ message: `${val} is not a valid permission` }),
+    )
+    .array(),
+});
+
+type RoleFormValues = z.infer<typeof RoleFormSchema>;
+
+type RoleFormProps = {
+  onSubmit: (values: RoleFormValues) => Promise<void>;
+  initialValues?: RoleFormValues;
+};
+
+function RoleForm({ onSubmit, initialValues }: RoleFormProps) {
+  return (
+    <Formik
+      className="p-4 md:p-5"
+      initialValues={
+        initialValues ?? {
+          name: "",
+          permissions: [],
+        }
+      }
+      validationSchema={toFormikValidationSchema(RoleFormSchema)}
+      onSubmit={async (values, { setSubmitting }) => {
+        try {
+          await onSubmit(values);
+        } catch (error) {
+          if (error instanceof TRPCClientError) {
+            toast.error(error.message);
+          } else {
+            console.error(error);
+            toast.error("Something went wrong!");
+          }
+        } finally {
+          setSubmitting(false);
+        }
+      }}
+    >
+      {(opts) => (
+        <Form className="p-4">
+          <div className="mb-4">
+            <label
+              htmlFor="name"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Name
+            </label>
+
+            <Field
+              id="name"
+              type="text"
+              name="name"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="e.g. Editor, Viewer, Sales etc."
+            />
+
+            <ErrorMessage
+              name="name"
+              render={(msg) => <p className="text-red-500 py-2">{msg}</p>}
+            />
+          </div>
+
+          <div className="mb-4">
+            <p className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Permissions
+            </p>
+
+            <ul>
+              {AllPermissions.map((perm) => {
+                const permName = UserPermissions[perm];
+
+                return (
+                  <li className="flex my-4" key={perm}>
+                    <div className="flex items-center h-5">
+                      <Field
+                        id={`perm-${perm}`}
+                        name="permissions"
+                        type="checkbox"
+                        value={permName}
+                        className="rounded-md w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                    </div>
+                    <div className="ms-2 text-sm">
+                      <label
+                        htmlFor={`perm-${perm}`}
+                        className="font-medium text-gray-900 dark:text-gray-300"
+                      >
+                        {permName}
+                      </label>
+                      <p className="text-xs font-normal text-gray-500 dark:text-gray-300">
+                        {PermissionDescriptions[perm]}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <ErrorMessage
+              name="permissions"
+              render={(msg) => <p className="text-red-500 py-2">{msg}</p>}
+            />
+          </div>
+
+          <div className="flex flex-row-reverse">
+            <Button
+              label="Submit"
+              isLoading={opts.isSubmitting}
+              disabled={!opts.isValid || !opts.dirty}
+            />
+          </div>
+        </Form>
+      )}
+    </Formik>
   );
 }
