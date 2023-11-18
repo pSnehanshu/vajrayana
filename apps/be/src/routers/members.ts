@@ -107,4 +107,94 @@ export const membersRouter = router({
 
       return { membership };
     }),
+  changeRole: permissionProcedure([UserPermissions["MEMBER:CHANGE-ROLE"]])
+    .input(
+      z.object({
+        userId: z.string().uuid(),
+        newRole: z.union([
+          z.literal("owner"),
+          z.object({ id: z.string().uuid() }),
+        ]),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const member = await ctx.prisma.membership.findUnique({
+        where: {
+          userId_orgId: {
+            orgId: ctx.org.id,
+            userId: input.userId,
+          },
+        },
+      });
+
+      if (!member) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      if (input.newRole === "owner") {
+        if (ctx.membership.roleType !== "owner") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Must be an owner to invite another owner",
+          });
+        }
+      } else {
+        const role = await ctx.prisma.role.findUnique({
+          where: { id: input.newRole.id },
+        });
+
+        if (role?.orgId !== ctx.org.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Invalid role" });
+        }
+      }
+
+      await ctx.prisma.membership.update({
+        where: {
+          userId_orgId: {
+            orgId: ctx.org.id,
+            userId: member.userId,
+          },
+        },
+        data: {
+          roleType: input.newRole === "owner" ? "owner" : "custom",
+          roleId: input.newRole === "owner" ? null : input.newRole.id,
+        },
+      });
+    }),
+  remove: permissionProcedure([UserPermissions["MEMBER:REMOVE"]])
+    .input(z.object({ userId: z.string().uuid() }))
+    .mutation(async ({ input, ctx }) => {
+      const member = await ctx.prisma.membership.findUnique({
+        where: {
+          userId_orgId: {
+            orgId: ctx.org.id,
+            userId: input.userId,
+          },
+        },
+      });
+
+      if (!member) {
+        // Assume already removed
+        return null;
+      }
+
+      if (member.roleType === "owner") {
+        if (ctx.membership.roleType !== "owner") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Must be an owner to remove another owner",
+          });
+        }
+      }
+
+      // Remove!
+      await ctx.prisma.membership.delete({
+        where: {
+          userId_orgId: {
+            orgId: ctx.org.id,
+            userId: member.userId,
+          },
+        },
+      });
+    }),
 });

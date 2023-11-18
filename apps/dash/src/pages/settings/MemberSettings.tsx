@@ -1,18 +1,37 @@
-import { useState } from "react";
+import { Fragment, ReactNode, useMemo, useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import { format } from "date-fns";
+import toast from "react-hot-toast";
 import ReactPaginate from "react-paginate";
 import { PiCaretLeft, PiCaretRight } from "react-icons/pi";
 import { HiUserPlus } from "react-icons/hi2";
+import { FaUserLargeSlash } from "react-icons/fa6";
 import classNames from "classnames";
 import { UserPermissions } from "@zigbolt/shared";
-import { trpc } from "../../utils/trpc";
+import { RouterOutputs, trpc } from "../../utils/trpc";
 import { Button } from "../../components/elements/button";
 import { Modal } from "../../components/elements/modal";
 import { usePermissions, useStore } from "../../store";
-import { MemberForm } from "../../components/MemberForm";
+import { MemberForm, MemberFormValues } from "../../components/MemberForm";
+import { Menu, Transition } from "@headlessui/react";
+import { HiOutlineDotsVertical } from "react-icons/hi";
+import { FaUserTag } from "react-icons/fa6";
+
+type MemberType = RouterOutputs["members"]["list"]["members"] extends Array<
+  infer T
+>
+  ? T
+  : never;
+
+type MenuItem = {
+  title: string;
+  icon: ReactNode;
+  onClick?: (role: MemberType) => void;
+};
 
 export default function MemberSettingsPage() {
+  const permissions = usePermissions();
+
   const [pageNum, setPageNum] = useState(1);
   const [itemsPerPage] = useState(20);
 
@@ -24,6 +43,9 @@ export default function MemberSettingsPage() {
     take: itemsPerPage,
     search,
   });
+  const inviteMutation = trpc.members.invite.useMutation();
+  const memberChangeRoleMutation = trpc.members.changeRole.useMutation();
+  const memberRemoveMutation = trpc.members.remove.useMutation();
 
   const loggedInUser = useStore((s) => s.user);
 
@@ -33,9 +55,65 @@ export default function MemberSettingsPage() {
   const endSN = itemsReceived > 0 ? startSN + total - 1 : 0;
   const pageCount = Math.ceil(itemsReceived / itemsPerPage);
 
-  const [memberModalVisible, setMemberModalVisible] = useState(false);
+  const [isMemberFormVisible, setMemberFormVisible] = useState(false);
+  const [member2edit, setMember2edit] = useState<MemberType>();
 
-  const permissions = usePermissions();
+  const formInitialValues = useMemo<MemberFormValues | undefined>(
+    () =>
+      member2edit
+        ? member2edit.roleType === "owner"
+          ? {
+              email: member2edit.User.email,
+              name: member2edit.User.name,
+              isOwner: true,
+            }
+          : {
+              email: member2edit.User.email,
+              name: member2edit.User.name,
+              isOwner: false,
+              role: member2edit.roleId ?? "",
+            }
+        : undefined,
+    [member2edit],
+  );
+
+  const actions = useMemo(() => {
+    const actions: MenuItem[] = [];
+
+    if (permissions.includes(UserPermissions["MEMBER:CHANGE-ROLE"])) {
+      actions.push({
+        title: "Change role",
+        onClick(member) {
+          setMember2edit(member);
+          setMemberFormVisible(true);
+        },
+        icon: <FaUserTag className="mr-2 h-5 w-5" aria-hidden="true" />,
+      });
+    }
+
+    if (permissions.includes(UserPermissions["MEMBER:REMOVE"])) {
+      actions.push({
+        title: "Remove",
+        icon: <FaUserLargeSlash className="mr-2 h-5 w-5" aria-hidden="true" />,
+        onClick(member) {
+          if (confirm(`Remove ${member.User.name} from this organization?`)) {
+            toast
+              .promise(
+                memberRemoveMutation.mutateAsync({ userId: member.userId }),
+                {
+                  loading: `Removing ${member.User.name}...`,
+                  success: `${member.User.name} has been removed successfully`,
+                  error: "Failed to remove member!",
+                },
+              )
+              .then(() => membersQuery.refetch());
+          }
+        },
+      });
+    }
+
+    return actions;
+  }, [memberRemoveMutation, membersQuery, permissions]);
 
   return (
     <section className="lg:ml-8">
@@ -83,7 +161,10 @@ export default function MemberSettingsPage() {
               type="button"
               className="mb-2 lg:mb-0 lg:ml-2"
               icon={<HiUserPlus className="mr-2 text-lg" />}
-              onClick={() => setMemberModalVisible(true)}
+              onClick={() => {
+                setMember2edit(undefined);
+                setMemberFormVisible(true);
+              }}
             />
           )}
         </div>
@@ -103,6 +184,9 @@ export default function MemberSettingsPage() {
                 </th>
                 <th scope="col" className="px-4 py-3">
                   Member since
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  <span className="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
@@ -152,6 +236,55 @@ export default function MemberSettingsPage() {
                   <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     {format(member.createdAt, "do LLL yyy, hh:mm aaa")}
                   </td>
+                  <td>
+                    {actions.length > 0 && (
+                      <Menu
+                        as="div"
+                        className="relative inline-block text-left"
+                      >
+                        <div>
+                          <Menu.Button className="text-violet-200 hover:text-violet-100 p-2 my-1 border border-transparent hover:border-gray-400 hover:bg-gray-500 rounded-full">
+                            <HiOutlineDotsVertical
+                              aria-hidden="true"
+                              className="text-2xl h-5 w-5 "
+                            />
+                          </Menu.Button>
+                        </div>
+
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-100"
+                          enterFrom="transform opacity-0 scale-95"
+                          enterTo="transform opacity-100 scale-100"
+                          leave="transition ease-in duration-75"
+                          leaveFrom="transform opacity-100 scale-100"
+                          leaveTo="transform opacity-0 scale-95"
+                        >
+                          <Menu.Items className="z-10 absolute right-0 mt-0 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                            <div className="p-1">
+                              {actions.map((act) => (
+                                <Menu.Item key={act.title}>
+                                  {({ active }) => (
+                                    <button
+                                      className={`${
+                                        active
+                                          ? "bg-violet-500 text-white"
+                                          : "text-gray-900"
+                                      } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                      onClick={() => act.onClick?.(member)}
+                                    >
+                                      {act.icon}
+                                      {act.title}
+                                    </button>
+                                  )}
+                                </Menu.Item>
+                              ))}
+                            </div>
+                          </Menu.Items>
+                        </Transition>
+                      </Menu>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -191,15 +324,36 @@ export default function MemberSettingsPage() {
       </div>
 
       <Modal
-        visible={memberModalVisible}
-        title="Invite new member"
-        onCloseAttempt={() => setMemberModalVisible(false)}
+        visible={isMemberFormVisible}
+        title={formInitialValues ? "Update member" : "Invite new member"}
+        onCloseAttempt={() => {
+          setMember2edit(undefined);
+          setMemberFormVisible(false);
+        }}
       >
         <MemberForm
-          onSubmit={() => {
+          onSubmit={async (values) => {
+            if (member2edit) {
+              await memberChangeRoleMutation.mutateAsync({
+                newRole: values.isOwner ? "owner" : { id: values.role },
+                userId: member2edit.userId,
+              });
+
+              toast.success("Done!");
+            } else {
+              await inviteMutation.mutateAsync({
+                email: values.email,
+                role: values.isOwner ? "owner" : { id: values.role },
+                name: values.name,
+              });
+
+              toast.success("Invitation sent!");
+            }
+
             membersQuery.refetch();
-            setMemberModalVisible(false);
+            setMemberFormVisible(false);
           }}
+          initialValues={formInitialValues}
         />
       </Modal>
     </section>

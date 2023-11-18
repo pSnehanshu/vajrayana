@@ -60,16 +60,21 @@ export default function RoleSettingsPage() {
   const [isRoleFormVisible, setRoleFormVisible] = useState(false);
 
   const [role2edit, setRole2edit] = useState<RoleType>();
-  const formInitialValues: RoleFormValues | undefined = role2edit
-    ? {
-        name: role2edit.name,
-        permissions: permissionSchema
-          .parse(role2edit.permissions)
-          .map((perm) => UserPermissions[perm]),
-      }
-    : undefined;
 
-  const roleActions = useMemo<MenuItem[]>(() => {
+  const formInitialValues = useMemo<RoleFormValues | undefined>(
+    () =>
+      role2edit
+        ? {
+            name: role2edit.name,
+            permissions: permissionSchema
+              .parse(role2edit.permissions)
+              .map((perm) => UserPermissions[perm]),
+          }
+        : undefined,
+    [role2edit],
+  );
+
+  const actions = useMemo<MenuItem[]>(() => {
     const actions: MenuItem[] = [];
 
     if (permissions.includes(UserPermissions["ROLE:WRITE"])) {
@@ -223,7 +228,7 @@ Consequently, they will lose access to the dashboard unless assigned another rol
                         {format(role.createdAt, "do LLL yyy, hh:mm aaa")}
                       </td>
                       <td>
-                        {roleActions.length > 0 && (
+                        {actions.length > 0 && (
                           <Menu
                             as="div"
                             className="relative inline-block text-left"
@@ -248,7 +253,7 @@ Consequently, they will lose access to the dashboard unless assigned another rol
                             >
                               <Menu.Items className="z-10 absolute right-0 mt-0 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
                                 <div className="p-1">
-                                  {roleActions.map((act) => (
+                                  {actions.map((act) => (
                                     <Menu.Item key={act.title}>
                                       {({ active }) => (
                                         <button

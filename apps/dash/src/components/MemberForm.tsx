@@ -9,10 +9,6 @@ import { PiCaretDownBold } from "react-icons/pi";
 import { IoMdCheckmark } from "react-icons/io";
 import { Button } from "./elements/button";
 
-type InviteMemberProps = {
-  onSubmit: () => void;
-};
-
 const MemberDetailSchema = z.object({
   email: z.string().email(),
   name: z.string().trim().optional(),
@@ -34,31 +30,30 @@ const RoleSchema = z.discriminatedUnion("isOwner", [
 
 const InvitememberSchema = MemberDetailSchema.and(RoleSchema);
 
-export function MemberForm({ onSubmit }: InviteMemberProps) {
+export type MemberFormValues = z.infer<typeof InvitememberSchema>;
+
+type InviteMemberProps = {
+  onSubmit: (values: MemberFormValues) => void;
+  initialValues?: MemberFormValues;
+};
+
+export function MemberForm({ onSubmit, initialValues }: InviteMemberProps) {
   const rolesQuery = trpc.roles.list.useQuery({});
-  const inviteMutation = trpc.members.invite.useMutation();
 
   return (
     <Formik
       initialValues={
-        {
+        (initialValues ?? {
           email: "",
           name: "",
           role: "",
           isOwner: true,
-        } as z.infer<typeof InvitememberSchema>
+        }) as MemberFormValues
       }
       validationSchema={toFormikValidationSchema(InvitememberSchema)}
       onSubmit={async (values, { setSubmitting }) => {
         try {
-          await inviteMutation.mutateAsync({
-            email: values.email,
-            role: values.isOwner ? "owner" : { id: values.role },
-            name: values.name,
-          });
-
-          toast.success("Invitation sent!");
-          onSubmit();
+          await onSubmit(values);
         } catch (error) {
           if (error instanceof TRPCClientError) {
             toast.error(error.message);
@@ -86,7 +81,8 @@ export function MemberForm({ onSubmit }: InviteMemberProps) {
             <Field
               type="email"
               name="email"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              disabled={!!initialValues}
+              className="bg-gray-50 border disabled:cursor-not-allowed border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
             />
 
             <ErrorMessage
@@ -106,7 +102,8 @@ export function MemberForm({ onSubmit }: InviteMemberProps) {
             <Field
               type="text"
               name="name"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              disabled={!!initialValues}
+              className="bg-gray-50 border disabled:cursor-not-allowed border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
             />
 
             <ErrorMessage
@@ -218,7 +215,7 @@ export function MemberForm({ onSubmit }: InviteMemberProps) {
 
           <div className="flex flex-row-reverse">
             <Button
-              label="Send invitation"
+              label="Submit"
               isLoading={opts.isSubmitting}
               disabled={!opts.isValid || !opts.dirty}
             />
