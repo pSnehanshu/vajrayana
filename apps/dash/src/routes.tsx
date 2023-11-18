@@ -77,8 +77,8 @@ export function Routes() {
                   <h1>CS!</h1>
                 </Route>
 
-                <Route path="/sessions">
-                  <h1>Sessions!</h1>
+                <Route path="/transactions">
+                  <h1>Transactions!</h1>
                 </Route>
 
                 <Route path="/tarrif">

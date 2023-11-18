@@ -5,7 +5,11 @@ import { ReactNode, useRef, useState } from "react";
 import { HiDocument } from "react-icons/hi2";
 import { PiCaretDownBold } from "react-icons/pi";
 import { IoPieChartSharp, IoSettingsSharp } from "react-icons/io5";
-import { MdElectricCar, MdAttachMoney } from "react-icons/md";
+import {
+  MdElectricCar,
+  MdAttachMoney,
+  MdOutlineElectricCar,
+} from "react-icons/md";
 import { FaPlugCircleBolt, FaMoneyBillTrendUp } from "react-icons/fa6";
 import { FaChargingStation, FaDotCircle } from "react-icons/fa";
 import { RiOrganizationChart } from "react-icons/ri";
@@ -30,18 +34,18 @@ const menu: MenuItem[] = [
     link: "/cs",
   },
   {
-    title: "Charging sessions",
+    title: "Transactions",
     icon: <FaPlugCircleBolt />,
-    link: "/sessions",
+    link: "/transactions",
   },
   {
     title: "Tarrif",
-    icon: <MdAttachMoney />,
+    icon: <MdAttachMoney className="text-xl -translate-x-1 -mr-1" />,
     link: "/tarrif",
   },
   {
     title: "Customers",
-    icon: <MdElectricCar />,
+    icon: <MdOutlineElectricCar className="text-xl -translate-x-1 -mr-1" />,
     link: "/customers",
   },
   {
