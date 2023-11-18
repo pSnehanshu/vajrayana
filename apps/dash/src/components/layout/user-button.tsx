@@ -1,10 +1,11 @@
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import { useStore } from "../../store";
 import { trpc } from "../../utils/trpc";
 import toast from "react-hot-toast";
+import { Transition } from "@headlessui/react";
 
 export function UserButton() {
   const [userMenuVisible, setUserMenuVisible] = useState(false);
@@ -45,64 +46,69 @@ export function UserButton() {
       </button>
 
       {/* Dropdown menu */}
-      <div
-        className={classNames(
-          { block: userMenuVisible, hidden: !userMenuVisible },
-          "absolute top-10 right-2 z-50 my-4 w-56 text-base list-none bg-white divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl",
-        )}
-        id="dropdown"
+      <Transition
+        as={Fragment}
+        show={userMenuVisible}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
       >
-        <div className="py-3 px-4">
-          <span className="block text-sm font-semibold text-gray-900 dark:text-white">
-            {user?.name}
-          </span>
-          <span className="block text-sm text-gray-900 truncate dark:text-white">
-            {user?.email}
-          </span>
+        <div className="absolute shadow-lg dark:shadow-gray-600 top-10 right-2 z-50 my-4 w-56 text-base list-none bg-white divide-y divide-gray-100 dark:bg-gray-700 dark:divide-gray-600 rounded-xl">
+          <div className="py-3 px-4">
+            <span className="block text-sm font-semibold text-gray-900 dark:text-white">
+              {user?.name}
+            </span>
+            <span className="block text-sm text-gray-900 truncate dark:text-white">
+              {user?.email}
+            </span>
+          </div>
+
+          <ul
+            className="py-1 text-gray-700 dark:text-gray-300"
+            aria-labelledby="dropdown"
+          >
+            <li>
+              <Link
+                to="/account/profile"
+                className="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
+              >
+                My profile
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/account/settings"
+                className="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
+              >
+                Account settings
+              </Link>
+            </li>
+          </ul>
+
+          <ul
+            className="text-gray-700 dark:text-gray-300"
+            aria-labelledby="dropdown"
+          >
+            <li>
+              <button
+                onClick={() =>
+                  toast.promise(logoutMutation.mutateAsync(), {
+                    success: "Succesfully logged out!",
+                    error: "Failed to logout!",
+                    loading: "Logging you out...",
+                  })
+                }
+                className="w-full text-left block py-2 px-4 text-sm rounded-b-xl hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+              >
+                Sign out
+              </button>
+            </li>
+          </ul>
         </div>
-
-        <ul
-          className="py-1 text-gray-700 dark:text-gray-300"
-          aria-labelledby="dropdown"
-        >
-          <li>
-            <Link
-              to="/account/profile"
-              className="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
-            >
-              My profile
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/account/settings"
-              className="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
-            >
-              Account settings
-            </Link>
-          </li>
-        </ul>
-
-        <ul
-          className="text-gray-700 dark:text-gray-300"
-          aria-labelledby="dropdown"
-        >
-          <li>
-            <button
-              onClick={() =>
-                toast.promise(logoutMutation.mutateAsync(), {
-                  success: "Succesfully logged out!",
-                  error: "Failed to logout!",
-                  loading: "Logging you out...",
-                })
-              }
-              className="w-full text-left block py-2 px-4 text-sm rounded-b-xl hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-            >
-              Sign out
-            </button>
-          </li>
-        </ul>
-      </div>
+      </Transition>
     </div>
   );
 }
