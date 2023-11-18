@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { orgProcedure, publicProcedure, router } from "../trpc";
+import { permissionProcedure, publicProcedure, router } from "../trpc";
 import { UserPermissions } from "@zigbolt/shared";
 
 export const orgRouter = router({
@@ -28,7 +28,7 @@ export const orgRouter = router({
 
       return domain.Org;
     }),
-  update: orgProcedure([UserPermissions["ORG:UPDATE"]])
+  update: permissionProcedure([UserPermissions["ORG:UPDATE"]])
     .input(
       z.object({
         name: z.string().trim().min(1),

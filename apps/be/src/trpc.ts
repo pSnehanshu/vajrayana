@@ -161,9 +161,15 @@ const permissionMiddleware = (
 /* Procedures */
 
 export const router = t.router;
+
+/** No restrictions */
 export const publicProcedure = t.procedure;
+
+/** Requires user to be logged in */
 export const authProcedure = t.procedure.use(authMiddleware);
-export const orgProcedure = (
+
+/** Requires user to have the specified permissions to proceed */
+export const permissionProcedure = (
   permissions: UserPermissions[] = [],
   mode: "every" | "some" = "every",
 ) => t.procedure.use(permissionMiddleware(permissions, mode));

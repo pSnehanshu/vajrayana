@@ -2,14 +2,14 @@ import { z } from "zod";
 import { uniq } from "lodash-es";
 import { Prisma, prisma } from "@zigbolt/prisma";
 import { UserPermissions, permissionSchema } from "@zigbolt/shared";
-import { orgProcedure, router } from "../trpc";
+import { permissionProcedure, router } from "../trpc";
 import { paginationSchema } from "../utils/schemas";
 import { TRPCError } from "@trpc/server";
 
 type ArrayElement<T> = T extends (infer U)[] ? U : never;
 
 export const rolesRouter = router({
-  list: orgProcedure([UserPermissions["ROLE:READ"]])
+  list: permissionProcedure([UserPermissions["ROLE:READ"]])
     .input(paginationSchema)
     .query(async ({ input, ctx }) => {
       const where: Prisma.RoleWhereInput = { orgId: ctx.org.id };
@@ -38,7 +38,7 @@ export const rolesRouter = router({
 
       return { roles: RoleMap, total };
     }),
-  create: orgProcedure([UserPermissions["ROLE:WRITE"]])
+  create: permissionProcedure([UserPermissions["ROLE:WRITE"]])
     .input(
       z.object({
         name: z.string().trim().min(1),
@@ -56,7 +56,7 @@ export const rolesRouter = router({
 
       return { role };
     }),
-  update: orgProcedure([UserPermissions["ROLE:WRITE"]])
+  update: permissionProcedure([UserPermissions["ROLE:WRITE"]])
     .input(
       z.object({
         roleId: z.string().uuid(),
@@ -84,7 +84,7 @@ export const rolesRouter = router({
 
       return { role: updatedRole };
     }),
-  delete: orgProcedure([UserPermissions["ROLE:DELETE"]])
+  delete: permissionProcedure([UserPermissions["ROLE:DELETE"]])
     .input(z.object({ roleId: z.string().uuid() }))
     .mutation(async ({ input, ctx }) => {
       const role = await ctx.prisma.role.findUnique({
