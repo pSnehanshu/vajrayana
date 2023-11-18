@@ -1,5 +1,4 @@
 import { useState } from "react";
-import * as Yup from "yup";
 import { useDebounce } from "usehooks-ts";
 import { format } from "date-fns";
 import { TRPCClientError } from "@trpc/client";
@@ -9,6 +8,9 @@ import { HiUserPlus } from "react-icons/hi2";
 import { IoMdCheckmark } from "react-icons/io";
 import { PiCaretDownBold } from "react-icons/pi";
 import classNames from "classnames";
+import { UserPermissions } from "@zigbolt/shared";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { Button } from "../../components/elements/button";
 import { Modal } from "../../components/elements/modal";
@@ -16,7 +18,6 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import toast from "react-hot-toast";
 import { Listbox } from "@headlessui/react";
 import { usePermissions, useStore } from "../../store";
-import { UserPermissions } from "@zigbolt/shared";
 
 export default function MemberSettingsPage() {
   const [pageNum, setPageNum] = useState(1);
@@ -202,7 +203,7 @@ export default function MemberSettingsPage() {
         onCloseAttempt={() => setMemberModalVisible(false)}
       >
         <InviteMember
-          onOK={() => {
+          onSubmit={() => {
             membersQuery.refetch();
             setMemberModalVisible(false);
           }}
@@ -213,32 +214,45 @@ export default function MemberSettingsPage() {
 }
 
 type InviteMemberProps = {
-  onOK: () => void;
+  onSubmit: () => void;
 };
 
-const InvitememberSchema = Yup.object().shape({
-  email: Yup.string().email().required(),
-  name: Yup.string(),
-  role: Yup.string().when("isOwner", {
-    is: false,
-    then: (s) => s.uuid().required(),
-  }),
-  isOwner: Yup.boolean().default(false),
+const MemberDetailSchema = z.object({
+  email: z.string().email(),
+  name: z.string().trim().optional(),
 });
 
-function InviteMember({ onOK }: InviteMemberProps) {
+const MemberOwnerSchema = z.object({
+  isOwner: z.literal(true),
+});
+
+const MemberCustomRoleSchema = z.object({
+  isOwner: z.literal(false),
+  role: z.string().uuid(),
+});
+
+const RoleSchema = z.discriminatedUnion("isOwner", [
+  MemberOwnerSchema,
+  MemberCustomRoleSchema,
+]);
+
+const InvitememberSchema = MemberDetailSchema.and(RoleSchema);
+
+function InviteMember({ onSubmit }: InviteMemberProps) {
   const rolesQuery = trpc.roles.list.useQuery({});
   const inviteMutation = trpc.members.invite.useMutation();
 
   return (
     <Formik
-      initialValues={{
-        email: "",
-        name: "",
-        role: "",
-        isOwner: true,
-      }}
-      validationSchema={InvitememberSchema}
+      initialValues={
+        {
+          email: "",
+          name: "",
+          role: "",
+          isOwner: true,
+        } as z.infer<typeof InvitememberSchema>
+      }
+      validationSchema={toFormikValidationSchema(InvitememberSchema)}
       onSubmit={async (values, { setSubmitting }) => {
         try {
           await inviteMutation.mutateAsync({
@@ -248,7 +262,7 @@ function InviteMember({ onOK }: InviteMemberProps) {
           });
 
           toast.success("Invitation sent!");
-          onOK();
+          onSubmit();
         } catch (error) {
           if (error instanceof TRPCClientError) {
             toast.error(error.message);
@@ -263,7 +277,7 @@ function InviteMember({ onOK }: InviteMemberProps) {
     >
       {(opts) => (
         <Form className="p-4">
-          {/* <pre>{JSON.stringify(opts, null, 2)}</pre> */}
+          {/* <pre>{JSON.stringify(opts.errors, null, 2)}</pre> */}
 
           <div className="mb-4">
             <label
