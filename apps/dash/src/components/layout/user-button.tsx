@@ -1,6 +1,5 @@
 import { Fragment, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
-import classNames from "classnames";
 import { Link } from "react-router-dom";
 import { useStore } from "../../store";
 import { trpc } from "../../utils/trpc";
