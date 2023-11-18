@@ -17,7 +17,6 @@ model Organization {
   Memberships      Membership[]
   Roles            Role[]
   ChargingStations ChargingStation[]
-  EVSEs            EVSE[]
 
   @@map("org")
 }
@@ -89,37 +88,40 @@ model ChargingStation {
   id           String       @id @default(uuid()) @db.Uuid
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  urlName      String       @db.VarChar(50)
   friendlyName String?      @db.VarChar(50)
   orgId        String       @db.Uuid
   Org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   latitude     Int?         @map("lat") @db.SmallInt
   longitude    Int?         @map("lon") @db.SmallInt
   EVSEs        EVSE[]
-}
-
-model EVSE {
-  id           String          @id @default(uuid()) @db.Uuid
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  orgId        String          @db.Uuid
-  Org          Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  urlName      String          @db.VarChar(50)
-  friendlyName String?         @db.VarChar(50)
-  stationId    String          @db.Uuid
-  Station      ChargingStation @relation(fields: [stationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   Connectors   Connector[]
 
   @@unique([orgId, urlName])
 }
 
-model Connector {
-  sn     Int            @db.SmallInt
-  evseId String         @db.Uuid
-  EVSE   EVSE           @relation(fields: [evseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  typeId String?
-  Type   ConnectorType? @relation(fields: [typeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+model EVSE {
+  sn           Int             @db.SmallInt
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  friendlyName String?         @db.VarChar(50)
+  stationId    String          @db.Uuid
+  Station      ChargingStation @relation(fields: [stationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Connectors   Connector[]
 
-  @@id([sn, evseId])
+  @@id([sn, stationId])
+}
+
+model Connector {
+  sn        Int             @db.SmallInt
+  stationId String          @db.Uuid
+  Station   ChargingStation @relation(fields: [stationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  evseNum   Int             @db.SmallInt
+  EVSE      EVSE            @relation(fields: [evseNum, stationId], references: [sn, stationId], onDelete: Cascade, onUpdate: Cascade)
+  typeId    String?
+  Type      ConnectorType?  @relation(fields: [typeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@id([sn, evseNum])
 }
 
 model ConnectorType {
