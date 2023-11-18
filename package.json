@@ -2,7 +2,7 @@
   "name": "zigbolt",
   "version": "1.0.0",
   "author": "Snehanshu Phukon",
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
     "dev:b": "yarn workspace @zigbolt/be dev",
