@@ -1,5 +1,6 @@
 import { WebSocketServer } from "ws";
 import { ConnectionsMap } from "./connections";
+import { OCPPRouter } from "./router";
 
 export const ocppWSS = new WebSocketServer({
   noServer: true,
@@ -20,16 +21,26 @@ ocppWSS.on("connection", (ws, req) => {
     return;
   }
 
+  /** A function, that will send the given message */
+  const messageSender = (msg: string) =>
+    new Promise<void>((resolve, reject) =>
+      ws.send(msg, (error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      }),
+    );
+
+  const router = new OCPPRouter(data, messageSender);
+
   // Handle messages from the client
-  ws.on("message", (msg) => {
-    try {
-      const msgStr = msg.toString("utf8");
-      const messageObj = JSON.parse(msgStr);
-      console.log(messageObj);
-    } catch (error) {
-      console.error(error);
-    }
-  });
+  ws.on("message", (msg) =>
+    router.handleMessage(msg.toString("utf8")).catch((err) => {
+      console.error(err);
+    }),
+  );
 
   ws.on("close", (code, reason) => {
     console.log(

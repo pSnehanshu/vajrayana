@@ -1,7 +1,7 @@
 import { Prisma } from "@zigbolt/prisma";
 import { WebSocket } from "ws";
 
-type ConnectionData = {
+export type ConnectionData = {
   urlName: string;
   chargingStation: Prisma.ChargingStationGetPayload<{
     include: {
