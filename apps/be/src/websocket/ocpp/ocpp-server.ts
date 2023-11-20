@@ -20,8 +20,6 @@ ocppWSS.on("connection", (ws, req) => {
     return;
   }
 
-  const { urlName, chargingStation } = data;
-
   // Handle messages from the client
   ws.on("message", (msg) => {
     try {

@@ -66,14 +66,21 @@ export function CreateWebsocketServer(server: Server) {
 
       // Upgrade the connection to a WebSocket connection
       ocppWSS.handleUpgrade(request, socket, head, (ws) => {
+        // Ensure only supported protocol
+        if (ws.protocol !== "ocpp2.0.1") {
+          ws.close(1002, `Recevied protocol: ${ws.protocol}`);
+          return;
+        }
+
         // Set connection data
         ConnectionsMap.set(ws, {
-          urlName: urlName,
+          urlName,
           chargingStation,
+          version: ws.protocol,
         });
 
         // Emit connection
-        ocppWSS.emit("connection", ws, request, {});
+        ocppWSS.emit("connection", ws, request);
       });
     } else {
       socket.destroy(new Error(`Not found. URL: ${url}`));

@@ -8,6 +8,7 @@ type ConnectionData = {
       Org: true;
     };
   }>;
+  version: "ocpp2.0.1";
 };
 
 export const ConnectionsMap = new WeakMap<WebSocket, ConnectionData>();
