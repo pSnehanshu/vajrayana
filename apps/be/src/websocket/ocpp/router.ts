@@ -51,10 +51,16 @@ export class OCPPRouter {
 
   /** Handle incoming websocket messages. It can be a CALL, CALLRESULT, CALLERROR, or invalid */
   async handleMessage(rawMessage: string) {
+    let hasBeenResponded = false;
+
     /** This function will respond with call error if invalid messages are received */
     const callErrorSender =
       (messageId: string): CallErrorSender =>
       (errCode, errMessage, errDetails) => {
+        if (hasBeenResponded) {
+          console.trace("Already responded");
+        }
+
         // Prepare the call error
         const callError = [
           4,
@@ -68,6 +74,7 @@ export class OCPPRouter {
         const message = JSON.stringify(callError);
 
         // Send it away!
+        hasBeenResponded = true;
         return this.messageSender(message);
       };
 
@@ -149,6 +156,10 @@ export class OCPPRouter {
       const callResultSender: CallResultSender<typeof actionName> = (
         resultPayload,
       ) => {
+        if (hasBeenResponded) {
+          console.trace("Already responded");
+        }
+
         // Prepare the call result
         const callResult = [3, messageId, resultPayload];
 
@@ -156,6 +167,7 @@ export class OCPPRouter {
         const message = JSON.stringify(callResult);
 
         // Send it away!
+        hasBeenResponded = true;
         return this.messageSender(message);
       };
 
