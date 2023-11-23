@@ -1,4 +1,5 @@
 import { WebSocketServer } from "ws";
+import { AttachCallHandlers } from "./v2.0.1/call-handlers";
 import { ConnectionsMap } from "./connections";
 import { OCPPRouter } from "./router";
 
@@ -34,6 +35,9 @@ ocppWSS.on("connection", (ws, req) => {
     );
 
   const router = new OCPPRouter(data, messageSender);
+
+  // Attach the call handlers
+  AttachCallHandlers(router);
 
   // Handle messages from the client
   ws.on("message", (msg) =>

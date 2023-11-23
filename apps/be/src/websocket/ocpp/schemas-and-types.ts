@@ -2,8 +2,9 @@ import { z } from "zod";
 import {
   CallActionPayloadSchemas,
   CallActions,
-  CallActionsSchema,
+  CallResultPayloadSchemas,
 } from "./v2.0.1/schemas-and-types";
+import { ConnectionData } from "./connections";
 
 export const CallErrorCodesSchema = z.enum([
   "FormatViolation",
@@ -20,7 +21,9 @@ export const CallErrorCodesSchema = z.enum([
   "TypeConstraintViolation",
 ]);
 
-export type CallResultSender = (message: unknown) => Promise<void>;
+export type CallResultSender<A extends CallActions> = (
+  message: z.infer<(typeof CallResultPayloadSchemas)[A]>,
+) => Promise<void>;
 
 export type CallErrorSender = (
   errCode: z.infer<typeof CallErrorCodesSchema>,
@@ -29,8 +32,9 @@ export type CallErrorSender = (
 ) => Promise<void>;
 
 export type CallHandler<A extends CallActions = "Authorize"> = (
+  details: ConnectionData,
   payload: z.infer<(typeof CallActionPayloadSchemas)[A]>,
-  sendResult: CallResultSender,
+  sendResult: CallResultSender<A>,
   sendError: CallErrorSender,
 ) => void;
 

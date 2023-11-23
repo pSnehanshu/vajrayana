@@ -85,17 +85,26 @@ model Role {
 }
 
 model ChargingStation {
-  id           String       @id @default(uuid()) @db.Uuid
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  urlName      String       @db.VarChar(50)
-  friendlyName String?      @db.VarChar(50)
-  orgId        String       @db.Uuid
-  Org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  latitude     Int?         @map("lat") @db.SmallInt
-  longitude    Int?         @map("lon") @db.SmallInt
-  EVSEs        EVSE[]
-  Connectors   Connector[]
+  id                  String       @id @default(uuid()) @db.Uuid
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  urlName             String       @db.VarChar(50)
+  friendlyName        String?      @db.VarChar(50)
+  orgId               String       @db.Uuid
+  Org                 Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  latitude            Int?         @map("lat") @db.SmallInt
+  longitude           Int?         @map("lon") @db.SmallInt
+  lastBootNotifTime   DateTime?    @map("lbnt")
+  lastBootNotifReason String?      @map("lbnr") @db.VarChar(20)
+  serialNumber        String?      @db.VarChar(25)
+  model               String?      @db.VarChar(20)
+  vendorName          String?      @db.VarChar(50)
+  firmwareVersion     String?      @map("firmV") @db.VarChar(50)
+  modem_iccid         String?      @map("iccid") @db.VarChar(20)
+  modem_imsi          String?      @map("imsi") @db.VarChar(20)
+  is_active           Boolean      @default(true)
+  EVSEs               EVSE[]
+  Connectors          Connector[]
 
   @@unique([orgId, urlName])
 }

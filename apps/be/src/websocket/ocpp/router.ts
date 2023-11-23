@@ -146,7 +146,9 @@ export class OCPPRouter {
       const handler = this.CallHandlers.get(actionName);
 
       /** This function will respond with the CALLRESULT for this CALL */
-      const callResultSender: CallResultSender = (resultPayload) => {
+      const callResultSender: CallResultSender<typeof actionName> = (
+        resultPayload,
+      ) => {
         // Prepare the call result
         const callResult = [3, messageId, resultPayload];
 
@@ -160,6 +162,7 @@ export class OCPPRouter {
       if (handler) {
         try {
           handler(
+            this.data,
             // @ts-expect-error I am not able to satisfy typescript, but I know it will be fine
             payloadParsed.data,
             callResultSender,
