@@ -6126,3 +6126,2861 @@ export const CallActionPayloadSchemas = {
     })
     .strict(),
 } satisfies Record<CallActions, z.AnyZodObject | null>;
+
+export const CallResultPayloadSchemas = {
+  Authorize: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      idTokenInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          status: z
+            .enum([
+              "Accepted",
+              "Blocked",
+              "ConcurrentTx",
+              "Expired",
+              "Invalid",
+              "NoCredit",
+              "NotAllowedTypeEVSE",
+              "NotAtThisLocation",
+              "NotAtThisTime",
+              "Unknown",
+            ])
+            .describe(
+              "ID_ Token. Status. Authorization_ Status\r\nurn:x-oca:ocpp:uid:1:569372\r\nCurrent status of the ID Token.\r\n",
+            ),
+          cacheExpiryDateTime: z
+            .string()
+            .datetime()
+            .describe(
+              "ID_ Token. Expiry. Date_ Time\r\nurn:x-oca:ocpp:uid:1:569373\r\nDate and Time after which the token must be considered invalid.\r\n",
+            )
+            .optional(),
+          chargingPriority: z
+            .number()
+            .int()
+            .describe(
+              "Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. \r\n",
+            )
+            .optional(),
+          language1: z
+            .string()
+            .max(8)
+            .describe(
+              "ID_ Token. Language1. Language_ Code\r\nurn:x-oca:ocpp:uid:1:569374\r\nPreferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n\r\n",
+            )
+            .optional(),
+          evseId: z
+            .array(z.number().int())
+            .min(1)
+            .describe(
+              "Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.\r\n\r\n",
+            )
+            .optional(),
+          groupIdToken: z
+            .object({
+              customData: z
+                .object({ vendorId: z.string().max(255) })
+                .describe(
+                  "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                )
+                .optional(),
+              additionalInfo: z
+                .array(
+                  z
+                    .object({
+                      customData: z
+                        .object({ vendorId: z.string().max(255) })
+                        .describe(
+                          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                        )
+                        .optional(),
+                      additionalIdToken: z
+                        .string()
+                        .max(36)
+                        .describe(
+                          "This field specifies the additional IdToken.\r\n",
+                        ),
+                      type: z
+                        .string()
+                        .max(50)
+                        .describe(
+                          "This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.\r\n",
+                        ),
+                    })
+                    .strict()
+                    .describe(
+                      "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+                    ),
+                )
+                .min(1)
+                .optional(),
+              idToken: z
+                .string()
+                .max(36)
+                .describe(
+                  "IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.\r\n",
+                ),
+              type: z
+                .enum([
+                  "Central",
+                  "eMAID",
+                  "ISO14443",
+                  "ISO15693",
+                  "KeyCode",
+                  "Local",
+                  "MacAddress",
+                  "NoAuthorization",
+                ])
+                .describe("Enumeration of possible idToken types.\r\n"),
+            })
+            .strict()
+            .describe(
+              "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            )
+            .optional(),
+          language2: z
+            .string()
+            .max(8)
+            .describe(
+              "ID_ Token. Language2. Language_ Code\r\nurn:x-oca:ocpp:uid:1:569375\r\nSecond preferred user interface language of identifier user. Don’t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n",
+            )
+            .optional(),
+          personalMessage: z
+            .object({
+              customData: z
+                .object({ vendorId: z.string().max(255) })
+                .describe(
+                  "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                )
+                .optional(),
+              format: z
+                .enum(["ASCII", "HTML", "URI", "UTF8"])
+                .describe(
+                  "Message_ Content. Format. Message_ Format_ Code\r\nurn:x-enexis:ecdm:uid:1:570848\r\nFormat of the message.\r\n",
+                ),
+              language: z
+                .string()
+                .max(8)
+                .describe(
+                  "Message_ Content. Language. Language_ Code\r\nurn:x-enexis:ecdm:uid:1:570849\r\nMessage language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n",
+                )
+                .optional(),
+              content: z
+                .string()
+                .max(512)
+                .describe(
+                  "Message_ Content. Content. Message\r\nurn:x-enexis:ecdm:uid:1:570852\r\nMessage contents.\r\n\r\n",
+                ),
+            })
+            .strict()
+            .describe(
+              "Message_ Content\r\nurn:x-enexis:ecdm:uid:2:234490\r\nContains message details, for a message to be displayed on a Charging Station.\r\n\r\n",
+            )
+            .optional(),
+        })
+        .strict()
+        .describe(
+          "ID_ Token\r\nurn:x-oca:ocpp:uid:2:233247\r\nContains status information about an identifier.\r\nIt is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.\r\n",
+        ),
+      certificateStatus: z
+        .enum([
+          "Accepted",
+          "SignatureError",
+          "CertificateExpired",
+          "CertificateRevoked",
+          "NoCertificateAvailable",
+          "CertChainError",
+          "ContractCancelled",
+        ])
+        .describe(
+          "Certificate status information. \r\n- if all certificates are valid: return 'Accepted'.\r\n- if one of the certificates was revoked, return 'CertificateRevoked'.\r\n",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  BootNotification: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      currentTime: z
+        .string()
+        .datetime()
+        .describe("This contains the CSMS’s current time.\r\n"),
+      interval: z
+        .number()
+        .int()
+        .describe(
+          "When &lt;&lt;cmn_registrationstatusenumtype,Status&gt;&gt; is Accepted, this contains the heartbeat interval in seconds. If the CSMS returns something other than Accepted, the value of the interval field indicates the minimum wait time before sending a next BootNotification request.\r\n",
+        ),
+      status: z
+        .enum(["Accepted", "Pending", "Rejected"])
+        .describe(
+          "This contains whether the Charging Station has been registered\r\nwithin the CSMS.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  CancelReservation: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe(
+          "This indicates the success or failure of the canceling of a reservation by CSMS.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  CertificateSigned: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe(
+          "Returns whether certificate signing has been accepted, otherwise rejected.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  ChangeAvailability: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "Scheduled"])
+        .describe(
+          "This indicates whether the Charging Station is able to perform the availability change.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  ClearCache: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe(
+          "Accepted if the Charging Station has executed the request, otherwise rejected.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  ClearChargingProfile: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Unknown"])
+        .describe(
+          "Indicates if the Charging Station was able to execute the request.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  ClearDisplayMessage: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Unknown"])
+        .describe(
+          "Returns whether the Charging Station has been able to remove the message.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  ClearVariableMonitoring: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      clearMonitoringResult: z
+        .array(
+          z
+            .object({
+              customData: z
+                .object({ vendorId: z.string().max(255) })
+                .describe(
+                  "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                )
+                .optional(),
+              status: z
+                .enum(["Accepted", "Rejected", "NotFound"])
+                .describe(
+                  "Result of the clear request for this monitor, identified by its Id.\r\n\r\n",
+                ),
+              id: z
+                .number()
+                .int()
+                .describe(
+                  "Id of the monitor of which a clear was requested.\r\n\r\n",
+                ),
+              statusInfo: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  reasonCode: z
+                    .string()
+                    .max(20)
+                    .describe(
+                      "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    ),
+                  additionalInfo: z
+                    .string()
+                    .max(512)
+                    .describe(
+                      "Additional text to provide detailed information.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe(
+                  "Element providing more information about the status.\r\n",
+                )
+                .optional(),
+            })
+            .strict(),
+        )
+        .min(1),
+    })
+    .strict(),
+
+  ClearedChargingLimit: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  CostUpdated: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  CustomerInformation: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "Invalid"])
+        .describe("Indicates whether the request was accepted.\r\n"),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  DataTransfer: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "UnknownMessageId", "UnknownVendorId"])
+        .describe(
+          "This indicates the success or failure of the data transfer.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+      data: z
+        .any()
+        .describe(
+          "Data without specified length or format, in response to request.\r\n",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  DeleteCertificate: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Failed", "NotFound"])
+        .describe(
+          "Charging Station indicates if it can process the request.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  FirmwareStatusNotification: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  Get15118EVCertificate: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Failed"])
+        .describe("Indicates whether the message was processed properly.\r\n"),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+      exiResponse: z
+        .string()
+        .max(5600)
+        .describe(
+          "Raw CertificateInstallationRes response for the EV, Base64 encoded.\r\n",
+        ),
+    })
+    .strict(),
+
+  GetBaseReport: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "NotSupported", "EmptyResultSet"])
+        .describe(
+          "This indicates whether the Charging Station is able to accept this request.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  GetCertificateStatus: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Failed"])
+        .describe(
+          "This indicates whether the charging station was able to retrieve the OCSP certificate status.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+      ocspResult: z
+        .string()
+        .max(5500)
+        .describe(
+          "OCSPResponse class as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;. DER encoded (as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;), and then base64 encoded. MAY only be omitted when status is not Accepted.\r\n",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  GetChargingProfiles: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "NoProfiles"])
+        .describe(
+          "This indicates whether the Charging Station is able to process this request and will send &lt;&lt;reportchargingprofilesrequest, ReportChargingProfilesRequest&gt;&gt; messages.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  GetCompositeSchedule: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe(
+          "The Charging Station will indicate if it was\r\nable to process the request\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+      schedule: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          chargingSchedulePeriod: z
+            .array(
+              z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  startPeriod: z
+                    .number()
+                    .int()
+                    .describe(
+                      "Charging_ Schedule_ Period. Start_ Period. Elapsed_ Time\r\nurn:x-oca:ocpp:uid:1:569240\r\nStart of the period, in seconds from the start of schedule. The value of StartPeriod also defines the stop time of the previous period.\r\n",
+                    ),
+                  limit: z
+                    .number()
+                    .describe(
+                      "Charging_ Schedule_ Period. Limit. Measure\r\nurn:x-oca:ocpp:uid:1:569241\r\nCharging rate limit during the schedule period, in the applicable chargingRateUnit, for example in Amperes (A) or Watts (W). Accepts at most one digit fraction (e.g. 8.1).\r\n",
+                    ),
+                  numberPhases: z
+                    .number()
+                    .int()
+                    .describe(
+                      "Charging_ Schedule_ Period. Number_ Phases. Counter\r\nurn:x-oca:ocpp:uid:1:569242\r\nThe number of phases that can be used for charging. If a number of phases is needed, numberPhases=3 will be assumed unless another number is given.\r\n",
+                    )
+                    .optional(),
+                  phaseToUse: z
+                    .number()
+                    .int()
+                    .describe(
+                      "Values: 1..3, Used if numberPhases=1 and if the EVSE is capable of switching the phase connected to the EV, i.e. ACPhaseSwitchingSupported is defined and true. It’s not allowed unless both conditions above are true. If both conditions are true, and phaseToUse is omitted, the Charging Station / EVSE will make the selection on its own.\r\n\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe(
+                  "Charging_ Schedule_ Period\r\nurn:x-oca:ocpp:uid:2:233257\r\nCharging schedule period structure defines a time period in a charging schedule.\r\n",
+                ),
+            )
+            .min(1),
+          evseId: z
+            .number()
+            .int()
+            .describe(
+              "The ID of the EVSE for which the\r\nschedule is requested. When evseid=0, the\r\nCharging Station calculated the expected\r\nconsumption for the grid connection.\r\n",
+            ),
+          duration: z
+            .number()
+            .int()
+            .describe("Duration of the schedule in seconds.\r\n"),
+          scheduleStart: z
+            .string()
+            .datetime()
+            .describe(
+              "Composite_ Schedule. Start. Date_ Time\r\nurn:x-oca:ocpp:uid:1:569456\r\nDate and time at which the schedule becomes active. All time measurements within the schedule are relative to this timestamp.\r\n",
+            ),
+          chargingRateUnit: z
+            .enum(["W", "A"])
+            .describe("The unit of measure Limit is\r\nexpressed in.\r\n"),
+        })
+        .strict()
+        .describe("Composite_ Schedule\r\nurn:x-oca:ocpp:uid:2:233362\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  GetDisplayMessages: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Unknown"])
+        .describe(
+          "Indicates if the Charging Station has Display Messages that match the request criteria in the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt;\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  GetInstalledCertificateIds: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "NotFound"])
+        .describe(
+          "Charging Station indicates if it can process the request.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+      certificateHashDataChain: z
+        .array(
+          z
+            .object({
+              customData: z
+                .object({ vendorId: z.string().max(255) })
+                .describe(
+                  "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                )
+                .optional(),
+              certificateHashData: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  hashAlgorithm: z
+                    .enum(["SHA256", "SHA384", "SHA512"])
+                    .describe("Used algorithms for the hashes provided.\r\n"),
+                  issuerNameHash: z
+                    .string()
+                    .max(128)
+                    .describe(
+                      "Hashed value of the Issuer DN (Distinguished Name).\r\n\r\n",
+                    ),
+                  issuerKeyHash: z
+                    .string()
+                    .max(128)
+                    .describe("Hashed value of the issuers public key\r\n"),
+                  serialNumber: z
+                    .string()
+                    .max(40)
+                    .describe("The serial number of the certificate.\r\n"),
+                })
+                .strict(),
+              certificateType: z
+                .enum([
+                  "V2GRootCertificate",
+                  "MORootCertificate",
+                  "CSMSRootCertificate",
+                  "V2GCertificateChain",
+                  "ManufacturerRootCertificate",
+                ])
+                .describe(
+                  "Indicates the type of the requested certificate(s).\r\n",
+                ),
+              childCertificateHashData: z
+                .array(
+                  z
+                    .object({
+                      customData: z
+                        .object({ vendorId: z.string().max(255) })
+                        .describe(
+                          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                        )
+                        .optional(),
+                      hashAlgorithm: z
+                        .enum(["SHA256", "SHA384", "SHA512"])
+                        .describe(
+                          "Used algorithms for the hashes provided.\r\n",
+                        ),
+                      issuerNameHash: z
+                        .string()
+                        .max(128)
+                        .describe(
+                          "Hashed value of the Issuer DN (Distinguished Name).\r\n\r\n",
+                        ),
+                      issuerKeyHash: z
+                        .string()
+                        .max(128)
+                        .describe("Hashed value of the issuers public key\r\n"),
+                      serialNumber: z
+                        .string()
+                        .max(40)
+                        .describe("The serial number of the certificate.\r\n"),
+                    })
+                    .strict(),
+                )
+                .min(1)
+                .max(4)
+                .optional(),
+            })
+            .strict(),
+        )
+        .min(1)
+        .optional(),
+    })
+    .strict(),
+
+  GetLocalListVersion: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      versionNumber: z
+        .number()
+        .int()
+        .describe(
+          "This contains the current version number of the local authorization list in the Charging Station.\r\n",
+        ),
+    })
+    .strict(),
+
+  GetLog: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "AcceptedCanceled"])
+        .describe(
+          "This field indicates whether the Charging Station was able to accept the request.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+      filename: z
+        .string()
+        .max(255)
+        .describe(
+          "This contains the name of the log file that will be uploaded. This field is not present when no logging information is available.\r\n",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  GetMonitoringReport: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "NotSupported", "EmptyResultSet"])
+        .describe(
+          "This field indicates whether the Charging Station was able to accept the request.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  GetReport: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "NotSupported", "EmptyResultSet"])
+        .describe(
+          "This field indicates whether the Charging Station was able to accept the request.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  GetTransactionStatus: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      ongoingIndicator: z
+        .boolean()
+        .describe("Whether the transaction is still ongoing.\r\n")
+        .optional(),
+      messagesInQueue: z
+        .boolean()
+        .describe("Whether there are still message to be delivered.\r\n"),
+    })
+    .strict(),
+
+  GetVariables: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      getVariableResult: z
+        .array(
+          z
+            .object({
+              customData: z
+                .object({ vendorId: z.string().max(255) })
+                .describe(
+                  "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                )
+                .optional(),
+              attributeStatusInfo: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  reasonCode: z
+                    .string()
+                    .max(20)
+                    .describe(
+                      "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    ),
+                  additionalInfo: z
+                    .string()
+                    .max(512)
+                    .describe(
+                      "Additional text to provide detailed information.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe(
+                  "Element providing more information about the status.\r\n",
+                )
+                .optional(),
+              attributeStatus: z
+                .enum([
+                  "Accepted",
+                  "Rejected",
+                  "UnknownComponent",
+                  "UnknownVariable",
+                  "NotSupportedAttributeType",
+                ])
+                .describe("Result status of getting the variable.\r\n\r\n"),
+              attributeType: z
+                .enum(["Actual", "Target", "MinSet", "MaxSet"])
+                .describe(
+                  "Attribute type for which value is requested. When absent, default Actual is assumed.\r\n",
+                )
+                .default("Actual"),
+              attributeValue: z
+                .string()
+                .max(2500)
+                .describe(
+                  "Value of requested attribute type of component-variable. This field can only be empty when the given status is NOT accepted.\r\n\r\nThe Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. \r\n\r\n",
+                )
+                .optional(),
+              component: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  evse: z
+                    .object({
+                      customData: z
+                        .object({ vendorId: z.string().max(255) })
+                        .describe(
+                          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                        )
+                        .optional(),
+                      id: z
+                        .number()
+                        .int()
+                        .describe(
+                          "Identified_ Object. MRID. Numeric_ Identifier\r\nurn:x-enexis:ecdm:uid:1:569198\r\nEVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.\r\n",
+                        ),
+                      connectorId: z
+                        .number()
+                        .int()
+                        .describe(
+                          "An id to designate a specific connector (on an EVSE) by connector index number.\r\n",
+                        )
+                        .optional(),
+                    })
+                    .strict()
+                    .describe(
+                      "EVSE\r\nurn:x-oca:ocpp:uid:2:233123\r\nElectric Vehicle Supply Equipment\r\n",
+                    )
+                    .optional(),
+                  name: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    ),
+                  instance: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe("A physical or logical component\r\n"),
+              variable: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  name: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    ),
+                  instance: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe("Reference key to a component-variable.\r\n"),
+            })
+            .strict()
+            .describe("Class to hold results of GetVariables request.\r\n"),
+        )
+        .min(1),
+    })
+    .strict(),
+
+  Heartbeat: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      currentTime: z
+        .string()
+        .datetime()
+        .describe("Contains the current time of the CSMS.\r\n"),
+    })
+    .strict(),
+
+  InstallCertificate: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "Failed"])
+        .describe(
+          "Charging Station indicates if installation was successful.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  LogStatusNotification: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  MeterValues: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  NotifyChargingLimit: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  NotifyCustomerInformation: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  NotifyDisplayMessages: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  NotifyEVChargingNeeds: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "Processing"])
+        .describe(
+          "Returns whether the CSMS has been able to process the message successfully. It does not imply that the evChargingNeeds can be met with the current charging profile.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  NotifyEVChargingSchedule: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe(
+          "Returns whether the CSMS has been able to process the message successfully. It does not imply any approval of the charging schedule.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  NotifyEvent: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  NotifyMonitoringReport: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  NotifyReport: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  PublishFirmware: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe("Indicates whether the request was accepted.\r\n"),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  PublishFirmwareStatusNotification: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  ReportChargingProfiles: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  RequestStartTransaction: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe(
+          "Status indicating whether the Charging Station accepts the request to start a transaction.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+      transactionId: z
+        .string()
+        .max(36)
+        .describe(
+          "When the transaction was already started by the Charging Station before the RequestStartTransactionRequest was received, for example: cable plugged in first. This contains the transactionId of the already started transaction.\r\n",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  RequestStopTransaction: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe(
+          "Status indicating whether Charging Station accepts the request to stop a transaction.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  ReservationStatusUpdate: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  ReserveNow: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Faulted", "Occupied", "Rejected", "Unavailable"])
+        .describe(
+          "This indicates the success or failure of the reservation.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  Reset: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "Scheduled"])
+        .describe(
+          "This indicates whether the Charging Station is able to perform the reset.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  SecurityEventNotification: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  SendLocalList: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Failed", "VersionMismatch"])
+        .describe(
+          "This indicates whether the Charging Station has successfully received and applied the update of the Local Authorization List.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  SetChargingProfile: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe(
+          "Returns whether the Charging Station has been able to process the message successfully. This does not guarantee the schedule will be followed to the letter. There might be other constraints the Charging Station may need to take into account.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  SetDisplayMessage: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum([
+          "Accepted",
+          "NotSupportedMessageFormat",
+          "Rejected",
+          "NotSupportedPriority",
+          "NotSupportedState",
+          "UnknownTransaction",
+        ])
+        .describe(
+          "This indicates whether the Charging Station is able to display the message.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  SetMonitoringBase: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "NotSupported", "EmptyResultSet"])
+        .describe(
+          "Indicates whether the Charging Station was able to accept the request.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  SetMonitoringLevel: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe(
+          "Indicates whether the Charging Station was able to accept the request.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  SetNetworkProfile: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "Failed"])
+        .describe("Result of operation.\r\n"),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  SetVariableMonitoring: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      setMonitoringResult: z
+        .array(
+          z
+            .object({
+              customData: z
+                .object({ vendorId: z.string().max(255) })
+                .describe(
+                  "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                )
+                .optional(),
+              id: z
+                .number()
+                .int()
+                .describe(
+                  "Id given to the VariableMonitor by the Charging Station. The Id is only returned when status is accepted. Installed VariableMonitors should have unique id's but the id's of removed Installed monitors should have unique id's but the id's of removed monitors MAY be reused.\r\n",
+                )
+                .optional(),
+              statusInfo: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  reasonCode: z
+                    .string()
+                    .max(20)
+                    .describe(
+                      "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    ),
+                  additionalInfo: z
+                    .string()
+                    .max(512)
+                    .describe(
+                      "Additional text to provide detailed information.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe(
+                  "Element providing more information about the status.\r\n",
+                )
+                .optional(),
+              status: z
+                .enum([
+                  "Accepted",
+                  "UnknownComponent",
+                  "UnknownVariable",
+                  "UnsupportedMonitorType",
+                  "Rejected",
+                  "Duplicate",
+                ])
+                .describe(
+                  "Status is OK if a value could be returned. Otherwise this will indicate the reason why a value could not be returned.\r\n",
+                ),
+              type: z
+                .enum([
+                  "UpperThreshold",
+                  "LowerThreshold",
+                  "Delta",
+                  "Periodic",
+                  "PeriodicClockAligned",
+                ])
+                .describe(
+                  "The type of this monitor, e.g. a threshold, delta or periodic monitor. \r\n\r\n",
+                ),
+              component: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  evse: z
+                    .object({
+                      customData: z
+                        .object({ vendorId: z.string().max(255) })
+                        .describe(
+                          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                        )
+                        .optional(),
+                      id: z
+                        .number()
+                        .int()
+                        .describe(
+                          "Identified_ Object. MRID. Numeric_ Identifier\r\nurn:x-enexis:ecdm:uid:1:569198\r\nEVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.\r\n",
+                        ),
+                      connectorId: z
+                        .number()
+                        .int()
+                        .describe(
+                          "An id to designate a specific connector (on an EVSE) by connector index number.\r\n",
+                        )
+                        .optional(),
+                    })
+                    .strict()
+                    .describe(
+                      "EVSE\r\nurn:x-oca:ocpp:uid:2:233123\r\nElectric Vehicle Supply Equipment\r\n",
+                    )
+                    .optional(),
+                  name: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    ),
+                  instance: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe("A physical or logical component\r\n"),
+              variable: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  name: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    ),
+                  instance: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe("Reference key to a component-variable.\r\n"),
+              severity: z
+                .number()
+                .int()
+                .describe(
+                  "The severity that will be assigned to an event that is triggered by this monitor. The severity range is 0-9, with 0 as the highest and 9 as the lowest severity level.\r\n\r\nThe severity levels have the following meaning: +\r\n*0-Danger* +\r\nIndicates lives are potentially in danger. Urgent attention is needed and action should be taken immediately. +\r\n*1-Hardware Failure* +\r\nIndicates that the Charging Station is unable to continue regular operations due to Hardware issues. Action is required. +\r\n*2-System Failure* +\r\nIndicates that the Charging Station is unable to continue regular operations due to software or minor hardware issues. Action is required. +\r\n*3-Critical* +\r\nIndicates a critical error. Action is required. +\r\n*4-Error* +\r\nIndicates a non-urgent error. Action is required. +\r\n*5-Alert* +\r\nIndicates an alert event. Default severity for any type of monitoring event.  +\r\n*6-Warning* +\r\nIndicates a warning event. Action may be required. +\r\n*7-Notice* +\r\nIndicates an unusual event. No immediate action is required. +\r\n*8-Informational* +\r\nIndicates a regular operational event. May be used for reporting, measuring throughput, etc. No action is required. +\r\n*9-Debug* +\r\nIndicates information useful to developers for debugging, not useful during operations.\r\n\r\n",
+                ),
+            })
+            .strict()
+            .describe(
+              "Class to hold result of SetVariableMonitoring request.\r\n",
+            ),
+        )
+        .min(1),
+    })
+    .strict(),
+
+  SetVariables: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      setVariableResult: z
+        .array(
+          z
+            .object({
+              customData: z
+                .object({ vendorId: z.string().max(255) })
+                .describe(
+                  "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                )
+                .optional(),
+              attributeType: z
+                .enum(["Actual", "Target", "MinSet", "MaxSet"])
+                .describe(
+                  "Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.\r\n",
+                )
+                .default("Actual"),
+              attributeStatus: z
+                .enum([
+                  "Accepted",
+                  "Rejected",
+                  "UnknownComponent",
+                  "UnknownVariable",
+                  "NotSupportedAttributeType",
+                  "RebootRequired",
+                ])
+                .describe("Result status of setting the variable.\r\n"),
+              attributeStatusInfo: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  reasonCode: z
+                    .string()
+                    .max(20)
+                    .describe(
+                      "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    ),
+                  additionalInfo: z
+                    .string()
+                    .max(512)
+                    .describe(
+                      "Additional text to provide detailed information.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe(
+                  "Element providing more information about the status.\r\n",
+                )
+                .optional(),
+              component: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  evse: z
+                    .object({
+                      customData: z
+                        .object({ vendorId: z.string().max(255) })
+                        .describe(
+                          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                        )
+                        .optional(),
+                      id: z
+                        .number()
+                        .int()
+                        .describe(
+                          "Identified_ Object. MRID. Numeric_ Identifier\r\nurn:x-enexis:ecdm:uid:1:569198\r\nEVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.\r\n",
+                        ),
+                      connectorId: z
+                        .number()
+                        .int()
+                        .describe(
+                          "An id to designate a specific connector (on an EVSE) by connector index number.\r\n",
+                        )
+                        .optional(),
+                    })
+                    .strict()
+                    .describe(
+                      "EVSE\r\nurn:x-oca:ocpp:uid:2:233123\r\nElectric Vehicle Supply Equipment\r\n",
+                    )
+                    .optional(),
+                  name: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    ),
+                  instance: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe("A physical or logical component\r\n"),
+              variable: z
+                .object({
+                  customData: z
+                    .object({ vendorId: z.string().max(255) })
+                    .describe(
+                      "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                    )
+                    .optional(),
+                  name: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    ),
+                  instance: z
+                    .string()
+                    .max(50)
+                    .describe(
+                      "Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    )
+                    .optional(),
+                })
+                .strict()
+                .describe("Reference key to a component-variable.\r\n"),
+            })
+            .strict(),
+        )
+        .min(1),
+    })
+    .strict(),
+
+  SignCertificate: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected"])
+        .describe("Specifies whether the CSMS can process the request.\r\n"),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  StatusNotification: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  TransactionEvent: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      totalCost: z
+        .number()
+        .describe(
+          "SHALL only be sent when charging has ended. Final total cost of this transaction, including taxes. In the currency configured with the Configuration Variable: &lt;&lt;configkey-currency,`Currency`&gt;&gt;. When omitted, the transaction was NOT free. To indicate a free transaction, the CSMS SHALL send 0.00.\r\n\r\n",
+        )
+        .optional(),
+      chargingPriority: z
+        .number()
+        .int()
+        .describe(
+          "Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; is temporarily, so it may not be set in the &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt; afterwards. Also the chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules the one in &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt;.  \r\n",
+        )
+        .optional(),
+      idTokenInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          status: z
+            .enum([
+              "Accepted",
+              "Blocked",
+              "ConcurrentTx",
+              "Expired",
+              "Invalid",
+              "NoCredit",
+              "NotAllowedTypeEVSE",
+              "NotAtThisLocation",
+              "NotAtThisTime",
+              "Unknown",
+            ])
+            .describe(
+              "ID_ Token. Status. Authorization_ Status\r\nurn:x-oca:ocpp:uid:1:569372\r\nCurrent status of the ID Token.\r\n",
+            ),
+          cacheExpiryDateTime: z
+            .string()
+            .datetime()
+            .describe(
+              "ID_ Token. Expiry. Date_ Time\r\nurn:x-oca:ocpp:uid:1:569373\r\nDate and Time after which the token must be considered invalid.\r\n",
+            )
+            .optional(),
+          chargingPriority: z
+            .number()
+            .int()
+            .describe(
+              "Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. \r\n",
+            )
+            .optional(),
+          language1: z
+            .string()
+            .max(8)
+            .describe(
+              "ID_ Token. Language1. Language_ Code\r\nurn:x-oca:ocpp:uid:1:569374\r\nPreferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n\r\n",
+            )
+            .optional(),
+          evseId: z
+            .array(z.number().int())
+            .min(1)
+            .describe(
+              "Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.\r\n\r\n",
+            )
+            .optional(),
+          groupIdToken: z
+            .object({
+              customData: z
+                .object({ vendorId: z.string().max(255) })
+                .describe(
+                  "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                )
+                .optional(),
+              additionalInfo: z
+                .array(
+                  z
+                    .object({
+                      customData: z
+                        .object({ vendorId: z.string().max(255) })
+                        .describe(
+                          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                        )
+                        .optional(),
+                      additionalIdToken: z
+                        .string()
+                        .max(36)
+                        .describe(
+                          "This field specifies the additional IdToken.\r\n",
+                        ),
+                      type: z
+                        .string()
+                        .max(50)
+                        .describe(
+                          "This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.\r\n",
+                        ),
+                    })
+                    .strict()
+                    .describe(
+                      "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+                    ),
+                )
+                .min(1)
+                .optional(),
+              idToken: z
+                .string()
+                .max(36)
+                .describe(
+                  "IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.\r\n",
+                ),
+              type: z
+                .enum([
+                  "Central",
+                  "eMAID",
+                  "ISO14443",
+                  "ISO15693",
+                  "KeyCode",
+                  "Local",
+                  "MacAddress",
+                  "NoAuthorization",
+                ])
+                .describe("Enumeration of possible idToken types.\r\n"),
+            })
+            .strict()
+            .describe(
+              "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            )
+            .optional(),
+          language2: z
+            .string()
+            .max(8)
+            .describe(
+              "ID_ Token. Language2. Language_ Code\r\nurn:x-oca:ocpp:uid:1:569375\r\nSecond preferred user interface language of identifier user. Don’t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n",
+            )
+            .optional(),
+          personalMessage: z
+            .object({
+              customData: z
+                .object({ vendorId: z.string().max(255) })
+                .describe(
+                  "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+                )
+                .optional(),
+              format: z
+                .enum(["ASCII", "HTML", "URI", "UTF8"])
+                .describe(
+                  "Message_ Content. Format. Message_ Format_ Code\r\nurn:x-enexis:ecdm:uid:1:570848\r\nFormat of the message.\r\n",
+                ),
+              language: z
+                .string()
+                .max(8)
+                .describe(
+                  "Message_ Content. Language. Language_ Code\r\nurn:x-enexis:ecdm:uid:1:570849\r\nMessage language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n",
+                )
+                .optional(),
+              content: z
+                .string()
+                .max(512)
+                .describe(
+                  "Message_ Content. Content. Message\r\nurn:x-enexis:ecdm:uid:1:570852\r\nMessage contents.\r\n\r\n",
+                ),
+            })
+            .strict()
+            .describe(
+              "Message_ Content\r\nurn:x-enexis:ecdm:uid:2:234490\r\nContains message details, for a message to be displayed on a Charging Station.\r\n\r\n",
+            )
+            .optional(),
+        })
+        .strict()
+        .describe(
+          "ID_ Token\r\nurn:x-oca:ocpp:uid:2:233247\r\nContains status information about an identifier.\r\nIt is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.\r\n",
+        )
+        .optional(),
+      updatedPersonalMessage: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          format: z
+            .enum(["ASCII", "HTML", "URI", "UTF8"])
+            .describe(
+              "Message_ Content. Format. Message_ Format_ Code\r\nurn:x-enexis:ecdm:uid:1:570848\r\nFormat of the message.\r\n",
+            ),
+          language: z
+            .string()
+            .max(8)
+            .describe(
+              "Message_ Content. Language. Language_ Code\r\nurn:x-enexis:ecdm:uid:1:570849\r\nMessage language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n",
+            )
+            .optional(),
+          content: z
+            .string()
+            .max(512)
+            .describe(
+              "Message_ Content. Content. Message\r\nurn:x-enexis:ecdm:uid:1:570852\r\nMessage contents.\r\n\r\n",
+            ),
+        })
+        .strict()
+        .describe(
+          "Message_ Content\r\nurn:x-enexis:ecdm:uid:2:234490\r\nContains message details, for a message to be displayed on a Charging Station.\r\n\r\n",
+        )
+        .optional(),
+    })
+    .strict(),
+
+  TriggerMessage: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["Accepted", "Rejected", "NotImplemented"])
+        .describe(
+          "Indicates whether the Charging Station will send the requested notification or not.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  UnlockConnector: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum([
+          "Unlocked",
+          "UnlockFailed",
+          "OngoingAuthorizedTransaction",
+          "UnknownConnector",
+        ])
+        .describe(
+          "This indicates whether the Charging Station has unlocked the connector.\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+
+  UnpublishFirmware: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum(["DownloadOngoing", "NoFirmware", "Unpublished"])
+        .describe(
+          "Indicates whether the Local Controller succeeded in unpublishing the firmware.\r\n",
+        ),
+    })
+    .strict(),
+
+  UpdateFirmware: z
+    .object({
+      customData: z
+        .object({ vendorId: z.string().max(255) })
+        .describe(
+          "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+        )
+        .optional(),
+      status: z
+        .enum([
+          "Accepted",
+          "Rejected",
+          "AcceptedCanceled",
+          "InvalidCertificate",
+          "RevokedCertificate",
+        ])
+        .describe(
+          "This field indicates whether the Charging Station was able to accept the request.\r\n\r\n",
+        ),
+      statusInfo: z
+        .object({
+          customData: z
+            .object({ vendorId: z.string().max(255) })
+            .describe(
+              "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            )
+            .optional(),
+          reasonCode: z
+            .string()
+            .max(20)
+            .describe(
+              "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+            ),
+          additionalInfo: z
+            .string()
+            .max(512)
+            .describe("Additional text to provide detailed information.\r\n")
+            .optional(),
+        })
+        .strict()
+        .describe("Element providing more information about the status.\r\n")
+        .optional(),
+    })
+    .strict(),
+} satisfies Record<CallActions, z.AnyZodObject | null>;
