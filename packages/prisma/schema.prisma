@@ -17,6 +17,8 @@ model Organization {
   Memberships      Membership[]
   Roles            Role[]
   ChargingStations ChargingStation[]
+  IdTokens         IdToken[]
+  Drivers          Driver[]
 
   @@map("org")
 }
@@ -140,4 +142,30 @@ model ConnectorType {
   name       String      @db.VarChar(20)
   iconB64    String?
   Connectors Connector[]
+}
+
+model Driver {
+  id        String       @id @default(uuid()) @db.Uuid
+  name      String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  is_active Boolean      @default(true)
+  orgId     String       @db.Uuid
+  Org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  IdToken   IdToken[]
+}
+
+model IdToken {
+  id        String       @id @default(uuid()) @db.Uuid
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  is_active Boolean      @default(true)
+  orgId     String       @db.Uuid
+  Org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  // token must be in lowercase
+  token     String       @db.VarChar(36)
+  driverId  String       @db.Uuid
+  Driver    Driver       @relation(fields: [driverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([token, orgId])
 }

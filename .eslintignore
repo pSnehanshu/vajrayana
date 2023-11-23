@@ -2,3 +2,4 @@
 reset.d.ts
 **/build/
 **/dist/
+tmp
