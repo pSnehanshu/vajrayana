@@ -87,27 +87,28 @@ model Role {
 }
 
 model ChargingStation {
-  id                  String        @id @default(uuid()) @db.Uuid
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-  urlName             String        @db.VarChar(50)
-  friendlyName        String?       @db.VarChar(50)
-  orgId               String        @db.Uuid
-  Org                 Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  latitude            Int?          @map("lat") @db.SmallInt
-  longitude           Int?          @map("lon") @db.SmallInt
-  lastBootNotifTime   DateTime?     @map("lbnt")
-  lastBootNotifReason String?       @map("lbnr") @db.VarChar(20)
-  serialNumber        String?       @db.VarChar(25)
-  model               String?       @db.VarChar(20)
-  vendorName          String?       @db.VarChar(50)
-  firmwareVersion     String?       @map("firmV") @db.VarChar(50)
-  modem_iccid         String?       @map("iccid") @db.VarChar(20)
-  modem_imsi          String?       @map("imsi") @db.VarChar(20)
-  is_active           Boolean       @default(true)
+  id                  String              @id @default(uuid()) @db.Uuid
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  urlName             String              @db.VarChar(50)
+  friendlyName        String?             @db.VarChar(50)
+  orgId               String              @db.Uuid
+  Org                 Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  latitude            Int?                @db.SmallInt
+  longitude           Int?                @db.SmallInt
+  lastBootNotifTime   DateTime?
+  lastBootNotifReason String?             @db.VarChar(20)
+  serialNumber        String?             @db.VarChar(25)
+  model               String?             @db.VarChar(20)
+  vendorName          String?             @db.VarChar(50)
+  firmwareVersion     String?             @db.VarChar(50)
+  modem_iccid         String?             @db.VarChar(20)
+  modem_imsi          String?             @db.VarChar(20)
+  is_active           Boolean             @default(true)
   EVSEs               EVSE[]
   Connectors          Connector[]
   Transactions        Transaction[]
+  MeterValues         MeterSampledValue[]
 
   @@unique([orgId, urlName])
 }
@@ -175,25 +176,75 @@ model Transaction {
   createdAt          DateTime               @default(now())
   updatedAt          DateTime               @updatedAt
   serverId           String                 @id @default(uuid()) @db.Uuid
+  offline            Boolean                @default(false)
+  numberOfPhasesUsed Int?                   @db.SmallInt
+  cableMaxCurrent    Int?                   @db.SmallInt
+  reservationId      Int?
   localId            String                 @db.VarChar(36)
-  state              TxStateEnum            @default(Started)
-  chargingState      ChargingStateEnumType? @map("cstate")
-  timeSpentCharging  Int?                   @map("tmsc") @db.SmallInt
-  stoppedReason      ReasonEnumType?        @map("strn")
-  remoteStartId      Int?                   @map("rsid")
-  numberOfPhasesUsed Int?                   @map("phase") @db.SmallInt
-  cableMaxCurrent    Int?                   @map("mxcnt") @db.SmallInt
+  chargingState      ChargingStateEnumType?
+  timeSpentCharging  Int?                   @db.SmallInt
+  stoppedReason      ReasonEnumType?
+  remoteStartId      Int?
   stationId          String                 @db.Uuid
   Station            ChargingStation        @relation(fields: [stationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   evseSn             Int?                   @db.SmallInt
   connectorSn        Int?                   @db.SmallInt
+  Events             TransactionEvent[]
+  MeterValues        MeterSampledValue[]
 
   @@index([stationId, localId])
 }
 
+model TransactionEvent {
+  eventType          TxStateEnum
+  timestamp          DateTime
+  triggerReason      TriggerReasonEnumType
+  seqNo              Int                    @db.SmallInt
+  offline            Boolean                @default(false)
+  numberOfPhasesUsed Int?                   @db.SmallInt
+  cableMaxCurrent    Int?                   @db.SmallInt
+  reservationId      Int?
+  txId               String                 @db.Uuid
+  Tx                 Transaction            @relation(fields: [txId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
+  chargingState      ChargingStateEnumType?
+  timeSpentCharging  Int?                   @db.SmallInt
+  stoppedReason      ReasonEnumType?
+  remoteStartId      Int?
+  evseSn             Int?                   @db.SmallInt
+  connectorSn        Int?                   @db.SmallInt
+  createdAt          DateTime               @default(now())
+
+  @@id([txId, seqNo])
+}
+
 enum TxStateEnum {
   Started
+  Updated
   Ended
+}
+
+enum TriggerReasonEnumType {
+  Authorized
+  CablePluggedIn
+  ChargingRateChanged
+  ChargingStateChanged
+  Deauthorized
+  EnergyLimitReached
+  EVCommunicationLost
+  EVConnectTimeout
+  MeterValueClock
+  MeterValuePeriodic
+  TimeLimitReached
+  Trigger
+  UnlockCommand
+  StopAuthorized
+  EVDeparted
+  EVDetected
+  RemoteStop
+  RemoteStart
+  AbnormalCondition
+  SignedDataReceived
+  ResetCommand
 }
 
 enum ChargingStateEnumType {
@@ -224,4 +275,35 @@ enum ReasonEnumType {
   StoppedByEV
   TimeLimitReached
   Timeout
+}
+
+model MeterSampledValue {
+  id             String             @default(uuid()) @db.Uuid
+  stationId      String             @db.Uuid
+  Station        ChargingStation    @relation(fields: [stationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  txId           String?            @db.Uuid
+  Tx             Transaction?       @relation(fields: [txId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
+  timestamp      DateTime
+  value          Float
+  context        String             @default("Sample.Periodic")
+  measurand      String             @default("Energy.Active.Import.Register")
+  phase          String?
+  location       MeterValueLocation @default(Outlet)
+  unitOfMeasure  String?            @db.VarChar(20)
+  unitMultiplier Int                @default(0) @db.SmallInt
+  signedData     String?
+  signingMethod  String?            @db.VarChar(50)
+  encodingMethod String?            @db.VarChar(50)
+  publicKey      String?
+  createdAt      DateTime           @default(now())
+
+  @@id([stationId, id])
+}
+
+enum MeterValueLocation {
+  Body
+  Cable
+  EV
+  Inlet
+  Outlet
 }

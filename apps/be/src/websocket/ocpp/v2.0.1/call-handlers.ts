@@ -1,11 +1,113 @@
-import { prisma } from "@zigbolt/prisma";
+import { Prisma, prisma } from "@zigbolt/prisma";
 import { type OCPPRouter } from "../router";
-import { CallResultPayloadSchemas } from "./schemas-and-types";
+import {
+  CallActionPayloadSchemas,
+  CallResultPayloadSchemas,
+} from "./schemas-and-types";
 import { z } from "zod";
 
 type AuthorizationStatusType = z.infer<
   typeof CallResultPayloadSchemas.Authorize
 >["idTokenInfo"]["status"];
+
+type IdTokenType = z.infer<
+  typeof CallActionPayloadSchemas.Authorize
+>["idToken"];
+
+type IdTokenInfoType = NonNullable<
+  z.infer<typeof CallResultPayloadSchemas.TransactionEvent>["idTokenInfo"]
+>;
+
+type MeterValues = NonNullable<
+  z.infer<typeof CallActionPayloadSchemas.TransactionEvent>["meterValue"]
+>;
+
+/** Handle authorization of IdToken */
+async function AuthorizeIdToken(
+  idTokenInput: IdTokenType,
+  orgId: string,
+  orgName: string,
+): Promise<IdTokenInfoType> {
+  const { idToken, type } = idTokenInput;
+
+  switch (type) {
+    case "Central":
+    case "ISO14443":
+    case "ISO15693": {
+      const dbIdToken = await prisma.idToken.findUnique({
+        where: {
+          orgId_token: {
+            orgId,
+            token: idToken,
+          },
+        },
+        include: {
+          Driver: true,
+        },
+      });
+
+      let status: AuthorizationStatusType = "Unknown";
+      let message = "";
+
+      if (!dbIdToken) {
+        status = "Unknown";
+        message = "We are not able to identify you.";
+      } else if (!dbIdToken.is_active) {
+        status = "Blocked";
+        message = "The card is not active. Please use another card.";
+      } else if (!dbIdToken.Driver.is_active) {
+        status = "Blocked";
+        message = "You are banned! Please contact support.";
+      } else {
+        status = "Accepted";
+        message = `Welcome to ${orgName}. We hope you have a pleasant charging experience.`;
+      }
+
+      return {
+        status,
+        personalMessage: {
+          format: "UTF8",
+          content: `Hi ${dbIdToken?.Driver.name ?? "there"}, ${message}`,
+        },
+      };
+    }
+    default:
+      return {
+        status: "Invalid",
+        personalMessage: {
+          format: "ASCII",
+          content: `${type} tokens not supported yet`,
+        },
+      };
+  }
+}
+
+async function SaveMeterValues(meterValues: MeterValues, stationId: string) {
+  const data: Prisma.MeterSampledValueCreateManyInput[] = [];
+
+  // Loop over it to prepare the data to insert
+  meterValues.forEach((meterValue) => {
+    meterValue.sampledValue.forEach((sampledValue) => {
+      data.push({
+        stationId,
+        timestamp: meterValue.timestamp,
+        value: sampledValue.value,
+        context: sampledValue.context,
+        measurand: sampledValue.measurand,
+        phase: sampledValue.phase,
+        location: sampledValue.location,
+        unitOfMeasure: sampledValue.unitOfMeasure?.unit,
+        unitMultiplier: sampledValue.unitOfMeasure?.multiplier,
+        signedData: sampledValue.signedMeterValue?.signedMeterData,
+        signingMethod: sampledValue.signedMeterValue?.signingMethod,
+        encodingMethod: sampledValue.signedMeterValue?.encodingMethod,
+        publicKey: sampledValue.signedMeterValue?.publicKey,
+      });
+    });
+  });
+
+  await prisma.meterSampledValue.createMany({ data });
+}
 
 /**
  * Given OCPP router instance, it will attach call handlers to it
@@ -51,57 +153,149 @@ export function AttachCallHandlers(router: OCPPRouter) {
   router.attachCallHandler(
     "Authorize",
     async (details, payload, sendResult, sendError) => {
-      const {
-        idToken: { idToken, type },
-      } = payload;
+      const { Org } = details.chargingStation;
 
-      switch (type) {
-        case "Central":
-        case "ISO14443":
-        case "ISO15693": {
-          const dbIdToken = await prisma.idToken.findUnique({
-            where: {
-              token_orgId: {
-                orgId: details.chargingStation.orgId,
-                token: idToken,
-              },
+      const idTokenInfo = await AuthorizeIdToken(
+        payload.idToken,
+        Org.id,
+        Org.name,
+      );
+
+      sendResult({ idTokenInfo });
+    },
+  );
+
+  router.attachCallHandler(
+    "TransactionEvent",
+    async (details, payload, sendResult, sendError) => {
+      const { Org } = details.chargingStation;
+      const { transactionInfo: txinfo, evse, idToken } = payload;
+
+      const idTokenInfo = idToken
+        ? await AuthorizeIdToken(idToken, Org.id, Org.name)
+        : undefined;
+
+      // Send response early, then proceed
+      sendResult({ idTokenInfo });
+
+      // If given EVSE and Connector aren't on DB already, let's insert them
+      if (evse) {
+        await prisma.eVSE.upsert({
+          where: {
+            stationId_sn: {
+              sn: evse.id,
+              stationId: details.chargingStation.id,
             },
-            include: {
-              Driver: true,
+          },
+          create: {
+            sn: evse.id,
+            stationId: details.chargingStation.id,
+            friendlyName: `EVSE #${evse.id}`,
+            Connectors:
+              // If connector is specified, create it
+              typeof evse.connectorId === "number"
+                ? {
+                    create: { sn: evse.connectorId },
+                  }
+                : undefined,
+          },
+          update: {
+            Connectors: {
+              upsert:
+                // If connector is specified, try to create it if it doesn't already exist
+                typeof evse.connectorId === "number"
+                  ? {
+                      where: {
+                        stationId_evseNum_sn: {
+                          sn: evse.connectorId,
+                          evseNum: evse.id,
+                          stationId: details.chargingStation.id,
+                        },
+                      },
+                      create: {
+                        sn: evse.connectorId,
+                      },
+                      update: {},
+                    }
+                  : undefined,
+            },
+          },
+        });
+      }
+
+      const dbTx = await prisma.transaction.findFirst({
+        where: {
+          localId: txinfo.transactionId,
+          stationId: details.chargingStation.id,
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+      });
+
+      // Insert the event
+      const txEvent = await prisma.transactionEvent.create({
+        data: {
+          eventType: payload.eventType,
+          timestamp: payload.timestamp,
+          triggerReason: payload.triggerReason,
+          seqNo: payload.seqNo,
+          offline: payload.offline,
+          numberOfPhasesUsed: payload.numberOfPhasesUsed,
+          cableMaxCurrent: payload.cableMaxCurrent,
+          reservationId: payload.reservationId,
+          Tx: dbTx
+            ? {
+                connect: {
+                  serverId: dbTx.serverId,
+                },
+              }
+            : {
+                create: {
+                  localId: txinfo.transactionId,
+                  stationId: details.chargingStation.id,
+                },
+              },
+          chargingState: txinfo.chargingState,
+          timeSpentCharging: txinfo.timeSpentCharging,
+          stoppedReason: txinfo.stoppedReason,
+          remoteStartId: txinfo.remoteStartId,
+          evseSn: evse?.id,
+          connectorSn: evse?.connectorId,
+        },
+      });
+
+      switch (payload.eventType) {
+        case "Started":
+        case "Updated":
+        case "Ended": {
+          await prisma.transaction.update({
+            where: { serverId: txEvent.txId },
+            data: {
+              offline: payload.offline,
+              numberOfPhasesUsed: payload.numberOfPhasesUsed,
+              cableMaxCurrent: payload.cableMaxCurrent,
+              reservationId: payload.reservationId,
+              chargingState: txinfo.chargingState,
+              timeSpentCharging: txinfo.timeSpentCharging,
+              stoppedReason: txinfo.stoppedReason,
+              remoteStartId: txinfo.remoteStartId,
+              evseSn: evse?.id,
+              connectorSn: evse?.connectorId,
             },
           });
 
-          let status: AuthorizationStatusType = "Unknown";
-          let message = "";
-
-          if (!dbIdToken) {
-            status = "Unknown";
-            message = "We are not able to identify you.";
-          } else if (!dbIdToken.is_active) {
-            status = "Blocked";
-            message = "The card is not active. Please use another card.";
-          } else if (!dbIdToken.Driver.is_active) {
-            status = "Blocked";
-            message = "You are banned! Please contact support.";
-          } else {
-            status = "Accepted";
-            message = `Welcome to ${details.chargingStation.Org.name}. We hope you have a pleasant charging experience.`;
-          }
-
-          sendResult({
-            idTokenInfo: {
-              status,
-              personalMessage: {
-                format: "UTF8",
-                content: `Hi ${dbIdToken?.Driver.name ?? "there"}, ${message}`,
-              },
-            },
-          });
           break;
         }
         default:
-          sendError("GenericError", `Can't use type: ${type}`);
+          console.error("Unknown eventType", payload.eventType);
       }
+
+      // Save the incoming meter values
+      await SaveMeterValues(
+        payload.meterValue ?? [],
+        details.chargingStation.id,
+      );
     },
   );
 

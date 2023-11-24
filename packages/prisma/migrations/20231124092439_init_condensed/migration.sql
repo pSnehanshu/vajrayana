@@ -2,13 +2,19 @@
 CREATE TYPE "RoleType" AS ENUM ('owner', 'custom');
 
 -- CreateEnum
-CREATE TYPE "TxStateEnum" AS ENUM ('Started', 'Ended');
+CREATE TYPE "TxStateEnum" AS ENUM ('Started', 'Updated', 'Ended');
+
+-- CreateEnum
+CREATE TYPE "TriggerReasonEnumType" AS ENUM ('Authorized', 'CablePluggedIn', 'ChargingRateChanged', 'ChargingStateChanged', 'Deauthorized', 'EnergyLimitReached', 'EVCommunicationLost', 'EVConnectTimeout', 'MeterValueClock', 'MeterValuePeriodic', 'TimeLimitReached', 'Trigger', 'UnlockCommand', 'StopAuthorized', 'EVDeparted', 'EVDetected', 'RemoteStop', 'RemoteStart', 'AbnormalCondition', 'SignedDataReceived', 'ResetCommand');
 
 -- CreateEnum
 CREATE TYPE "ChargingStateEnumType" AS ENUM ('Charging', 'EVConnected', 'SuspendedEV', 'SuspendedEVSE', 'Idle');
 
 -- CreateEnum
 CREATE TYPE "ReasonEnumType" AS ENUM ('DeAuthorized', 'EmergencyStop', 'EnergyLimitReached', 'EVDisconnected', 'GroundFault', 'ImmediateReset', 'Local', 'LocalOutOfCredit', 'MasterPass', 'Other', 'OvercurrentFault', 'PowerLoss', 'PowerQuality', 'Reboot', 'Remote', 'SOCLimitReached', 'StoppedByEV', 'TimeLimitReached', 'Timeout');
+
+-- CreateEnum
+CREATE TYPE "MeterValueLocation" AS ENUM ('Body', 'Cable', 'EV', 'Inlet', 'Outlet');
 
 -- CreateTable
 CREATE TABLE "org" (
@@ -89,16 +95,16 @@ CREATE TABLE "ChargingStation" (
     "urlName" VARCHAR(50) NOT NULL,
     "friendlyName" VARCHAR(50),
     "orgId" UUID NOT NULL,
-    "lat" SMALLINT,
-    "lon" SMALLINT,
-    "lbnt" TIMESTAMP(3),
-    "lbnr" VARCHAR(20),
+    "latitude" SMALLINT,
+    "longitude" SMALLINT,
+    "lastBootNotifTime" TIMESTAMP(3),
+    "lastBootNotifReason" VARCHAR(20),
     "serialNumber" VARCHAR(25),
     "model" VARCHAR(20),
     "vendorName" VARCHAR(50),
-    "firmV" VARCHAR(50),
-    "iccid" VARCHAR(20),
-    "imsi" VARCHAR(20),
+    "firmwareVersion" VARCHAR(50),
+    "modem_iccid" VARCHAR(20),
+    "modem_imsi" VARCHAR(20),
     "is_active" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "ChargingStation_pkey" PRIMARY KEY ("id")
@@ -166,19 +172,64 @@ CREATE TABLE "Transaction" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "serverId" UUID NOT NULL,
+    "offline" BOOLEAN NOT NULL DEFAULT false,
+    "numberOfPhasesUsed" SMALLINT,
+    "cableMaxCurrent" SMALLINT,
+    "reservationId" INTEGER,
     "localId" VARCHAR(36) NOT NULL,
-    "state" "TxStateEnum" NOT NULL DEFAULT 'Started',
-    "cstate" "ChargingStateEnumType",
-    "tmsc" SMALLINT,
-    "strn" "ReasonEnumType",
-    "rsid" INTEGER,
-    "phase" SMALLINT,
-    "mxcnt" SMALLINT,
+    "chargingState" "ChargingStateEnumType",
+    "timeSpentCharging" SMALLINT,
+    "stoppedReason" "ReasonEnumType",
+    "remoteStartId" INTEGER,
     "stationId" UUID NOT NULL,
     "evseSn" SMALLINT,
     "connectorSn" SMALLINT,
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("serverId")
+);
+
+-- CreateTable
+CREATE TABLE "TransactionEvent" (
+    "eventType" "TxStateEnum" NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL,
+    "triggerReason" "TriggerReasonEnumType" NOT NULL,
+    "seqNo" SMALLINT NOT NULL,
+    "offline" BOOLEAN NOT NULL DEFAULT false,
+    "numberOfPhasesUsed" SMALLINT,
+    "cableMaxCurrent" SMALLINT,
+    "reservationId" INTEGER,
+    "txId" UUID NOT NULL,
+    "chargingState" "ChargingStateEnumType",
+    "timeSpentCharging" SMALLINT,
+    "stoppedReason" "ReasonEnumType",
+    "remoteStartId" INTEGER,
+    "evseSn" SMALLINT,
+    "connectorSn" SMALLINT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TransactionEvent_pkey" PRIMARY KEY ("txId","seqNo")
+);
+
+-- CreateTable
+CREATE TABLE "MeterSampledValue" (
+    "id" UUID NOT NULL,
+    "stationId" UUID NOT NULL,
+    "txId" UUID,
+    "timestamp" TIMESTAMP(3) NOT NULL,
+    "value" DOUBLE PRECISION NOT NULL,
+    "context" TEXT NOT NULL DEFAULT 'Sample.Periodic',
+    "measurand" TEXT NOT NULL DEFAULT 'Energy.Active.Import.Register',
+    "phase" TEXT,
+    "location" "MeterValueLocation" NOT NULL DEFAULT 'Outlet',
+    "unitOfMeasure" VARCHAR(20),
+    "unitMultiplier" SMALLINT NOT NULL DEFAULT 0,
+    "signedData" TEXT,
+    "signingMethod" VARCHAR(50),
+    "encodingMethod" VARCHAR(50),
+    "publicKey" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "MeterSampledValue_pkey" PRIMARY KEY ("stationId","id")
 );
 
 -- CreateIndex
@@ -240,3 +291,12 @@ ALTER TABLE "IdToken" ADD CONSTRAINT "IdToken_driverId_fkey" FOREIGN KEY ("drive
 
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "ChargingStation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TransactionEvent" ADD CONSTRAINT "TransactionEvent_txId_fkey" FOREIGN KEY ("txId") REFERENCES "Transaction"("serverId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MeterSampledValue" ADD CONSTRAINT "MeterSampledValue_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "ChargingStation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MeterSampledValue" ADD CONSTRAINT "MeterSampledValue_txId_fkey" FOREIGN KEY ("txId") REFERENCES "Transaction"("serverId") ON DELETE CASCADE ON UPDATE CASCADE;
