@@ -158,7 +158,7 @@ export function AttachCallHandlers(router: OCPPRouter) {
 
   router.attachCallHandler(
     "Authorize",
-    async (details, payload, sendResult, sendError) => {
+    async (details, payload, sendResult) => {
       const { Org } = details.chargingStation;
 
       const authResponse = await AuthorizeIdToken(
@@ -173,7 +173,7 @@ export function AttachCallHandlers(router: OCPPRouter) {
 
   router.attachCallHandler(
     "TransactionEvent",
-    async (details, payload, sendResult, sendError) => {
+    async (details, payload, sendResult) => {
       const { Org } = details.chargingStation;
       const { transactionInfo: txinfo, evse, idToken } = payload;
 
@@ -309,6 +309,56 @@ export function AttachCallHandlers(router: OCPPRouter) {
         payload.meterValue ?? [],
         details.chargingStation.id,
       );
+    },
+  );
+
+  router.attachCallHandler(
+    "StatusNotification",
+    async (details, payload, sendResult) => {
+      await prisma.eVSE.upsert({
+        where: {
+          stationId_sn: {
+            sn: payload.evseId,
+            stationId: details.chargingStation.id,
+          },
+        },
+        create: {
+          sn: payload.evseId,
+          stationId: details.chargingStation.id,
+          friendlyName: `EVSE #${payload.evseId}`,
+          Connectors: {
+            create: {
+              sn: payload.connectorId,
+              status: payload.connectorStatus,
+              statusUpdatedAt: payload.timestamp,
+            },
+          },
+        },
+        update: {
+          Connectors: {
+            upsert: {
+              where: {
+                stationId_evseNum_sn: {
+                  sn: payload.connectorId,
+                  evseNum: payload.evseId,
+                  stationId: details.chargingStation.id,
+                },
+              },
+              create: {
+                sn: payload.connectorId,
+                status: payload.connectorStatus,
+                statusUpdatedAt: payload.timestamp,
+              },
+              update: {
+                status: payload.connectorStatus,
+                statusUpdatedAt: payload.timestamp,
+              },
+            },
+          },
+        },
+      });
+
+      sendResult({});
     },
   );
 
