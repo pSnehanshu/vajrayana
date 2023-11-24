@@ -27,13 +27,14 @@ async function AuthorizeIdToken(
   idTokenInput: IdTokenType,
   orgId: string,
   orgName: string,
-): Promise<IdTokenInfoType> {
+): Promise<{ idTokenInfo: IdTokenInfoType; tokenId?: string }> {
   const { idToken, type } = idTokenInput;
 
   switch (type) {
     case "Central":
     case "ISO14443":
-    case "ISO15693": {
+    case "ISO15693":
+    case "KeyCode": {
       const dbIdToken = await prisma.idToken.findUnique({
         where: {
           orgId_token: {
@@ -64,19 +65,24 @@ async function AuthorizeIdToken(
       }
 
       return {
-        status,
-        personalMessage: {
-          format: "UTF8",
-          content: `Hi ${dbIdToken?.Driver.name ?? "there"}, ${message}`,
+        idTokenInfo: {
+          status,
+          personalMessage: {
+            format: "UTF8",
+            content: `Hi ${dbIdToken?.Driver.name ?? "there"}, ${message}`,
+          },
         },
+        tokenId: dbIdToken?.id,
       };
     }
     default:
       return {
-        status: "Invalid",
-        personalMessage: {
-          format: "ASCII",
-          content: `${type} tokens not supported yet`,
+        idTokenInfo: {
+          status: "Invalid",
+          personalMessage: {
+            format: "ASCII",
+            content: `${type} tokens not supported yet`,
+          },
         },
       };
   }
@@ -155,13 +161,13 @@ export function AttachCallHandlers(router: OCPPRouter) {
     async (details, payload, sendResult, sendError) => {
       const { Org } = details.chargingStation;
 
-      const idTokenInfo = await AuthorizeIdToken(
+      const authResponse = await AuthorizeIdToken(
         payload.idToken,
         Org.id,
         Org.name,
       );
 
-      sendResult({ idTokenInfo });
+      sendResult({ idTokenInfo: authResponse.idTokenInfo });
     },
   );
 
@@ -171,12 +177,12 @@ export function AttachCallHandlers(router: OCPPRouter) {
       const { Org } = details.chargingStation;
       const { transactionInfo: txinfo, evse, idToken } = payload;
 
-      const idTokenInfo = idToken
+      const authResponse = idToken
         ? await AuthorizeIdToken(idToken, Org.id, Org.name)
         : undefined;
 
       // Send response early, then proceed
-      sendResult({ idTokenInfo });
+      sendResult({ idTokenInfo: authResponse?.idTokenInfo });
 
       // If given EVSE and Connector aren't on DB already, let's insert them
       if (evse) {
@@ -254,6 +260,7 @@ export function AttachCallHandlers(router: OCPPRouter) {
                 create: {
                   localId: txinfo.transactionId,
                   stationId: details.chargingStation.id,
+                  idTokenId: authResponse?.tokenId,
                 },
               },
           chargingState: txinfo.chargingState,
@@ -262,6 +269,11 @@ export function AttachCallHandlers(router: OCPPRouter) {
           remoteStartId: txinfo.remoteStartId,
           evseSn: evse?.id,
           connectorSn: evse?.connectorId,
+          IdToken: authResponse?.tokenId
+            ? {
+                connect: { id: authResponse.tokenId },
+              }
+            : undefined,
         },
       });
 
@@ -282,6 +294,7 @@ export function AttachCallHandlers(router: OCPPRouter) {
               remoteStartId: txinfo.remoteStartId,
               evseSn: evse?.id,
               connectorSn: evse?.connectorId,
+              idTokenId: authResponse?.tokenId,
             },
           });
 
