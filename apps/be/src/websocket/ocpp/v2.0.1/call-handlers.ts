@@ -366,5 +366,45 @@ export function AttachCallHandlers(router: OCPPRouter) {
     sendResult({ currentTime: new Date().toUTCString() });
   });
 
+  router.attachCallHandler(
+    "NotifyEvent",
+    async (details, payload, sendResult) => {
+      sendResult({});
+
+      const data: Prisma.NotifyEventCreateManyInput[] = [];
+
+      payload.eventData.forEach((eventData) => {
+        data.push({
+          stationId: details.chargingStation.id,
+          timestamp: eventData.timestamp,
+          tbc: payload.tbc,
+          seqNo: payload.seqNo,
+          localEventId: eventData.eventId,
+          trigger: eventData.trigger,
+          cause: eventData.cause,
+          actualValue: eventData.actualValue,
+          techCode: eventData.techCode,
+          techInfo: eventData.techInfo,
+          cleared: eventData.cleared,
+          localTxId: eventData.transactionId,
+          variableMonitoringId: eventData.variableMonitoringId,
+          type: eventData.eventNotificationType,
+          componentName: eventData.component.name,
+          componentInstance: eventData.component.instance,
+          evseSn: eventData.component.evse?.id,
+          connectorSn: eventData.component.evse?.connectorId,
+          variableName: eventData.variable.name,
+          variableInstance: eventData.variable.instance,
+        });
+      });
+
+      await prisma.notifyEvent.createMany({ data });
+    },
+  );
+
+  router.attachCallHandler("DataTransfer", (_details, _payload, sendResult) => {
+    sendResult({ status: "UnknownVendorId" });
+  });
+
   return router;
 }

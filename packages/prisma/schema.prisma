@@ -109,6 +109,7 @@ model ChargingStation {
   Connectors          Connector[]
   Transactions        Transaction[]
   MeterValues         MeterSampledValue[]
+  NotifyEvents        NotifyEvent[]
 
   @@unique([orgId, urlName])
 }
@@ -207,6 +208,7 @@ model Transaction {
   MeterValues        MeterSampledValue[]
   idTokenId          String?                @db.Uuid
   IdToken            IdToken?               @relation(fields: [idTokenId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  NotifyEvents       NotifyEvent[]
 
   @@index([stationId, localId])
 }
@@ -324,4 +326,46 @@ enum MeterValueLocation {
   EV
   Inlet
   Outlet
+}
+
+model NotifyEvent {
+  id                   String                    @default(uuid()) @db.Uuid
+  stationId            String                    @db.Uuid
+  Station              ChargingStation           @relation(fields: [stationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  timestamp            DateTime
+  tbc                  Boolean                   @default(false)
+  seqNo                Int                       @db.SmallInt
+  localEventId         Int
+  trigger              EventTriggerEnumType
+  cause                Int?
+  actualValue          String
+  techCode             String?                   @db.VarChar(50)
+  techInfo             String?                   @db.VarChar(500)
+  cleared              Boolean?
+  localTxId            String?                   @db.VarChar(36)
+  txId                 String?                   @db.Uuid
+  Tx                   Transaction?              @relation(fields: [txId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
+  variableMonitoringId Int?
+  type                 EventNotificationEnumType
+  componentName        String                    @db.VarChar(50)
+  componentInstance    String?                   @db.VarChar(50)
+  evseSn               Int?
+  connectorSn          Int?
+  variableName         String                    @db.VarChar(50)
+  variableInstance     String?                   @db.VarChar(50)
+
+  @@id([stationId, id])
+}
+
+enum EventTriggerEnumType {
+  Alerting
+  Delta
+  Periodic
+}
+
+enum EventNotificationEnumType {
+  HardWiredNotification
+  HardWiredMonitor
+  PreconfiguredMonitor
+  CustomMonitor
 }
