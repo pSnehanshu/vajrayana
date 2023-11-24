@@ -2,6 +2,9 @@
 CREATE TYPE "RoleType" AS ENUM ('owner', 'custom');
 
 -- CreateEnum
+CREATE TYPE "ConnectorStatus" AS ENUM ('Available', 'Occupied', 'Reserved', 'Unavailable', 'Faulted');
+
+-- CreateEnum
 CREATE TYPE "TxStateEnum" AS ENUM ('Started', 'Updated', 'Ended');
 
 -- CreateEnum
@@ -15,6 +18,12 @@ CREATE TYPE "ReasonEnumType" AS ENUM ('DeAuthorized', 'EmergencyStop', 'EnergyLi
 
 -- CreateEnum
 CREATE TYPE "MeterValueLocation" AS ENUM ('Body', 'Cable', 'EV', 'Inlet', 'Outlet');
+
+-- CreateEnum
+CREATE TYPE "EventTriggerEnumType" AS ENUM ('Alerting', 'Delta', 'Periodic');
+
+-- CreateEnum
+CREATE TYPE "EventNotificationEnumType" AS ENUM ('HardWiredNotification', 'HardWiredMonitor', 'PreconfiguredMonitor', 'CustomMonitor');
 
 -- CreateTable
 CREATE TABLE "org" (
@@ -123,10 +132,14 @@ CREATE TABLE "EVSE" (
 
 -- CreateTable
 CREATE TABLE "Connector" (
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "sn" SMALLINT NOT NULL,
     "stationId" UUID NOT NULL,
     "evseNum" SMALLINT NOT NULL,
     "typeId" TEXT,
+    "status" "ConnectorStatus" NOT NULL DEFAULT 'Unavailable',
+    "statusUpdatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Connector_pkey" PRIMARY KEY ("stationId","evseNum","sn")
 );
@@ -184,6 +197,7 @@ CREATE TABLE "Transaction" (
     "stationId" UUID NOT NULL,
     "evseSn" SMALLINT,
     "connectorSn" SMALLINT,
+    "idTokenId" UUID,
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("serverId")
 );
@@ -206,6 +220,7 @@ CREATE TABLE "TransactionEvent" (
     "evseSn" SMALLINT,
     "connectorSn" SMALLINT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "idTokenId" UUID,
 
     CONSTRAINT "TransactionEvent_pkey" PRIMARY KEY ("txId","seqNo")
 );
@@ -230,6 +245,34 @@ CREATE TABLE "MeterSampledValue" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "MeterSampledValue_pkey" PRIMARY KEY ("stationId","id")
+);
+
+-- CreateTable
+CREATE TABLE "NotifyEvent" (
+    "id" UUID NOT NULL,
+    "stationId" UUID NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL,
+    "tbc" BOOLEAN NOT NULL DEFAULT false,
+    "seqNo" SMALLINT NOT NULL,
+    "localEventId" INTEGER NOT NULL,
+    "trigger" "EventTriggerEnumType" NOT NULL,
+    "cause" INTEGER,
+    "actualValue" TEXT NOT NULL,
+    "techCode" VARCHAR(50),
+    "techInfo" VARCHAR(500),
+    "cleared" BOOLEAN,
+    "localTxId" VARCHAR(36),
+    "txId" UUID,
+    "variableMonitoringId" INTEGER,
+    "type" "EventNotificationEnumType" NOT NULL,
+    "componentName" VARCHAR(50) NOT NULL,
+    "componentInstance" VARCHAR(50),
+    "evseSn" INTEGER,
+    "connectorSn" INTEGER,
+    "variableName" VARCHAR(50) NOT NULL,
+    "variableInstance" VARCHAR(50),
+
+    CONSTRAINT "NotifyEvent_pkey" PRIMARY KEY ("stationId","id")
 );
 
 -- CreateIndex
@@ -293,10 +336,22 @@ ALTER TABLE "IdToken" ADD CONSTRAINT "IdToken_driverId_fkey" FOREIGN KEY ("drive
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "ChargingStation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_idTokenId_fkey" FOREIGN KEY ("idTokenId") REFERENCES "IdToken"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "TransactionEvent" ADD CONSTRAINT "TransactionEvent_txId_fkey" FOREIGN KEY ("txId") REFERENCES "Transaction"("serverId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TransactionEvent" ADD CONSTRAINT "TransactionEvent_idTokenId_fkey" FOREIGN KEY ("idTokenId") REFERENCES "IdToken"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "MeterSampledValue" ADD CONSTRAINT "MeterSampledValue_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "ChargingStation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "MeterSampledValue" ADD CONSTRAINT "MeterSampledValue_txId_fkey" FOREIGN KEY ("txId") REFERENCES "Transaction"("serverId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "NotifyEvent" ADD CONSTRAINT "NotifyEvent_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "ChargingStation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "NotifyEvent" ADD CONSTRAINT "NotifyEvent_txId_fkey" FOREIGN KEY ("txId") REFERENCES "Transaction"("serverId") ON DELETE CASCADE ON UPDATE CASCADE;
