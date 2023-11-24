@@ -362,5 +362,9 @@ export function AttachCallHandlers(router: OCPPRouter) {
     },
   );
 
+  router.attachCallHandler("Heartbeat", (_details, _payload, sendResult) => {
+    sendResult({ currentTime: new Date().toUTCString() });
+  });
+
   return router;
 }
