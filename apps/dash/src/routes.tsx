@@ -11,8 +11,9 @@ import { trpc } from "./utils/trpc";
 import { useEffect } from "react";
 import { TopBar } from "./components/layout/topbar";
 import { SideBar } from "./components/layout/sidebar";
-import SettingsPage from "./pages/settings";
 import { FullPageLoading } from "./components/full-page-loading";
+import { SettingsPage } from "./pages/settings";
+import { ChargingStationsPage } from "./pages/charging-stations";
 
 export function Routes() {
   const setUser = useStore((s) => s.setUser);
@@ -74,7 +75,7 @@ export function Routes() {
                 </Route>
 
                 <Route path="/cs">
-                  <h1>CS!</h1>
+                  <ChargingStationsPage />
                 </Route>
 
                 <Route path="/transactions">

@@ -7,10 +7,10 @@ import {
   Switch,
   useRouteMatch,
 } from "react-router-dom";
-import { FaUsers, FaBuildingColumns, FaUserTag } from "react-icons/fa6";
-import OrgSettingsPage from "./OrgSettings";
-import MemberSettingsPage from "./MemberSettings";
-import RoleSettingsPage from "./RoleSettings";
+import { FaUsers, FaChargingStation } from "react-icons/fa6";
+import { ChargingStationsList } from "./ChargingStationsList";
+// import MemberSettingsPage from "./MemberSettings";
+// import RoleSettingsPage from "./RoleSettings";
 
 type MenuItem = {
   title: string;
@@ -18,27 +18,27 @@ type MenuItem = {
   link: string;
 };
 
-export function SettingsPage() {
+export function ChargingStationsPage() {
   const match = useRouteMatch();
   const [navVisible, setNavVisible] = useState(true);
 
   const menu = useMemo<MenuItem[]>(
     () => [
       {
-        title: "Organization",
-        link: `${match.url}/org`,
-        icon: <FaBuildingColumns />,
+        title: "Stations",
+        link: `${match.url}/stations`,
+        icon: <FaChargingStation />,
       },
       {
-        title: "Members",
-        link: `${match.url}/members`,
-        icon: <FaUsers />,
+        title: "EVSEs",
+        link: `${match.url}/evse`,
+        icon: <FaChargingStation />,
       },
-      {
-        title: "Roles",
-        link: `${match.url}/roles`,
-        icon: <FaUserTag />,
-      },
+      // {
+      //   title: "Roles",
+      //   link: `${match.url}/roles`,
+      //   icon: <FaUserTag />,
+      // },
     ],
     [match.url],
   );
@@ -77,9 +77,12 @@ export function SettingsPage() {
 
       <div className="border-t-2 lg:border-0 border-gray-200 dark:border-gray-700 lg:flex-grow p-4 py-8 overflow-x-auto">
         <Switch>
-          <Route path={`${match.url}/org`} component={OrgSettingsPage} />
-          <Route path={`${match.url}/members`} component={MemberSettingsPage} />
-          <Route path={`${match.url}/roles`} component={RoleSettingsPage} />
+          <Route
+            path={`${match.url}/stations`}
+            component={ChargingStationsList}
+          />
+          {/* <Route path={`${match.url}/members`} component={MemberSettingsPage} />
+          <Route path={`${match.url}/roles`} component={RoleSettingsPage} /> */}
           <Route path="/">
             <Redirect to={menu.at(0)?.link ?? "/"} />
           </Route>
