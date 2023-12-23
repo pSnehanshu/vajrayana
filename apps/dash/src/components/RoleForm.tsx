@@ -32,7 +32,6 @@ type RoleFormProps = {
 export function RoleForm({ onSubmit, initialValues }: RoleFormProps) {
   return (
     <Formik
-      className="p-4 md:p-5"
       initialValues={
         initialValues ?? {
           name: "",
@@ -56,7 +55,7 @@ export function RoleForm({ onSubmit, initialValues }: RoleFormProps) {
       }}
     >
       {(opts) => (
-        <Form className="p-4">
+        <Form>
           <div className="mb-4">
             <label
               htmlFor="name"

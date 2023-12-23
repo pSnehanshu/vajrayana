@@ -67,7 +67,7 @@ export function MemberForm({ onSubmit, initialValues }: InviteMemberProps) {
       }}
     >
       {(opts) => (
-        <Form className="p-4">
+        <Form>
           {/* <pre>{JSON.stringify(opts.errors, null, 2)}</pre> */}
 
           <div className="mb-4">
