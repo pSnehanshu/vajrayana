@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import { FaUsers, FaChargingStation } from "react-icons/fa6";
 import { ChargingStationsList } from "./ChargingStationsList";
+import { ChargingStationsDetails } from "./ChargingStationDetails";
 // import MemberSettingsPage from "./MemberSettings";
 // import RoleSettingsPage from "./RoleSettings";
 
@@ -79,8 +80,15 @@ export function ChargingStationsPage() {
         <Switch>
           <Route
             path={`${match.url}/stations`}
+            exact
             component={ChargingStationsList}
           />
+
+          <Route
+            path={`${match.url}/stations/:id`}
+            component={ChargingStationsDetails}
+          />
+
           {/* <Route path={`${match.url}/members`} component={MemberSettingsPage} />
           <Route path={`${match.url}/roles`} component={RoleSettingsPage} /> */}
           <Route path="/">

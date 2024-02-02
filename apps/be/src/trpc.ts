@@ -168,6 +168,9 @@ export const publicProcedure = t.procedure;
 /** Requires user to be logged in */
 export const authProcedure = t.procedure.use(authMiddleware);
 
+/** Requires x-org-id to be mentioned */
+export const orgProcedure = t.procedure.use(orgMiddleware);
+
 /** Requires user to have the specified permissions to proceed */
 export const permissionProcedure = (
   permissions: UserPermissions[] = [],

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { uniq } from "lodash-es";
-import { Prisma, prisma } from "@zigbolt/prisma";
+import { Prisma } from "@zigbolt/prisma";
 import { UserPermissions, permissionSchema } from "@zigbolt/shared";
 import { permissionProcedure, router } from "../trpc";
 import { paginationSchema } from "../utils/schemas";
