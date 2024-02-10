@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20 as build
+FROM node:20-slim as build
 RUN corepack enable
 
 WORKDIR /var/www/zigbolt
@@ -16,7 +16,7 @@ RUN yarn workspace @zigbolt/frontend build
 
 
 # Final stage
-FROM node:20
+FROM node:20-slim
 
 # Install Nginx
 RUN apt-get update && \
