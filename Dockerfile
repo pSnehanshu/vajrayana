@@ -36,7 +36,7 @@ RUN rm -rf ./apps/frontend; \
   yarn prisma generate
 
 # Copy frontend built artifacts
-COPY --from=build /var/zigbolt/apps/frontend/dist /var/www/
+COPY --from=build /var/zigbolt/apps/frontend/dist /var/www/html
 
 # Make the script executable
 RUN mv ./docker-assets/start.sh ./start.sh && \
