@@ -9,11 +9,11 @@
     "prisma": "prisma"
   },
   "dependencies": {
-    "@prisma/client": "^5.3.1",
-    "prisma": "^5.3.1"
+    "@prisma/client": "^5.9.1",
+    "prisma": "^5.9.1"
   },
   "devDependencies": {
     "cpy-cli": "^5.0.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   }
 }
