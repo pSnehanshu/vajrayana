@@ -10,7 +10,8 @@
     "dev": "run-p dev:b dev:d",
     "prisma": "yarn workspace @zigbolt/prisma prisma",
     "pretty": "prettier . -w",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "check-upgrades": "yarn upgrade-interactive"
   },
   "workspaces": [
     "apps/*",
