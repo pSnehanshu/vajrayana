@@ -5,8 +5,8 @@
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "dev:b": "yarn workspace @zigbolt/be dev",
-    "dev:d": "yarn workspace @zigbolt/dash dev",
+    "dev:b": "yarn workspace @zigbolt/backend dev",
+    "dev:d": "yarn workspace @zigbolt/frontend dev",
     "dev": "run-p dev:b dev:d",
     "prisma": "yarn workspace @zigbolt/prisma prisma",
     "pretty": "prettier . -w",
