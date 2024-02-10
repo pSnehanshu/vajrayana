@@ -3,5 +3,12 @@
   "version": "1.0.0",
   "author": "Snehanshu Phukon",
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "scripts": {
+    "build": "tsc && cpy package.json dist"
+  },
+  "devDependencies": {
+    "cpy-cli": "^5.0.0",
+    "typescript": "^5.2.2"
+  }
 }

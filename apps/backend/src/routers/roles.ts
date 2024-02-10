@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uniq } from "lodash-es";
+import _ from "lodash";
 import { Prisma } from "@zigbolt/prisma";
 import { UserPermissions, permissionSchema } from "@zigbolt/shared";
 import { permissionProcedure, router } from "../trpc";
@@ -42,7 +42,7 @@ export const rolesRouter = router({
     .input(
       z.object({
         name: z.string().trim().min(1),
-        permissions: permissionSchema.transform((v) => uniq(v)),
+        permissions: permissionSchema.transform((v) => _.uniq(v)),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -61,7 +61,7 @@ export const rolesRouter = router({
       z.object({
         roleId: z.string().uuid(),
         name: z.string().trim().min(1).optional(),
-        permissions: permissionSchema.transform((v) => uniq(v)).optional(),
+        permissions: permissionSchema.transform((v) => _.uniq(v)).optional(),
       }),
     )
     .mutation(async ({ input, ctx }) => {

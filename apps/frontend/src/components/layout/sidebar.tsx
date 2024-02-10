@@ -5,11 +5,7 @@ import { ReactNode, useRef, useState } from "react";
 import { HiDocument } from "react-icons/hi2";
 import { PiCaretDownBold } from "react-icons/pi";
 import { IoPieChartSharp, IoSettingsSharp } from "react-icons/io5";
-import {
-  MdElectricCar,
-  MdAttachMoney,
-  MdOutlineElectricCar,
-} from "react-icons/md";
+import { MdAttachMoney, MdOutlineElectricCar } from "react-icons/md";
 import { FaPlugCircleBolt, FaMoneyBillTrendUp } from "react-icons/fa6";
 import { FaChargingStation, FaDotCircle } from "react-icons/fa";
 import { RiOrganizationChart } from "react-icons/ri";

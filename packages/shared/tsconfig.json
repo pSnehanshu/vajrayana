@@ -2,6 +2,7 @@
   "compilerOptions": {
     "sourceMap": true,
     "strict": true,
+    "outDir": "dist",
     "lib": ["ES2021", "DOM"],
     "target": "ES2021",
     "esModuleInterop": true,

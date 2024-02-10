@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "build": "tsc && cpy schema.prisma migrations build",
+    "build": "tsc && cpy schema.prisma migrations package.json dist",
     "prisma": "prisma"
   },
   "dependencies": {

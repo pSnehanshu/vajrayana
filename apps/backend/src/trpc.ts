@@ -1,4 +1,4 @@
-import { ZodError, z } from "zod";
+import { ZodError } from "zod";
 import cookie from "cookie";
 import superjson from "superjson";
 import { prisma } from "@zigbolt/prisma";

@@ -1,5 +1,5 @@
 import { UserPermissions } from "@zigbolt/shared";
-import { orgProcedure, permissionProcedure, router } from "../trpc";
+import { permissionProcedure, router } from "../trpc";
 import { z } from "zod";
 import { paginationSchema } from "../utils/schemas";
 import { Prisma } from "@zigbolt/prisma";
