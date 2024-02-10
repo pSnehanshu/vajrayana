@@ -2,7 +2,7 @@
 FROM node:20 as build
 RUN corepack enable
 
-WORKDIR /var/zigbolt
+WORKDIR /var/www/zigbolt
 
 # Copy file
 ADD . .
@@ -24,7 +24,7 @@ RUN apt-get update && \
   # Enable Yarn
   corepack enable
 
-WORKDIR /var/zigbolt
+WORKDIR /var/www/zigbolt
 
 # Copy file
 COPY . .
@@ -36,7 +36,7 @@ RUN rm -rf ./apps/frontend; \
   yarn prisma generate
 
 # Copy frontend built artifacts
-COPY --from=build /var/zigbolt/apps/frontend/dist /var/www/html
+COPY --from=build /var/www/zigbolt/apps/frontend/dist /var/www/html
 
 # Make the script executable
 RUN mv ./docker-assets/start.sh ./start.sh && \
