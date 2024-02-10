@@ -29,6 +29,9 @@ WORKDIR /var/www/zigbolt
 # Copy file
 COPY . .
 COPY docker-assets/nginx.conf /etc/nginx/nginx.conf
+RUN mkdir -p /etc/nginx/certs
+COPY docker-assets/nginx.crt /etc/nginx/certs/nginx.crt
+COPY docker-assets/nginx.key /etc/nginx/certs/nginx.key
 
 # Remove the frontend dir
 RUN rm -rf ./apps/frontend; \
@@ -43,6 +46,8 @@ RUN mv ./docker-assets/start.sh ./start.sh && \
   chmod +x ./start.sh
 
 EXPOSE 80
+EXPOSE 443
+
 ENV NODE_ENV=production
 
 CMD ["./start.sh"]
