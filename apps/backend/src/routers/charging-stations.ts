@@ -3,49 +3,74 @@ import { orgProcedure, permissionProcedure, router } from "../trpc";
 import { z } from "zod";
 import { paginationSchema } from "../utils/schemas";
 import { Prisma } from "@zigbolt/prisma";
+import { TRPCError } from "@trpc/server";
 
 type ArrayElement<T> = T extends (infer U)[] ? U : never;
 
 export const chargingStationsRouter = router({
-  list: orgProcedure.input(paginationSchema).query(async ({ input, ctx }) => {
-    const where: Prisma.ChargingStationWhereInput = {
-      orgId: ctx.org.id,
-    };
+  list: permissionProcedure([UserPermissions["CS:READ"]])
+    .input(paginationSchema)
+    .query(async ({ input, ctx }) => {
+      const where: Prisma.ChargingStationWhereInput = {
+        orgId: ctx.org.id,
+      };
 
-    if (input.search) {
-      const searchColumns: Array<keyof Prisma.ChargingStationWhereInput> = [
-        "friendlyName",
-        "model",
-        "serialNumber",
-        "modem_iccid",
-        "modem_imsi",
-        "urlName",
-        "vendorName",
-      ];
+      if (input.search) {
+        const searchColumns: Array<keyof Prisma.ChargingStationWhereInput> = [
+          "friendlyName",
+          "model",
+          "serialNumber",
+          "modem_iccid",
+          "modem_imsi",
+          "urlName",
+          "vendorName",
+        ];
 
-      where.OR = searchColumns.map((column) => ({
-        [column]: {
-          contains: input.search,
-          mode: "insensitive",
-        },
-      }));
-    }
+        where.OR = searchColumns.map((column) => ({
+          [column]: {
+            contains: input.search,
+            mode: "insensitive",
+          },
+        }));
+      }
 
-    const [chargingStations, total] = await Promise.all([
-      ctx.prisma.chargingStation.findMany({
-        where,
-        take: input.take,
-        skip: (input.page - 1) * input.take,
-        orderBy: {
-          createdAt: "desc",
-        },
+      const [chargingStations, total] = await Promise.all([
+        ctx.prisma.chargingStation.findMany({
+          where,
+          take: input.take,
+          skip: (input.page - 1) * input.take,
+          orderBy: {
+            createdAt: "desc",
+          },
+        }),
+        ctx.prisma.chargingStation.count({ where }),
+      ]);
+
+      const CSMap = new Map<string, ArrayElement<typeof chargingStations>>();
+      chargingStations.forEach((cs) => CSMap.set(cs.id, cs));
+
+      return { stations: CSMap, total };
+    }),
+  getById: permissionProcedure([UserPermissions["CS:READ"]])
+    .input(
+      z.object({
+        id: z.string().uuid(),
       }),
-      ctx.prisma.chargingStation.count({ where }),
-    ]);
+    )
+    .query(async ({ input, ctx }) => {
+      // Fetch cs
+      const cs = await ctx.prisma.chargingStation.findUnique({
+        where: { id: input.id },
+        include: { EVSEs: true },
+      });
 
-    const CSMap = new Map<string, ArrayElement<typeof chargingStations>>();
-    chargingStations.forEach((cs) => CSMap.set(cs.id, cs));
+      if (!cs || cs.orgId !== ctx.org.id) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Charging station not found",
+        });
+      }
 
-    return { stations: CSMap, total };
-  }),
+      return cs;
+    }),
 });

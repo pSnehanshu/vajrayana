@@ -7,11 +7,9 @@ import {
   Switch,
   useRouteMatch,
 } from "react-router-dom";
-import { FaUsers, FaChargingStation } from "react-icons/fa6";
+import { FaChargingStation } from "react-icons/fa6";
 import { ChargingStationsList } from "./ChargingStationsList";
 import { ChargingStationsDetails } from "./ChargingStationDetails";
-// import MemberSettingsPage from "./MemberSettings";
-// import RoleSettingsPage from "./RoleSettings";
 
 type MenuItem = {
   title: string;
@@ -35,11 +33,6 @@ export function ChargingStationsPage() {
         link: `${match.url}/evse`,
         icon: <FaChargingStation />,
       },
-      // {
-      //   title: "Roles",
-      //   link: `${match.url}/roles`,
-      //   icon: <FaUserTag />,
-      // },
     ],
     [match.url],
   );
@@ -89,8 +82,6 @@ export function ChargingStationsPage() {
             component={ChargingStationsDetails}
           />
 
-          {/* <Route path={`${match.url}/members`} component={MemberSettingsPage} />
-          <Route path={`${match.url}/roles`} component={RoleSettingsPage} /> */}
           <Route path="/">
             <Redirect to={menu.at(0)?.link ?? "/"} />
           </Route>
