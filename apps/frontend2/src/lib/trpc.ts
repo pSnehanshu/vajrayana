@@ -1,7 +1,7 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import SuperJSON from "superjson";
-import { useStore } from "@/store";
+import { useAppStore } from "@/store";
 import type { AppRouter } from "../../../backend/src/routers";
 
 export const trpc = createTRPCProxyClient<AppRouter>({
@@ -10,7 +10,7 @@ export const trpc = createTRPCProxyClient<AppRouter>({
     httpBatchLink({
       url: "/api/trpc",
       headers: () => ({
-        "x-org-id": useStore.getState().org?.id ?? "",
+        "x-org-id": useAppStore.getState().org?.id ?? "",
       }),
     }),
   ],

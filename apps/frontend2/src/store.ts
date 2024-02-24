@@ -15,26 +15,26 @@ type AppStore = {
   setUser: (user: User) => void;
   org: Org | null;
   setOrg: (org: Org) => void;
-  mobileSideBarVisible: boolean;
-  setMobileSideBarVisible: (v?: boolean) => void;
+  // mobileSideBarVisible: boolean;
+  // setMobileSideBarVisible: (v?: boolean) => void;
 };
 
-export const useStore = create<AppStore>((set) => ({
+export const useAppStore = create<AppStore>((set) => ({
   user: null,
   setUser: (user) => set(() => ({ user })),
   org: null,
   setOrg: (org) => set(() => ({ org })),
-  mobileSideBarVisible: false,
-  setMobileSideBarVisible: (v) =>
-    set((s) => ({
-      mobileSideBarVisible:
-        typeof v === "boolean" ? v : !s.mobileSideBarVisible,
-    })),
+  // mobileSideBarVisible: false,
+  // setMobileSideBarVisible: (v) =>
+  //   set((s) => ({
+  //     mobileSideBarVisible:
+  //       typeof v === "boolean" ? v : !s.mobileSideBarVisible,
+  //   })),
 }));
 
 /** Get all the permissions this user has on this org */
 export function usePermissions(): UserPermissions[] {
-  const membership = useStore((s) =>
+  const membership = useAppStore((s) =>
     s.user?.Memberships.find((m) => m.orgId === s.org?.id),
   );
 

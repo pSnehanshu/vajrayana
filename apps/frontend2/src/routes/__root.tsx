@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { trpc } from "@/lib/trpc";
-import { useStore } from "@/store";
+import { useAppStore } from "@/store";
 import { unstable_batchedUpdates } from "react-dom";
 
 const TanStackRouterDevtools = import.meta.env.DEV
@@ -18,7 +18,7 @@ export const Route = createRootRoute({
     // Here we try to fetch the user and the org and save in store
 
     // Get the store obj
-    const store = useStore.getState();
+    const store = useAppStore.getState();
 
     // Fetch current user and the org
     const requests = [
@@ -54,8 +54,8 @@ export const Route = createRootRoute({
 });
 
 function Root() {
-  const userId = useStore((s) => s.user?.id);
-  const orgId = useStore((s) => s.org?.id);
+  const userId = useAppStore((s) => s.user?.id);
+  const orgId = useAppStore((s) => s.org?.id);
 
   return (
     <>
@@ -66,9 +66,7 @@ function Root() {
               Home
             </Link>
           </div>
-          <p>
-            {userId} @ {orgId}
-          </p>
+
           <hr />
         </>
       )}
