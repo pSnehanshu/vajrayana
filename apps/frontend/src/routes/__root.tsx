@@ -59,22 +59,6 @@ function Root() {
 
   return (
     <>
-      {/* {isLoggedIn && (
-        <header>
-          <div className="p-2 flex gap-2">
-            <Link to="/" className="[&.active]:font-bold">
-              Home
-            </Link>
-          </div>
-
-          <Button onClick={handleLogout} isLoading={isLoggingOut}>
-            Logout
-          </Button>
-
-          <hr />
-        </header>
-      )} */}
-
       <div className="grid grid-cols-3 md:grid-cols-5">
         {isLoggedIn && <Sidebar className="hidden md:block" />}
 
