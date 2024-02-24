@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   createRootRoute,
   Link,
@@ -9,6 +9,8 @@ import { trpc } from "@/lib/trpc";
 import { useAppStore } from "@/store";
 import { unstable_batchedUpdates } from "react-dom";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 const TanStackRouterDevtools = import.meta.env.DEV
   ? lazy(() =>
@@ -62,9 +64,13 @@ function Root() {
   const navigate = useNavigate();
   const isLoggedIn = useAppStore((s) => !!(s.user?.id && s.org?.id));
   const logout = useAppStore((s) => s.logout);
+  const [isLoggingOut, setLoggingOut] = useState(false);
 
   async function handleLogout() {
+    setLoggingOut(true);
     await logout();
+    setLoggingOut(false);
+    toast("You have been logged out");
     navigate({ to: "/login" });
   }
 
@@ -78,7 +84,9 @@ function Root() {
             </Link>
           </div>
 
-          <Button onClick={handleLogout}>Logout</Button>
+          <Button onClick={handleLogout} isLoading={isLoggingOut}>
+            Logout
+          </Button>
 
           <hr />
         </header>
@@ -91,6 +99,8 @@ function Root() {
       <Suspense>
         <TanStackRouterDevtools />
       </Suspense>
+
+      <Toaster />
     </>
   );
 }

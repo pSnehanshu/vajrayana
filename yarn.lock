@@ -1462,10 +1462,12 @@ __metadata:
     eslint: ^8.56.0
     eslint-plugin-react-hooks: ^4.6.0
     eslint-plugin-react-refresh: ^0.4.5
+    next-themes: ^0.2.1
     postcss: ^8.4.35
     react: ^18.2.0
     react-dom: ^18.2.0
     react-hook-form: ^7.50.1
+    sonner: ^1.4.1
     tailwind-merge: ^2.2.1
     tailwindcss: ^3.4.1
     tailwindcss-animate: ^1.0.7
@@ -3939,6 +3941,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"next-themes@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "next-themes@npm:0.2.1"
+  peerDependencies:
+    next: "*"
+    react: "*"
+    react-dom: "*"
+  checksum: ebc248b956138e73436c4ed0a0f0a877a0a48a33156db577029b8b8469e48b5c777d61abf2baeb75953378febea74e067a4869ff90b4a3e94fce123289b862ba
+  languageName: node
+  linkType: hard
+
 "nice-try@npm:^1.0.4":
   version: 1.0.5
   resolution: "nice-try@npm:1.0.5"
@@ -4934,6 +4947,16 @@ __metadata:
     ip: ^2.0.0
     smart-buffer: ^4.2.0
   checksum: 259d9e3e8e1c9809a7f5c32238c3d4d2a36b39b83851d0f573bfde5f21c4b1288417ce1af06af1452569cd1eb0841169afd4998f0e04ba04656f6b7f0e46d748
+  languageName: node
+  linkType: hard
+
+"sonner@npm:^1.4.1":
+  version: 1.4.1
+  resolution: "sonner@npm:1.4.1"
+  peerDependencies:
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  checksum: 0f88851a92b91d85011e40d922d1780fd7eac5cbcc55620c1bf434af0282f96b023c2f44c7623d12a72275f6b94cf0d325221e5f0d7d4cf71322257472d891c2
   languageName: node
   linkType: hard
 

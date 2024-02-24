@@ -14,6 +14,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "sonner";
 import logo from "@/assets/images/logo.png";
 
 export const Route = createLazyFileRoute("/login")({
@@ -43,6 +44,7 @@ function Login() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await login(values.email, values.password);
+    toast("Login succesfull!");
     navigate({ to: "/" });
   }
 
