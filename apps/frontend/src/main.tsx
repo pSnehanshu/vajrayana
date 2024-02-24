@@ -5,12 +5,16 @@ import "./index.css";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import { ThemeProvider } from "./components/theme-provider";
 
 // Create a new router instance
 const router = createRouter({
   routeTree,
   defaultPendingComponent: () => <h1>Loading, please wait...</h1>,
   defaultErrorComponent: () => <h1>Something went wrong!</h1>,
+  InnerWrap({ children }) {
+    return <ThemeProvider>{children}</ThemeProvider>;
+  },
 });
 
 // Register the router instance for type safety

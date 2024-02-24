@@ -5,12 +5,13 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useAppStore } from "@/store";
 import { toast } from "sonner";
 import { HiDocument } from "react-icons/hi2";
-import { PiCaretDownBold } from "react-icons/pi";
+// import { PiCaretDownBold } from "react-icons/pi";
 import { IoPieChartSharp, IoSettingsSharp } from "react-icons/io5";
 import { MdAttachMoney, MdOutlineElectricCar } from "react-icons/md";
 import { FaPlugCircleBolt, FaMoneyBillTrendUp } from "react-icons/fa6";
 import { FaChargingStation, FaDotCircle } from "react-icons/fa";
 import { RiOrganizationChart } from "react-icons/ri";
+import { ModeToggle } from "@/components/mode-toggle";
 
 type MenuItem = {
   title: string;
@@ -23,7 +24,7 @@ const menu: MenuItem[] = [
   {
     title: "Dashboard",
     icon: <IoPieChartSharp />,
-    link: "/dashboard",
+    link: "/",
   },
   {
     title: "Charging stations",
@@ -94,8 +95,14 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                 buttonVariants({ variant: "ghost" }),
                 "w-full justify-start",
               )}
+              activeProps={{
+                className: cn(
+                  buttonVariants({ variant: "secondary" }),
+                  "w-full justify-start",
+                ),
+              }}
             >
-              {item.icon}
+              {item.icon ?? <FaDotCircle />}
               <span className="ml-2">{item.title}</span>
             </Link>
           </li>
@@ -105,6 +112,8 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       <Button onClick={handleLogout} className="m-2" isLoading={isLoggingOut}>
         Logout
       </Button>
+
+      <ModeToggle />
     </nav>
   );
 }

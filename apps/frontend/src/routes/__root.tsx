@@ -84,7 +84,7 @@ function Root() {
       </div>
 
       <Suspense>
-        <TanStackRouterDevtools />
+        <TanStackRouterDevtools position="bottom-right" />
       </Suspense>
 
       <Toaster />
