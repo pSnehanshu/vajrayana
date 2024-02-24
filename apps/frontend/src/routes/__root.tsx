@@ -1,16 +1,10 @@
-import { lazy, Suspense, useState } from "react";
-import {
-  createRootRoute,
-  Link,
-  Outlet,
-  useNavigate,
-} from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
+import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { trpc } from "@/lib/trpc";
 import { useAppStore } from "@/store";
 import { unstable_batchedUpdates } from "react-dom";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { Sidebar } from "@/components/layout/sidebar";
 
 const TanStackRouterDevtools = import.meta.env.DEV
   ? lazy(() =>
@@ -61,22 +55,11 @@ export const Route = createRootRoute({
 });
 
 function Root() {
-  const navigate = useNavigate();
   const isLoggedIn = useAppStore((s) => !!(s.user?.id && s.org?.id));
-  const logout = useAppStore((s) => s.logout);
-  const [isLoggingOut, setLoggingOut] = useState(false);
-
-  async function handleLogout() {
-    setLoggingOut(true);
-    await logout();
-    setLoggingOut(false);
-    toast("You have been logged out");
-    navigate({ to: "/login" });
-  }
 
   return (
     <>
-      {isLoggedIn && (
+      {/* {isLoggedIn && (
         <header>
           <div className="p-2 flex gap-2">
             <Link to="/" className="[&.active]:font-bold">
@@ -90,11 +73,15 @@ function Root() {
 
           <hr />
         </header>
-      )}
+      )} */}
 
-      <main className="min-h-screen p-4">
-        <Outlet />
-      </main>
+      <div className="grid grid-cols-3 md:grid-cols-5">
+        {isLoggedIn && <Sidebar className="hidden md:block" />}
+
+        <main className="col-span-3 md:col-span-4 md:border-l min-h-screen p-4">
+          <Outlet />
+        </main>
+      </div>
 
       <Suspense>
         <TanStackRouterDevtools />
