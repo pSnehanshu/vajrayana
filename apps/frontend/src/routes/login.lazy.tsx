@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,6 +14,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import logo from "@/assets/images/logo.png";
 
 export const Route = createLazyFileRoute("/login")({
   component: Login,
@@ -37,17 +37,28 @@ function Login() {
     },
   });
 
+  // formState is wrapped with a Proxy to improve render performance and skip extra logic if specific state is not subscribed to.
+  // Therefore make sure you invoke or read it before a render in order to enable the state update.
+  const { formState } = form;
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await login(values.email, values.password);
     navigate({ to: "/" });
   }
 
   return (
-    <>
-      <h1>Login</h1>
+    <div className="flex items-center flex-col my-20">
+      <img src={logo} alt="ZigBolt LOGO" className="max-w-48" />
+
+      <h1 className="text-2xl mb-4 font-bold text-center">
+        Login to your account
+      </h1>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full space-y-4 sm:w-1/2 lg:w-1/3 border-2 p-4 rounded-md"
+        >
           <FormField
             control={form.control}
             name="email"
@@ -55,11 +66,9 @@ function Login() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="johndoe@example.com" {...field} />
+                  <Input placeholder="john.doe@example.com" {...field} />
                 </FormControl>
-                <FormDescription>
-                  The email address associated with your account
-                </FormDescription>
+
                 <FormMessage />
               </FormItem>
             )}
@@ -72,17 +81,24 @@ function Login() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input
+                    type="password"
+                    placeholder="M¥ $€¢Ü₹£ ₽@$$\/\/0₹D"
+                    {...field}
+                  />
                 </FormControl>
-                <FormDescription>Your password</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <Button type="submit">Submit</Button>
+          <div className="flex justify-center">
+            <Button type="submit" isLoading={formState.isSubmitting}>
+              Login
+            </Button>
+          </div>
         </form>
       </Form>
-    </>
+    </div>
   );
 }
