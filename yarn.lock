@@ -730,6 +730,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@trpc/client@npm:^10.45.1":
+  version: 10.45.1
+  resolution: "@trpc/client@npm:10.45.1"
+  peerDependencies:
+    "@trpc/server": 10.45.1
+  checksum: 14fd5d7d6e659303797459975780636ef16045d21f642b51730e61fcba9e871d5a4656b244f38dff9f391d0ad67ff40cea201688613a08a4c31207ab9dc4abc4
+  languageName: node
+  linkType: hard
+
 "@trpc/server@npm:^10.45.1":
   version: 10.45.1
   resolution: "@trpc/server@npm:10.45.1"
@@ -1356,6 +1365,8 @@ __metadata:
     "@tanstack/react-router": ^1.16.6
     "@tanstack/router-devtools": ^1.16.6
     "@tanstack/router-vite-plugin": ^1.16.5
+    "@trpc/client": ^10.45.1
+    "@trpc/server": ^10.45.1
     "@types/node": ^20.11.20
     "@types/react": ^18.2.56
     "@types/react-dom": ^18.2.19
@@ -1376,6 +1387,7 @@ __metadata:
     tailwindcss-animate: ^1.0.7
     typescript: ^5.2.2
     vite: ^5.1.4
+    zustand: ^4.5.1
   languageName: unknown
   linkType: soft
 
@@ -5369,7 +5381,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:^1.2.0":
+"use-sync-external-store@npm:1.2.0, use-sync-external-store@npm:^1.2.0":
   version: 1.2.0
   resolution: "use-sync-external-store@npm:1.2.0"
   peerDependencies:
@@ -5604,5 +5616,25 @@ __metadata:
   version: 3.22.4
   resolution: "zod@npm:3.22.4"
   checksum: 80bfd7f8039b24fddeb0718a2ec7c02aa9856e4838d6aa4864335a047b6b37a3273b191ef335bf0b2002e5c514ef261ffcda5a589fb084a48c336ffc4cdbab7f
+  languageName: node
+  linkType: hard
+
+"zustand@npm:^4.5.1":
+  version: 4.5.1
+  resolution: "zustand@npm:4.5.1"
+  dependencies:
+    use-sync-external-store: 1.2.0
+  peerDependencies:
+    "@types/react": ">=16.8"
+    immer: ">=9.0.6"
+    react: ">=16.8"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    immer:
+      optional: true
+    react:
+      optional: true
+  checksum: 420af9fda3e70536bccf65cf964dd6668cc88baa5e6e0208254f69c2c068963710f49bf580ad05ba3c5c5ae0470a17d2677165b199b749c4fc7228800e7fa705
   languageName: node
   linkType: hard
