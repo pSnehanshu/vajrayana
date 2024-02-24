@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { create } from "zustand";
-import { RouterOutputs } from "./lib/trpc";
+import { RouterOutputs, trpc } from "@/lib/trpc";
 import {
   AllPermissions,
   UserPermissions,
@@ -13,23 +13,45 @@ type User = RouterOutputs["auth"]["whoAmI"];
 type AppStore = {
   user: User | null;
   setUser: (user: User) => void;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   org: Org | null;
   setOrg: (org: Org) => void;
-  // mobileSideBarVisible: boolean;
-  // setMobileSideBarVisible: (v?: boolean) => void;
 };
 
 export const useAppStore = create<AppStore>((set) => ({
+  /// Auth related states
+
   user: null,
+
   setUser: (user) => set(() => ({ user })),
+
+  async login(email, password) {
+    // Do login
+    await trpc.auth.login.mutate({ email, password });
+
+    // Fetch current user
+    const user = await trpc.auth.whoAmI.query();
+
+    // Save in state
+    set(() => ({ user }));
+  },
+
+  logout: async () => {
+    // Do logout
+    await trpc.auth.logout.mutate();
+
+    // Remove user from state
+    set(() => ({ user: null }));
+  },
+
+  /// Org related states
+
   org: null,
+
   setOrg: (org) => set(() => ({ org })),
-  // mobileSideBarVisible: false,
-  // setMobileSideBarVisible: (v) =>
-  //   set((s) => ({
-  //     mobileSideBarVisible:
-  //       typeof v === "boolean" ? v : !s.mobileSideBarVisible,
-  //   })),
+
+  /// Others
 }));
 
 /** Get all the permissions this user has on this org */

@@ -1,8 +1,14 @@
 import { lazy, Suspense } from "react";
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  Link,
+  Outlet,
+  useNavigate,
+} from "@tanstack/react-router";
 import { trpc } from "@/lib/trpc";
 import { useAppStore } from "@/store";
 import { unstable_batchedUpdates } from "react-dom";
+import { Button } from "@/components/ui/button";
 
 const TanStackRouterDevtools = import.meta.env.DEV
   ? lazy(() =>
@@ -54,8 +60,15 @@ export const Route = createRootRoute({
 });
 
 function Root() {
+  const navigate = useNavigate();
   const userId = useAppStore((s) => s.user?.id);
   const orgId = useAppStore((s) => s.org?.id);
+  const logout = useAppStore((s) => s.logout);
+
+  async function handleLogout() {
+    await logout();
+    navigate({ to: "/login" });
+  }
 
   return (
     <>
@@ -66,6 +79,8 @@ function Root() {
               Home
             </Link>
           </div>
+
+          <Button onClick={handleLogout}>Logout</Button>
 
           <hr />
         </>

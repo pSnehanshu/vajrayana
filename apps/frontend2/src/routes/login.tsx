@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { trpc } from "@/lib/trpc";
 import { useAppStore } from "@/store";
 
 const formSchema = z.object({
@@ -32,6 +31,9 @@ export const Route = createFileRoute("/login")({
 });
 
 function Login() {
+  const navigate = useNavigate();
+  const login = useAppStore((s) => s.login);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,7 +43,8 @@ function Login() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await trpc.auth.login.mutate(values);
+    await login(values.email, values.password);
+    navigate({ to: "/" });
   }
 
   return (
