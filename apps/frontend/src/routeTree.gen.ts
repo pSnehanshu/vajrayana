@@ -19,7 +19,7 @@ import { Route as IndexImport } from './routes/index'
 const LoginRoute = LoginImport.update({
   path: '/login',
   getParentRoute: () => rootRoute,
-} as any)
+} as any).lazy(() => import('./routes/login.lazy').then((d) => d.Route))
 
 const IndexRoute = IndexImport.update({
   path: '/',

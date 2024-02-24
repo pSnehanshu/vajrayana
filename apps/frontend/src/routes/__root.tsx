@@ -60,8 +60,7 @@ export const Route = createRootRoute({
 
 function Root() {
   const navigate = useNavigate();
-  const userId = useAppStore((s) => s.user?.id);
-  const orgId = useAppStore((s) => s.org?.id);
+  const isLoggedIn = useAppStore((s) => !!(s.user?.id && s.org?.id));
   const logout = useAppStore((s) => s.logout);
 
   async function handleLogout() {
@@ -71,8 +70,8 @@ function Root() {
 
   return (
     <>
-      {userId && orgId && (
-        <>
+      {isLoggedIn && (
+        <header>
           <div className="p-2 flex gap-2">
             <Link to="/" className="[&.active]:font-bold">
               Home
@@ -82,9 +81,12 @@ function Root() {
           <Button onClick={handleLogout}>Logout</Button>
 
           <hr />
-        </>
+        </header>
       )}
-      <Outlet />
+
+      <main className="min-h-screen p-4">
+        <Outlet />
+      </main>
 
       <Suspense>
         <TanStackRouterDevtools />
