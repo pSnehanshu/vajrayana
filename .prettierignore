@@ -1,2 +1,2 @@
 .yarn/*
-apps/frontend2/src/routeTree.gen.ts
+apps/frontend/src/routeTree.gen.ts
