@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CiMenuKebab } from "react-icons/ci";
 import { useTheme } from "@/components/theme-provider";
+import logo from "@/assets/images/logo.png";
 
 type MenuItem = {
   title: string;
@@ -106,9 +107,13 @@ export function Sidebar({ className, ...props }: SidebarProps) {
   }
 
   return (
-    <nav className={cn("", className)} {...props}>
-      <div className="h-full grid grid-rows-10">
-        <ul className="row-span-9 space-y-2 px-4 mb-4">
+    <nav className={cn("max-h-screen", className)} {...props}>
+      <div className="h-full grid grid-rows-9">
+        <div className="row-span-1 p-2">
+          <img src={logo} alt="ZigBolt LOGO" className="h-16 m-auto" />
+        </div>
+
+        <ul className="row-span-7 space-y-2 px-4 pt-2">
           {menu.map((item, i) => (
             <li key={i}>
               <Link
