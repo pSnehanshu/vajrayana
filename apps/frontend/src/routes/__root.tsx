@@ -56,7 +56,6 @@ export const Route = createRootRoute({
     }
   },
   component: Root,
-  pendingComponent: () => <h1>Loading, please wait...</h1>,
 });
 
 function Root() {

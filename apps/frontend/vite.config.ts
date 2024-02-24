@@ -7,7 +7,7 @@ import { TanStackRouterVite } from "@tanstack/router-vite-plugin";
 export default defineConfig({
   plugins: [react(), splitVendorChunkPlugin(), TanStackRouterVite()],
   server: {
-    port: 22279,
+    port: 22280,
     proxy: {
       "/api": {
         target: "http://localhost:22281/",
