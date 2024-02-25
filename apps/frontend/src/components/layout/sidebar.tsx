@@ -141,8 +141,8 @@ export function Sidebar({ className, ...props }: SidebarProps) {
           </ul>
         </ScrollArea>
 
-        <footer className="grid grid-cols-6 border-t py-2 w-full">
-          <div className="my-auto px-1 col-span-2 lg:col-span-1">
+        <footer className="grid grid-cols-6 max-h-full border-t w-full">
+          <div className="my-auto mx-auto col-span-2 lg:col-span-1">
             <img
               className="w-8 h-8 rounded-full"
               src={`https://gravatar.com/avatar/${emailHash}?s=64&d=mp`}
