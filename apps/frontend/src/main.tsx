@@ -1,6 +1,7 @@
 import "@/main.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { unstable_batchedUpdates } from "react-dom";
 import {
   RouterProvider,
   createRouter,
@@ -8,8 +9,8 @@ import {
 } from "@tanstack/react-router";
 import { routeTree } from "@/routeTree.gen";
 import { ThemeProvider } from "@/components/theme-provider";
-import { useMobileMenuStore } from "./store";
-import { unstable_batchedUpdates } from "react-dom";
+import { useMobileMenuStore } from "@/store";
+import { LazyTanStackRouterDevtools } from "@/components/LazyRouterDevtool";
 
 // Create a new router instance
 const router = createRouter({
@@ -17,6 +18,14 @@ const router = createRouter({
   history: createHashHistory(),
   defaultPendingComponent: () => <h1>Loading, please wait...</h1>,
   defaultErrorComponent: () => <h1>Something went wrong!</h1>,
+  InnerWrap({ children }) {
+    return (
+      <>
+        {children}
+        <LazyTanStackRouterDevtools />
+      </>
+    );
+  },
 });
 
 // For closing mobile menu when navigation happens

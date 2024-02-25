@@ -1,8 +1,7 @@
 import { useAppStore, useMobileMenuStore } from "@/store";
 import { Sidebar } from "@/components/layout/sidebar";
 import { cn } from "@/lib/utils";
-import { type ReactNode, Suspense } from "react";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { type ReactNode } from "react";
 import { Toaster } from "sonner";
 import { Topbar } from "@/components/layout/topbar";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -32,10 +31,6 @@ export function GlobalLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
       </div>
-
-      <Suspense>
-        <TanStackRouterDevtools position="bottom-right" />
-      </Suspense>
 
       <Toaster />
 
