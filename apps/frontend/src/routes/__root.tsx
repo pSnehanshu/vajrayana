@@ -5,6 +5,7 @@ import { useAppStore } from "@/store";
 import { unstable_batchedUpdates } from "react-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { Sidebar } from "@/components/layout/sidebar";
+import { cn } from "@/lib/utils";
 
 const TanStackRouterDevtools = import.meta.env.DEV
   ? lazy(() =>
@@ -62,7 +63,12 @@ function Root() {
       <div className="grid grid-cols-3 md:grid-cols-5">
         {isLoggedIn && <Sidebar className="hidden md:block h-screen" />}
 
-        <main className="col-span-3 md:col-span-4 md:border-l h-screen overflow-y-scroll overflow-x-auto p-4 border-2">
+        <main
+          className={cn(
+            "col-span-3 h-screen overflow-y-scroll overflow-x-auto p-4 border-2",
+            [isLoggedIn ? "md:col-span-4 md:border-l" : "md:col-span-5"],
+          )}
+        >
           <Outlet />
         </main>
       </div>
