@@ -27,6 +27,7 @@ import {
 import { CiMenuKebab } from "react-icons/ci";
 import { useTheme } from "@/components/theme-provider";
 import logo from "@/assets/images/logo.png";
+import { ScrollArea } from "../ui/scroll-area";
 
 type MenuItem = {
   title: string;
@@ -107,34 +108,38 @@ export function Sidebar({ className, ...props }: SidebarProps) {
   }
 
   return (
-    <nav className={cn("max-h-screen", className)} {...props}>
+    <nav className={cn("overflow-hidden", className)} {...props}>
       <div className="h-full grid grid-rows-9">
         <div className="row-span-1 p-2">
-          <img src={logo} alt="ZigBolt LOGO" className="h-16 m-auto" />
+          <Link to="/">
+            <img src={logo} alt="ZigBolt LOGO" className="h-full m-auto" />
+          </Link>
         </div>
 
-        <ul className="row-span-7 space-y-2 px-4 pt-2">
-          {menu.map((item, i) => (
-            <li key={i}>
-              <Link
-                to={item.link}
-                className={cn(
-                  buttonVariants({ variant: "ghost" }),
-                  "w-full justify-start",
-                )}
-                activeProps={{
-                  className: cn(
-                    buttonVariants({ variant: "secondary" }),
+        <ScrollArea className="row-span-7">
+          <ul className="space-y-2 px-1 lg:px-4 pt-2">
+            {menu.map((item, i) => (
+              <li key={i}>
+                <Link
+                  to={item.link}
+                  className={cn(
+                    buttonVariants({ variant: "ghost" }),
                     "w-full justify-start",
-                  ),
-                }}
-              >
-                {item.icon ?? <FaDotCircle />}
-                <span className="ml-2">{item.title}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+                  )}
+                  activeProps={{
+                    className: cn(
+                      buttonVariants({ variant: "secondary" }),
+                      "w-full justify-start",
+                    ),
+                  }}
+                >
+                  {item.icon ?? <FaDotCircle />}
+                  <span className="ml-2">{item.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
 
         <footer className="grid grid-cols-6 border-t py-2 w-full">
           <div className="my-auto px-1 col-span-2 lg:col-span-1">

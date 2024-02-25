@@ -60,9 +60,9 @@ function Root() {
   return (
     <>
       <div className="grid grid-cols-3 md:grid-cols-5">
-        {isLoggedIn && <Sidebar className="hidden md:block" />}
+        {isLoggedIn && <Sidebar className="hidden md:block h-screen" />}
 
-        <main className="col-span-3 md:col-span-4 md:border-l min-h-screen p-4">
+        <main className="col-span-3 md:col-span-4 md:border-l h-screen overflow-y-scroll overflow-x-auto p-4 border-2">
           <Outlet />
         </main>
       </div>
