@@ -17,9 +17,6 @@ const router = createRouter({
   history: createHashHistory(),
   defaultPendingComponent: () => <h1>Loading, please wait...</h1>,
   defaultErrorComponent: () => <h1>Something went wrong!</h1>,
-  InnerWrap({ children }) {
-    return <ThemeProvider>{children}</ThemeProvider>;
-  },
 });
 
 // For closing mobile menu when navigation happens
@@ -39,6 +36,8 @@ declare module "@tanstack/react-router" {
 // Render the app
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </StrictMode>,
 );
