@@ -16,6 +16,7 @@ import { LazyTanStackRouterDevtools } from "@/components/LazyRouterDevtool";
 const router = createRouter({
   routeTree,
   history: createHashHistory(),
+  defaultPendingMinMs: 0,
   defaultPendingComponent: () => <h1>Loading, please wait...</h1>,
   defaultErrorComponent: () => <h1>Something went wrong!</h1>,
   InnerWrap({ children }) {
