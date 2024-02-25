@@ -84,9 +84,15 @@ const menu: MenuItem[] = [
   },
 ];
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+  showLogo?: boolean;
+}
 
-export function Sidebar({ className, ...props }: SidebarProps) {
+export function Sidebar({
+  className,
+  showLogo = true,
+  ...props
+}: SidebarProps) {
   const navigate = useNavigate();
   const user = useAppStore((s) => s.user);
   const logout = useAppStore((s) => s.logout);
@@ -110,11 +116,13 @@ export function Sidebar({ className, ...props }: SidebarProps) {
   return (
     <nav className={cn("overflow-hidden", className)} {...props}>
       <div className="h-full grid grid-rows-9">
-        <div className="row-span-1 p-2">
-          <Link to="/">
-            <img src={logo} alt="ZigBolt LOGO" className="h-full m-auto" />
-          </Link>
-        </div>
+        {showLogo && (
+          <div className="row-span-1 p-2">
+            <Link to="/">
+              <img src={logo} alt="ZigBolt LOGO" className="h-full m-auto" />
+            </Link>
+          </div>
+        )}
 
         <ScrollArea className="row-span-7">
           <ul className="space-y-2 px-1 lg:px-4 pt-2">
