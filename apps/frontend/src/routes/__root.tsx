@@ -1,20 +1,9 @@
-import { lazy, Suspense } from "react";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { trpc } from "@/lib/trpc";
 import { useAppStore } from "@/store";
 import { unstable_batchedUpdates } from "react-dom";
-import { Toaster } from "@/components/ui/sonner";
-import { Sidebar } from "@/components/layout/sidebar";
-import { cn } from "@/lib/utils";
-
-const TanStackRouterDevtools = import.meta.env.DEV
-  ? lazy(() =>
-      // Lazy load in development
-      import("@tanstack/router-devtools").then((res) => ({
-        default: res.TanStackRouterDevtools,
-      })),
-    )
-  : () => null;
+import { NotFound } from "@/components/not-found";
+import { GlobalLayout } from "@/components/layout/global-layout";
 
 export const Route = createRootRoute({
   async beforeLoad() {
@@ -52,32 +41,14 @@ export const Route = createRootRoute({
       });
     }
   },
-  component: Root,
+  component: () => (
+    <GlobalLayout>
+      <Outlet />
+    </GlobalLayout>
+  ),
+  notFoundComponent: () => (
+    <GlobalLayout>
+      <NotFound />
+    </GlobalLayout>
+  ),
 });
-
-function Root() {
-  const isLoggedIn = useAppStore((s) => !!(s.user?.id && s.org?.id));
-
-  return (
-    <>
-      <div className="grid grid-cols-3 md:grid-cols-5">
-        {isLoggedIn && <Sidebar className="hidden md:block h-screen" />}
-
-        <main
-          className={cn(
-            "col-span-3 h-screen overflow-y-scroll overflow-x-auto p-4 border-2",
-            [isLoggedIn ? "md:col-span-4 md:border-l" : "md:col-span-5"],
-          )}
-        >
-          <Outlet />
-        </main>
-      </div>
-
-      <Suspense>
-        <TanStackRouterDevtools position="bottom-right" />
-      </Suspense>
-
-      <Toaster />
-    </>
-  );
-}
