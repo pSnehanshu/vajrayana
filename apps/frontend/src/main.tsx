@@ -22,7 +22,22 @@ const router = createRouter({
 // For closing mobile menu when navigation happens
 router.subscribe("onBeforeLoad", () => {
   unstable_batchedUpdates(() => {
+    // Automatically close the mobile menu when nav happens
     useMobileMenuStore.getState().setOpen(false);
+
+    /**
+     * This code is to handle a bug, where ui/sheet forgets
+     * to remove the `pointer-events:none` style from the
+     * `body` when navigation happens from ui/dropdown-menu
+     */
+    setTimeout(() => {
+      if (document.body.style.pointerEvents === "none") {
+        document.body.style.pointerEvents = "";
+        console.log(
+          "pointer-events:none was applied to body and has been removed.",
+        );
+      }
+    }, 500);
   });
 });
 
