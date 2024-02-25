@@ -179,7 +179,7 @@ export function Sidebar({
                     <Link to="/profile">My profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/account">Account settings</Link>
+                    <Link to="/settings">Account settings</Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
