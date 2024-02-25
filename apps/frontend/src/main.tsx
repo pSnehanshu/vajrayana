@@ -11,6 +11,7 @@ import { routeTree } from "@/routeTree.gen";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useMobileMenuStore } from "@/store";
 import { LazyTanStackRouterDevtools } from "@/components/LazyRouterDevtool";
+import { ErrorComp } from "./components/error";
 
 // Create a new router instance
 const router = createRouter({
@@ -18,7 +19,14 @@ const router = createRouter({
   history: createHashHistory(),
   defaultPendingMinMs: 0,
   defaultPendingComponent: () => <h1>Loading, please wait...</h1>,
-  defaultErrorComponent: () => <h1>Something went wrong!</h1>,
+  defaultErrorComponent: (data) => {
+    const errorMessage =
+      typeof data?.error?.message === "string"
+        ? (data.error.message as string)
+        : "";
+
+    return <ErrorComp message={errorMessage} />;
+  },
   InnerWrap({ children }) {
     return (
       <>

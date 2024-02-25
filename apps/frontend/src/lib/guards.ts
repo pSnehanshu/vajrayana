@@ -16,7 +16,7 @@ export function authGuard() {
   const membership = user.Memberships.find((m) => m.orgId === org?.id);
 
   if (!membership) {
-    throw new Error("User is not member of this org");
+    throw new Error("You are not a member of this organization");
   }
 }
 
@@ -34,6 +34,6 @@ export function permissionGuard(
   );
 
   if (!hasPermission) {
-    throw Error("User does not have permission");
+    throw Error("You do not have enough permission to access this page");
   }
 }

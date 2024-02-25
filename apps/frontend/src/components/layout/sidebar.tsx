@@ -110,7 +110,7 @@ export function Sidebar({
   async function handleLogout() {
     await logout();
     toast("You have been logged out");
-    navigate({ to: "/login" });
+    window.location.href = "/";
   }
 
   return (
