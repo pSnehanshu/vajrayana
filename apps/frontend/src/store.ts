@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { create } from "zustand";
+import { create as createStore } from "zustand";
 import { RouterOutputs, trpc } from "@/lib/trpc";
 import {
   AllPermissions,
@@ -19,7 +19,7 @@ type AppStore = {
   setOrg: (org: Org) => void;
 };
 
-export const useAppStore = create<AppStore>((set) => ({
+export const useAppStore = createStore<AppStore>((set) => ({
   /// Auth related states
 
   user: null,
@@ -50,8 +50,6 @@ export const useAppStore = create<AppStore>((set) => ({
   org: null,
 
   setOrg: (org) => set(() => ({ org })),
-
-  /// Others
 }));
 
 /** Get all the permissions this user has on this org */
@@ -75,3 +73,21 @@ export function usePermissions(): UserPermissions[] {
 
   return permissions;
 }
+
+type MobileMenuStore = {
+  isOpen: boolean;
+  setOpen: (status: boolean) => void;
+  toggle: () => void;
+};
+
+export const useMobileMenuStore = createStore<MobileMenuStore>((set) => ({
+  isOpen: false,
+
+  setOpen(status) {
+    set(() => ({ isOpen: status }));
+  },
+
+  toggle() {
+    set((s) => ({ isOpen: !s.isOpen }));
+  },
+}));

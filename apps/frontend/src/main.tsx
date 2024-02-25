@@ -8,6 +8,8 @@ import {
 } from "@tanstack/react-router";
 import { routeTree } from "@/routeTree.gen";
 import { ThemeProvider } from "@/components/theme-provider";
+import { useMobileMenuStore } from "./store";
+import { unstable_batchedUpdates } from "react-dom";
 
 // Create a new router instance
 const router = createRouter({
@@ -18,6 +20,13 @@ const router = createRouter({
   InnerWrap({ children }) {
     return <ThemeProvider>{children}</ThemeProvider>;
   },
+});
+
+// For closing mobile menu when navigation happens
+router.subscribe("onBeforeLoad", () => {
+  unstable_batchedUpdates(() => {
+    useMobileMenuStore.getState().setOpen(false);
+  });
 });
 
 // Register the router instance for type safety

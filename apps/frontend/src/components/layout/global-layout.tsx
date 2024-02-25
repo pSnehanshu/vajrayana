@@ -1,13 +1,17 @@
-import { useAppStore } from "@/store";
+import { useAppStore, useMobileMenuStore } from "@/store";
 import { Sidebar } from "@/components/layout/sidebar";
 import { cn } from "@/lib/utils";
 import { type ReactNode, Suspense } from "react";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { Toaster } from "sonner";
-import { Topbar } from "./topbar";
+import { Topbar } from "@/components/layout/topbar";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 export function GlobalLayout({ children }: { children: ReactNode }) {
   const isLoggedIn = useAppStore((s) => !!(s.user?.id && s.org?.id));
+
+  const isOpen = useMobileMenuStore((s) => s.isOpen);
+  const setOpen = useMobileMenuStore((s) => s.setOpen);
 
   return (
     <>
@@ -34,6 +38,12 @@ export function GlobalLayout({ children }: { children: ReactNode }) {
       </Suspense>
 
       <Toaster />
+
+      <Sheet open={isOpen} onOpenChange={setOpen}>
+        <SheetContent side="left">
+          <Sidebar showLogo={false} className="h-full mt-4" />
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
