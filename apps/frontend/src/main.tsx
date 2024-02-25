@@ -1,13 +1,18 @@
 import "@/main.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import {
+  RouterProvider,
+  createRouter,
+  createHashHistory,
+} from "@tanstack/react-router";
 import { routeTree } from "@/routeTree.gen";
 import { ThemeProvider } from "@/components/theme-provider";
 
 // Create a new router instance
 const router = createRouter({
   routeTree,
+  history: createHashHistory(),
   defaultPendingComponent: () => <h1>Loading, please wait...</h1>,
   defaultErrorComponent: () => <h1>Something went wrong!</h1>,
   InnerWrap({ children }) {
