@@ -93,7 +93,6 @@ export function Sidebar({
   showLogo = true,
   ...props
 }: SidebarProps) {
-  const navigate = useNavigate();
   const user = useAppStore((s) => s.user);
   const logout = useAppStore((s) => s.logout);
   const { setTheme, theme } = useTheme();
@@ -179,7 +178,7 @@ export function Sidebar({
                     <Link to="/profile">My profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/settings">Account settings</Link>
+                    <Link to="/settings/account">Account settings</Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

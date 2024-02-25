@@ -15,6 +15,11 @@ import { Route as SettingsImport } from './routes/settings'
 import { Route as ProfileImport } from './routes/profile'
 import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
+import { Route as SettingsIndexImport } from './routes/settings/index'
+import { Route as SettingsRolesImport } from './routes/settings/roles'
+import { Route as SettingsOrgImport } from './routes/settings/org'
+import { Route as SettingsMembersImport } from './routes/settings/members'
+import { Route as SettingsAccountImport } from './routes/settings/account'
 
 // Create/Update Routes
 
@@ -38,6 +43,31 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
 
+const SettingsIndexRoute = SettingsIndexImport.update({
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
+
+const SettingsRolesRoute = SettingsRolesImport.update({
+  path: '/roles',
+  getParentRoute: () => SettingsRoute,
+} as any)
+
+const SettingsOrgRoute = SettingsOrgImport.update({
+  path: '/org',
+  getParentRoute: () => SettingsRoute,
+} as any)
+
+const SettingsMembersRoute = SettingsMembersImport.update({
+  path: '/members',
+  getParentRoute: () => SettingsRoute,
+} as any)
+
+const SettingsAccountRoute = SettingsAccountImport.update({
+  path: '/account',
+  getParentRoute: () => SettingsRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -58,6 +88,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsImport
       parentRoute: typeof rootRoute
     }
+    '/settings/account': {
+      preLoaderRoute: typeof SettingsAccountImport
+      parentRoute: typeof SettingsImport
+    }
+    '/settings/members': {
+      preLoaderRoute: typeof SettingsMembersImport
+      parentRoute: typeof SettingsImport
+    }
+    '/settings/org': {
+      preLoaderRoute: typeof SettingsOrgImport
+      parentRoute: typeof SettingsImport
+    }
+    '/settings/roles': {
+      preLoaderRoute: typeof SettingsRolesImport
+      parentRoute: typeof SettingsImport
+    }
+    '/settings/': {
+      preLoaderRoute: typeof SettingsIndexImport
+      parentRoute: typeof SettingsImport
+    }
   }
 }
 
@@ -67,7 +117,13 @@ export const routeTree = rootRoute.addChildren([
   IndexRoute,
   LoginRoute,
   ProfileRoute,
-  SettingsRoute,
+  SettingsRoute.addChildren([
+    SettingsAccountRoute,
+    SettingsMembersRoute,
+    SettingsOrgRoute,
+    SettingsRolesRoute,
+    SettingsIndexRoute,
+  ]),
 ])
 
 /* prettier-ignore-end */

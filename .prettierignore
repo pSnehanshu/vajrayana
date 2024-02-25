@@ -1,2 +1,3 @@
 .yarn/*
 apps/frontend/src/routeTree.gen.ts
+apps/frontend/dist
