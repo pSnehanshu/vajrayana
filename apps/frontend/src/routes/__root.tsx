@@ -5,16 +5,8 @@ import { unstable_batchedUpdates } from "react-dom";
 import { NotFound } from "@/components/not-found";
 import { GlobalLayout } from "@/components/layout/global-layout";
 
-function wait(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 export const Route = createRootRoute({
   async beforeLoad() {
-    // await wait(60000);
-
     // Here we try to fetch the user and the org and save in store
 
     // Get the store obj
