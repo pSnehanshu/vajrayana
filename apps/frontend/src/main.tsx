@@ -12,6 +12,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { useMobileMenuStore } from "@/store";
 import { LazyTanStackRouterDevtools } from "@/components/LazyRouterDevtool";
 import { ErrorComp } from "@/components/error";
+import { Loading } from "@/components/loading";
 import { TrpcReactQueryProvider } from "@/lib/trpc";
 
 // Create a new router instance
@@ -19,7 +20,7 @@ const router = createRouter({
   routeTree,
   history: createHashHistory(),
   defaultPendingMinMs: 0,
-  defaultPendingComponent: () => <h1>Loading, please wait...</h1>,
+  defaultPendingComponent: Loading,
   defaultErrorComponent: (data) => {
     const errorMessage =
       typeof data?.error?.message === "string"

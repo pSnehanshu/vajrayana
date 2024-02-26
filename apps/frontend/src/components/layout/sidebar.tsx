@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ReactNode, useMemo } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useAppStore } from "@/store";
 import { toast } from "sonner";
 import { HiDocument } from "react-icons/hi2";
