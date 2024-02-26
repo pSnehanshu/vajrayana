@@ -80,12 +80,12 @@ interface FileButtonProps extends React.InputHTMLAttributes<HTMLInputElement> {
   render?: React.ComponentType<{ onClick: () => void }>;
 }
 const FileButton = React.forwardRef<HTMLInputElement, FileButtonProps>(
-  ({ render: Render, ...props }, ref) => {
+  ({ render: Render, className, ...props }, ref) => {
     const handleClick = () =>
       props.id && document.getElementById(props.id)?.click();
 
     return (
-      <>
+      <div className={className}>
         {Render ? (
           <Render onClick={handleClick} />
         ) : (
@@ -94,7 +94,7 @@ const FileButton = React.forwardRef<HTMLInputElement, FileButtonProps>(
           </Button>
         )}
         <input {...props} ref={ref} type="file" className="hidden" />
-      </>
+      </div>
     );
   },
 );
