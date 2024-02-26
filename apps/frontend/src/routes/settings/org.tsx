@@ -24,6 +24,7 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { IoSaveOutline } from "react-icons/io5";
 
 export const Route = createFileRoute("/settings/org")({
   component: OrgSettings,
@@ -162,7 +163,8 @@ function OrgSettings() {
           isLoading={formState.isSubmitting}
           disabled={!formState.isDirty && formState.isValid}
         >
-          Save
+          <IoSaveOutline className="mr-1 translate-y-[0.5px]" />
+          <span>Save</span>
         </Button>
       </CardFooter>
     </Card>
