@@ -24,7 +24,7 @@ export function GlobalLayout({ children }: { children: ReactNode }) {
 
         <main
           className={cn(
-            "col-span-3 h-screen overflow-y-scroll overflow-x-auto p-4 pt-12 md:pt-4",
+            "col-span-3 h-screen overflow-y-scroll overflow-x-auto p-4 pt-16 md:pt-4",
             [isLoggedIn ? "md:col-span-4 md:border-l" : "md:col-span-5"],
           )}
         >

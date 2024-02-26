@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, useOrgLogo } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ReactNode, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
@@ -26,7 +26,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CiMenuKebab } from "react-icons/ci";
 import { useTheme } from "@/components/theme-provider";
-import logo from "@/assets/images/logo.png";
 import { ScrollArea } from "../ui/scroll-area";
 
 type MenuItem = {
@@ -96,6 +95,7 @@ export function Sidebar({
   const user = useAppStore((s) => s.user);
   const logout = useAppStore((s) => s.logout);
   const { setTheme, theme } = useTheme();
+  const logo = useOrgLogo();
 
   const emailHash = useMemo(() => {
     if (user?.email) {

@@ -15,7 +15,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
-import logo from "@/assets/images/logo.png";
+import { useOrgLogo } from "@/lib/utils";
 
 export const Route = createLazyFileRoute("/login")({
   component: Login,
@@ -29,6 +29,7 @@ const formSchema = z.object({
 function Login() {
   const navigate = useNavigate();
   const login = useAppStore((s) => s.login);
+  const logo = useOrgLogo();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
