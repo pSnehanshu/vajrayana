@@ -13,6 +13,7 @@ model Organization {
   name             String            @db.VarChar(50)
   isActive         Boolean           @default(true)
   createdAt        DateTime          @default(now())
+  logo             String?           @db.Text
   Domains          Domain[]
   Memberships      Membership[]
   Roles            Role[]

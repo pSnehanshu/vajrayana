@@ -32,6 +32,13 @@ export const orgRouter = router({
     .input(
       z.object({
         name: z.string().trim().min(1),
+        logo: z
+          .string()
+          .regex(
+            /^data:image\/[^;]+;base64,[A-Za-z0-9/+]+={0,2}$/,
+            "Invalid image format, must be in base64",
+          )
+          .optional(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
