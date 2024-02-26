@@ -13,7 +13,7 @@ export function useOrgLogo(): string {
     domain: window.location.hostname,
   });
 
-  if (orgQuery.isLoading || orgQuery.isError) return "";
+  if (orgQuery.isLoading || orgQuery.isError) return logo;
 
   return orgQuery.data.logo ?? logo;
 }
