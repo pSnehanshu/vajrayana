@@ -11,7 +11,8 @@ import { routeTree } from "@/routeTree.gen";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useMobileMenuStore } from "@/store";
 import { LazyTanStackRouterDevtools } from "@/components/LazyRouterDevtool";
-import { ErrorComp } from "./components/error";
+import { ErrorComp } from "@/components/error";
+import { TrpcReactQueryProvider } from "@/lib/trpc";
 
 // Create a new router instance
 const router = createRouter({
@@ -70,7 +71,9 @@ declare module "@tanstack/react-router" {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
-      <RouterProvider router={router} />
+      <TrpcReactQueryProvider>
+        <RouterProvider router={router} />
+      </TrpcReactQueryProvider>
     </ThemeProvider>
   </StrictMode>,
 );

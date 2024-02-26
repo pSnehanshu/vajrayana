@@ -1301,6 +1301,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/query-core@npm:4.36.1":
+  version: 4.36.1
+  resolution: "@tanstack/query-core@npm:4.36.1"
+  checksum: 47672094da20d89402d9fe03bb7b0462be73a76ff9ca715169738bc600a719d064d106d083a8eedae22a2c22de22f87d5eb5d31ef447aba771d9190f2117ed10
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:4":
+  version: 4.36.1
+  resolution: "@tanstack/react-query@npm:4.36.1"
+  dependencies:
+    "@tanstack/query-core": 4.36.1
+    use-sync-external-store: ^1.2.0
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-native: "*"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 1aff0a476859386f8d32253fa0d0bde7b81769a6d4d4d9cbd78778f0f955459a3bdb7ee27a0d2ee7373090f12998b45df80db0b5b313bd0a7a39d36c6e8e51c5
+  languageName: node
+  linkType: hard
+
 "@tanstack/react-router@npm:1.16.6, @tanstack/react-router@npm:^1.16.6":
   version: 1.16.6
   resolution: "@tanstack/react-router@npm:1.16.6"
@@ -1376,6 +1402,19 @@ __metadata:
   peerDependencies:
     "@trpc/server": 10.45.1
   checksum: 14fd5d7d6e659303797459975780636ef16045d21f642b51730e61fcba9e871d5a4656b244f38dff9f391d0ad67ff40cea201688613a08a4c31207ab9dc4abc4
+  languageName: node
+  linkType: hard
+
+"@trpc/react-query@npm:^10.45.1":
+  version: 10.45.1
+  resolution: "@trpc/react-query@npm:10.45.1"
+  peerDependencies:
+    "@tanstack/react-query": ^4.18.0
+    "@trpc/client": 10.45.1
+    "@trpc/server": 10.45.1
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 8b2dc8f669d58835ddcf7c7a0fa5ef3baa96c29c3a4fc3c722e0a02df7ec2037474d2ce482ffb10cf097f1b56cbafaa2f4c76c6fb58fcfce986774b7ebcfe016
   languageName: node
   linkType: hard
 
@@ -2009,10 +2048,12 @@ __metadata:
     "@radix-ui/react-scroll-area": ^1.0.5
     "@radix-ui/react-slot": ^1.0.2
     "@radix-ui/react-tabs": ^1.0.4
+    "@tanstack/react-query": 4
     "@tanstack/react-router": ^1.16.6
     "@tanstack/router-devtools": ^1.17.1
     "@tanstack/router-vite-plugin": ^1.16.5
     "@trpc/client": ^10.45.1
+    "@trpc/react-query": ^10.45.1
     "@trpc/server": ^10.45.1
     "@types/node": ^20.11.20
     "@types/react": ^18.2.58
