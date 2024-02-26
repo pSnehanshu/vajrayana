@@ -38,7 +38,7 @@ export const orgRouter = router({
             /^data:image\/[^;]+;base64,[A-Za-z0-9/+]+={0,2}$/,
             "Invalid image format, must be in base64",
           )
-          .optional(),
+          .nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
