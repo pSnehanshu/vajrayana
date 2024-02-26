@@ -79,26 +79,25 @@ Button.displayName = "Button";
 interface FileButtonProps extends React.InputHTMLAttributes<HTMLInputElement> {
   render?: React.ComponentType<{ onClick: () => void }>;
 }
-const FileButton: React.FC<FileButtonProps> = ({
-  render: Render,
-  ...props
-}) => {
-  const ref = React.useRef<HTMLInputElement>(null);
-  const handleClick = () => ref.current?.click();
+const FileButton = React.forwardRef<HTMLInputElement, FileButtonProps>(
+  ({ render: Render, ...props }, ref) => {
+    const handleClick = () =>
+      props.id && document.getElementById(props.id)?.click();
 
-  return (
-    <>
-      {Render ? (
-        <Render onClick={handleClick} />
-      ) : (
-        <Button type="button" variant="outline" onClick={handleClick}>
-          Choose file
-        </Button>
-      )}
-      <input {...props} ref={ref} type="file" className="hidden" />
-    </>
-  );
-};
+    return (
+      <>
+        {Render ? (
+          <Render onClick={handleClick} />
+        ) : (
+          <Button type="button" variant="outline" onClick={handleClick}>
+            Choose file
+          </Button>
+        )}
+        <input {...props} ref={ref} type="file" className="hidden" />
+      </>
+    );
+  },
+);
 FileButton.displayName = "FileButton";
 
 export { Button, FileButton, buttonVariants };
