@@ -8,36 +8,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Organization {
-  id               String            @id @default(uuid()) @db.Uuid
-  name             String            @db.VarChar(50)
-  isActive         Boolean           @default(true)
-  createdAt        DateTime          @default(now())
-  logo             String?           @db.Text
-  Domains          Domain[]
-  Memberships      Membership[]
-  Roles            Role[]
-  ChargingStations ChargingStation[]
-  IdTokens         IdToken[]
-  Drivers          Driver[]
-
-  @@map("org")
-}
-
-model Domain {
-  domain    String       @id @db.VarChar(50)
-  orgId     String       @db.Uuid
-  Org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt DateTime     @default(now())
-}
-
 model User {
   id            String             @id @default(uuid()) @db.Uuid
   name          String             @db.VarChar(50)
   email         String             @unique @db.VarChar(255)
   createdAt     DateTime           @default(now())
+  roleType      RoleType           @default(custom)
+  roleId        String?            @db.Uuid
+  Role          Role?              @relation(fields: [roleId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   SensitiveInfo UserSensitiveInfo?
-  Memberships   Membership[]
   Sessions      Session[]
 }
 
@@ -57,44 +36,26 @@ model Session {
   expiresAt DateTime
 }
 
-model Membership {
-  userId    String       @db.Uuid
-  User      User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  orgId     String       @db.Uuid
-  Org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  roleType  RoleType     @default(custom)
-  roleId    String?      @db.Uuid
-  Role      Role?        @relation(fields: [roleId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  isActive  Boolean      @default(true)
-  createdAt DateTime     @default(now())
-
-  @@id([userId, orgId])
-}
-
 enum RoleType {
   owner
   custom
 }
 
 model Role {
-  id          String       @id @default(uuid()) @db.Uuid
-  name        String       @db.VarChar(50)
-  permissions Json         @default("[]")
-  orgId       String       @db.Uuid
-  Org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  Memberships Membership[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(50)
+  permissions Json     @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  User        User[]
 }
 
 model ChargingStation {
   id                  String              @id @default(uuid()) @db.Uuid
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
-  urlName             String              @db.VarChar(50)
+  urlName             String              @unique @db.VarChar(50)
   friendlyName        String?             @db.VarChar(50)
-  orgId               String              @db.Uuid
-  Org                 Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   latitude            Int?                @db.SmallInt
   longitude           Int?                @db.SmallInt
   lastBootNotifTime   DateTime?
@@ -111,8 +72,6 @@ model ChargingStation {
   Transactions        Transaction[]
   MeterValues         MeterSampledValue[]
   NotifyEvents        NotifyEvent[]
-
-  @@unique([orgId, urlName])
 }
 
 model EVSE {
@@ -161,13 +120,11 @@ model ConnectorType {
 }
 
 model Driver {
-  id        String       @id @default(uuid()) @db.Uuid
+  id        String    @id @default(uuid()) @db.Uuid
   name      String?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  is_active Boolean      @default(true)
-  orgId     String       @db.Uuid
-  Org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  is_active Boolean   @default(true)
   IdToken   IdToken[]
 }
 
@@ -176,16 +133,11 @@ model IdToken {
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
   is_active    Boolean            @default(true)
-  orgId        String             @db.Uuid
-  Org          Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  // token must be in lowercase
-  token        String             @db.VarChar(36)
+  token        String             @unique @db.VarChar(36) // token must be in lowercase
   driverId     String             @db.Uuid
   Driver       Driver             @relation(fields: [driverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   Transactions Transaction[]
   TxEvents     TransactionEvent[]
-
-  @@unique([orgId, token])
 }
 
 model Transaction {

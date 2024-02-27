@@ -17,7 +17,6 @@ import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
 import { Route as SettingsIndexImport } from './routes/settings/index'
 import { Route as SettingsRolesImport } from './routes/settings/roles'
-import { Route as SettingsOrgImport } from './routes/settings/org'
 import { Route as SettingsMembersImport } from './routes/settings/members'
 import { Route as SettingsAccountImport } from './routes/settings/account'
 
@@ -50,11 +49,6 @@ const SettingsIndexRoute = SettingsIndexImport.update({
 
 const SettingsRolesRoute = SettingsRolesImport.update({
   path: '/roles',
-  getParentRoute: () => SettingsRoute,
-} as any)
-
-const SettingsOrgRoute = SettingsOrgImport.update({
-  path: '/org',
   getParentRoute: () => SettingsRoute,
 } as any)
 
@@ -96,10 +90,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsMembersImport
       parentRoute: typeof SettingsImport
     }
-    '/settings/org': {
-      preLoaderRoute: typeof SettingsOrgImport
-      parentRoute: typeof SettingsImport
-    }
     '/settings/roles': {
       preLoaderRoute: typeof SettingsRolesImport
       parentRoute: typeof SettingsImport
@@ -120,7 +110,6 @@ export const routeTree = rootRoute.addChildren([
   SettingsRoute.addChildren([
     SettingsAccountRoute,
     SettingsMembersRoute,
-    SettingsOrgRoute,
     SettingsRolesRoute,
     SettingsIndexRoute,
   ]),

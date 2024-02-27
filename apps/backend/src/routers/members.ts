@@ -9,31 +9,26 @@ export const membersRouter = router({
   list: permissionProcedure([UserPermissions["MEMBER:READ"]])
     .input(paginationSchema)
     .query(async ({ input, ctx }) => {
-      const where: Prisma.MembershipWhereInput = { orgId: ctx.org.id };
+      const where: Prisma.UserWhereInput = {};
 
       if (input.search) {
-        where.User = {
-          OR: [
-            { name: { contains: input.search, mode: "insensitive" } },
-            { email: { contains: input.search, mode: "insensitive" } },
-          ],
-        };
+        where.OR = [
+          { name: { contains: input.search, mode: "insensitive" } },
+          { email: { contains: input.search, mode: "insensitive" } },
+        ];
       }
 
       const [members, total] = await Promise.all([
-        ctx.prisma.membership.findMany({
+        ctx.prisma.user.findMany({
           where,
-          include: {
-            User: true,
-            Role: true,
-          },
+          include: { Role: true },
           take: input.take,
           skip: (input.page - 1) * input.take,
           orderBy: {
-            User: { name: "asc" },
+            name: "asc",
           },
         }),
-        ctx.prisma.membership.count({ where }),
+        ctx.prisma.user.count({ where }),
       ]);
 
       return { members, total };
@@ -50,34 +45,8 @@ export const membersRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      // Try fetching the user based on email to check if they exist
-      const user = await ctx.prisma.user.upsert({
-        where: { email: input.email },
-        update: {},
-        create: {
-          email: input.email,
-          name: input.name ?? input.email.split("@")[0],
-          SensitiveInfo: {
-            create: {},
-          },
-        },
-        include: {
-          // Fetch memberships of this org if any
-          Memberships: {
-            where: {
-              orgId: ctx.org.id,
-            },
-          },
-        },
-      });
-
-      if (user.Memberships.length > 0) {
-        // Already a member, don't invite again
-        return null;
-      }
-
       if (input.role === "owner") {
-        if (ctx.membership.roleType !== "owner") {
+        if (ctx.session.User.roleType !== "owner") {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "Must be an owner to invite another owner",
@@ -88,24 +57,28 @@ export const membersRouter = router({
           where: { id: input.role.id },
         });
 
-        if (role?.orgId !== ctx.org.id) {
+        if (!role) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Invalid role" });
         }
       }
 
-      const membership = await ctx.prisma.membership.create({
-        data: {
-          userId: user.id,
-          orgId: ctx.org.id,
+      const user = await ctx.prisma.user.upsert({
+        where: { email: input.email },
+        update: {
           roleType: input.role === "owner" ? "owner" : "custom",
           roleId: input.role === "owner" ? null : input.role.id,
         },
-        include: {
-          User: true,
+        create: {
+          email: input.email,
+          name: input.name ?? input.email.split("@")[0],
+          SensitiveInfo: {
+            create: {},
+          },
         },
+        include: { Role: true },
       });
 
-      return { membership };
+      return { user };
     }),
   changeRole: permissionProcedure([UserPermissions["MEMBER:CHANGE-ROLE"]])
     .input(
@@ -118,21 +91,16 @@ export const membersRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const member = await ctx.prisma.membership.findUnique({
-        where: {
-          userId_orgId: {
-            orgId: ctx.org.id,
-            userId: input.userId,
-          },
-        },
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: input.userId },
       });
 
-      if (!member) {
+      if (!user) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
       if (input.newRole === "owner") {
-        if (ctx.membership.roleType !== "owner") {
+        if (ctx.session.User.roleType !== "owner") {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "Must be an owner to invite another owner",
@@ -143,18 +111,13 @@ export const membersRouter = router({
           where: { id: input.newRole.id },
         });
 
-        if (role?.orgId !== ctx.org.id) {
+        if (!role) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Invalid role" });
         }
       }
 
-      await ctx.prisma.membership.update({
-        where: {
-          userId_orgId: {
-            orgId: ctx.org.id,
-            userId: member.userId,
-          },
-        },
+      await ctx.prisma.user.update({
+        where: { id: user.id },
         data: {
           roleType: input.newRole === "owner" ? "owner" : "custom",
           roleId: input.newRole === "owner" ? null : input.newRole.id,
@@ -164,22 +127,17 @@ export const membersRouter = router({
   remove: permissionProcedure([UserPermissions["MEMBER:REMOVE"]])
     .input(z.object({ userId: z.string().uuid() }))
     .mutation(async ({ input, ctx }) => {
-      const member = await ctx.prisma.membership.findUnique({
-        where: {
-          userId_orgId: {
-            orgId: ctx.org.id,
-            userId: input.userId,
-          },
-        },
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: input.userId },
       });
 
-      if (!member) {
+      if (!user) {
         // Assume already removed
         return null;
       }
 
-      if (member.roleType === "owner") {
-        if (ctx.membership.roleType !== "owner") {
+      if (user.roleType === "owner") {
+        if (ctx.session.User.roleType !== "owner") {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "Must be an owner to remove another owner",
@@ -188,13 +146,8 @@ export const membersRouter = router({
       }
 
       // Remove!
-      await ctx.prisma.membership.delete({
-        where: {
-          userId_orgId: {
-            orgId: ctx.org.id,
-            userId: member.userId,
-          },
-        },
+      await ctx.prisma.user.delete({
+        where: { id: user.id },
       });
     }),
 });

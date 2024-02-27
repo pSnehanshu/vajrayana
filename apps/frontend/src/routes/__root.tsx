@@ -7,38 +7,21 @@ import { GlobalLayout } from "@/components/layout/global-layout";
 
 export const Route = createRootRoute({
   async beforeLoad() {
-    // Here we try to fetch the user and the org and save in store
+    // Here we try to fetch the user and save in store
 
     // Get the store obj
-    const store = useAppStore.getState();
+    const { user } = useAppStore.getState();
 
-    // Fetch current user and the org
-    const requests = [
-      // Only fetch if not in store
-      store.org
-        ? Promise.resolve(store.org)
-        : trpc.org.lookup.query({ domain: window.location.hostname }),
-      // Only fetch if not in store
-      store.user ? Promise.resolve(store.user) : trpc.auth.whoAmI.query(),
-    ] as const;
+    // Fetch current user
+    if (!user) {
+      try {
+        const user = await trpc.auth.whoAmI.query();
 
-    // Run the fetch
-    const results = await Promise.allSettled(requests);
-
-    // If succesfully fetched, save in store
-    if (results[0].status === "fulfilled") {
-      const org = results[0].value;
-      unstable_batchedUpdates(() => {
-        store.setOrg(org);
-      });
-    }
-
-    // If succesfully fetched, save in store
-    if (results[1].status === "fulfilled") {
-      const user = results[1].value;
-      unstable_batchedUpdates(() => {
-        store.setUser(user);
-      });
+        // If succesfully fetched, save in store
+        unstable_batchedUpdates(() => useAppStore.setState(() => ({ user })));
+      } catch (error) {
+        // Failed to fetch the user, probably not logged in
+      }
     }
 
     document.getElementById("full-screen-spinner")?.remove();

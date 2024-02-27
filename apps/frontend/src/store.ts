@@ -7,7 +7,6 @@ import { RouterOutputs, trpc } from "@/lib/trpc";
 //   permissionSchema,
 // } from "@zigbolt/shared";
 
-type Org = RouterOutputs["org"]["lookup"];
 type User = RouterOutputs["auth"]["whoAmI"];
 
 type AppStore = {
@@ -15,8 +14,6 @@ type AppStore = {
   setUser: (user: User) => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  org: Org | null;
-  setOrg: (org: Org) => void;
 };
 
 export const useAppStore = createStore<AppStore>((set) => ({
@@ -44,12 +41,6 @@ export const useAppStore = createStore<AppStore>((set) => ({
     // Remove user from state
     set(() => ({ user: null }));
   },
-
-  /// Org related states
-
-  org: null,
-
-  setOrg: (org) => set(() => ({ org })),
 }));
 
 /** Get all the permissions this user has on this org */

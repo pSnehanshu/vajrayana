@@ -26,30 +26,13 @@ CREATE TYPE "EventTriggerEnumType" AS ENUM ('Alerting', 'Delta', 'Periodic');
 CREATE TYPE "EventNotificationEnumType" AS ENUM ('HardWiredNotification', 'HardWiredMonitor', 'PreconfiguredMonitor', 'CustomMonitor');
 
 -- CreateTable
-CREATE TABLE "org" (
-    "id" UUID NOT NULL,
-    "name" VARCHAR(50) NOT NULL,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "org_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Domain" (
-    "domain" VARCHAR(50) NOT NULL,
-    "orgId" UUID NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Domain_pkey" PRIMARY KEY ("domain")
-);
-
--- CreateTable
 CREATE TABLE "User" (
     "id" UUID NOT NULL,
     "name" VARCHAR(50) NOT NULL,
     "email" VARCHAR(255) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "roleType" "RoleType" NOT NULL DEFAULT 'custom',
+    "roleId" UUID,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -73,23 +56,10 @@ CREATE TABLE "Session" (
 );
 
 -- CreateTable
-CREATE TABLE "Membership" (
-    "userId" UUID NOT NULL,
-    "orgId" UUID NOT NULL,
-    "roleType" "RoleType" NOT NULL DEFAULT 'custom',
-    "roleId" UUID,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Membership_pkey" PRIMARY KEY ("userId","orgId")
-);
-
--- CreateTable
 CREATE TABLE "Role" (
     "id" UUID NOT NULL,
     "name" VARCHAR(50) NOT NULL,
     "permissions" JSONB NOT NULL DEFAULT '[]',
-    "orgId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -103,7 +73,6 @@ CREATE TABLE "ChargingStation" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "urlName" VARCHAR(50) NOT NULL,
     "friendlyName" VARCHAR(50),
-    "orgId" UUID NOT NULL,
     "latitude" SMALLINT,
     "longitude" SMALLINT,
     "lastBootNotifTime" TIMESTAMP(3),
@@ -162,7 +131,6 @@ CREATE TABLE "Driver" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "orgId" UUID NOT NULL,
 
     CONSTRAINT "Driver_pkey" PRIMARY KEY ("id")
 );
@@ -173,7 +141,6 @@ CREATE TABLE "IdToken" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "orgId" UUID NOT NULL,
     "token" VARCHAR(36) NOT NULL,
     "driverId" UUID NOT NULL,
 
@@ -279,37 +246,22 @@ CREATE TABLE "NotifyEvent" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ChargingStation_orgId_urlName_key" ON "ChargingStation"("orgId", "urlName");
+CREATE UNIQUE INDEX "ChargingStation_urlName_key" ON "ChargingStation"("urlName");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "IdToken_orgId_token_key" ON "IdToken"("orgId", "token");
+CREATE UNIQUE INDEX "IdToken_token_key" ON "IdToken"("token");
 
 -- CreateIndex
 CREATE INDEX "Transaction_stationId_localId_idx" ON "Transaction"("stationId", "localId");
 
 -- AddForeignKey
-ALTER TABLE "Domain" ADD CONSTRAINT "Domain_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "org"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "usi" ADD CONSTRAINT "usi_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Membership" ADD CONSTRAINT "Membership_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Membership" ADD CONSTRAINT "Membership_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "org"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Membership" ADD CONSTRAINT "Membership_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Role" ADD CONSTRAINT "Role_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "org"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ChargingStation" ADD CONSTRAINT "ChargingStation_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "org"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "EVSE" ADD CONSTRAINT "EVSE_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "ChargingStation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -322,12 +274,6 @@ ALTER TABLE "Connector" ADD CONSTRAINT "Connector_evseNum_stationId_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "Connector" ADD CONSTRAINT "Connector_typeId_fkey" FOREIGN KEY ("typeId") REFERENCES "ConnectorType"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Driver" ADD CONSTRAINT "Driver_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "org"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "IdToken" ADD CONSTRAINT "IdToken_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "org"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "IdToken" ADD CONSTRAINT "IdToken_driverId_fkey" FOREIGN KEY ("driverId") REFERENCES "Driver"("id") ON DELETE CASCADE ON UPDATE CASCADE;

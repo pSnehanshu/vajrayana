@@ -25,8 +25,6 @@ type MeterValues = NonNullable<
 /** Handle authorization of IdToken */
 async function AuthorizeIdToken(
   idTokenInput: IdTokenType,
-  orgId: string,
-  orgName: string,
 ): Promise<{ idTokenInfo: IdTokenInfoType; tokenId?: string }> {
   const { idToken, type } = idTokenInput;
 
@@ -36,12 +34,7 @@ async function AuthorizeIdToken(
     case "ISO15693":
     case "KeyCode": {
       const dbIdToken = await prisma.idToken.findUnique({
-        where: {
-          orgId_token: {
-            orgId,
-            token: idToken,
-          },
-        },
+        where: { token: idToken },
         include: {
           Driver: true,
         },
@@ -61,7 +54,7 @@ async function AuthorizeIdToken(
         message = "You are banned! Please contact support.";
       } else {
         status = "Accepted";
-        message = `Welcome to ${orgName}. We hope you have a pleasant charging experience.`;
+        message = `Welcome! We hope you have a pleasant charging experience.`;
       }
 
       return {
@@ -159,13 +152,7 @@ export function AttachCallHandlers(router: OCPPRouter) {
   router.attachCallHandler(
     "Authorize",
     async (details, payload, sendResult) => {
-      const { Org } = details.chargingStation;
-
-      const authResponse = await AuthorizeIdToken(
-        payload.idToken,
-        Org.id,
-        Org.name,
-      );
+      const authResponse = await AuthorizeIdToken(payload.idToken);
 
       sendResult({ idTokenInfo: authResponse.idTokenInfo });
     },
@@ -174,11 +161,10 @@ export function AttachCallHandlers(router: OCPPRouter) {
   router.attachCallHandler(
     "TransactionEvent",
     async (details, payload, sendResult) => {
-      const { Org } = details.chargingStation;
       const { transactionInfo: txinfo, evse, idToken } = payload;
 
       const authResponse = idToken
-        ? await AuthorizeIdToken(idToken, Org.id, Org.name)
+        ? await AuthorizeIdToken(idToken)
         : undefined;
 
       // Send response early, then proceed

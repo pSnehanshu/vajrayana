@@ -11,9 +11,7 @@ export const chargingStationsRouter = router({
   list: permissionProcedure([UserPermissions["CS:READ"]])
     .input(paginationSchema)
     .query(async ({ input, ctx }) => {
-      const where: Prisma.ChargingStationWhereInput = {
-        orgId: ctx.org.id,
-      };
+      const where: Prisma.ChargingStationWhereInput = {};
 
       if (input.search) {
         const searchColumns: Array<keyof Prisma.ChargingStationWhereInput> = [
@@ -64,7 +62,7 @@ export const chargingStationsRouter = router({
         include: { EVSEs: true },
       });
 
-      if (!cs || cs.orgId !== ctx.org.id) {
+      if (!cs) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Charging station not found",

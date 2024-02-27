@@ -1,13 +1,11 @@
-import { Prisma } from "@zigbolt/prisma";
+import { prisma } from "@zigbolt/prisma";
 import { WebSocket } from "ws";
 
 export type ConnectionData = {
   urlName: string;
-  chargingStation: Prisma.ChargingStationGetPayload<{
-    include: {
-      Org: true;
-    };
-  }>;
+  chargingStation: NonNullable<
+    Awaited<ReturnType<typeof prisma.chargingStation.findUnique>>
+  >;
   version: "ocpp2.0.1";
 };
 

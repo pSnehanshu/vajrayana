@@ -10,11 +10,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function useOrgLogo(): string {
-  const orgQuery = trpcRQ.org.lookup.useQuery({
-    domain: window.location.hostname,
-  });
+  // const orgQuery = trpcRQ.org.lookup.useQuery({
+  //   domain: window.location.hostname,
+  // });
 
-  if (orgQuery.isLoading || orgQuery.isError) return emptyLogo;
+  // if (orgQuery.isLoading || orgQuery.isError) return emptyLogo;
 
-  return orgQuery.data.logo ?? logo;
+  return /* orgQuery.data.logo ?? */ logo;
 }

@@ -8,7 +8,6 @@ import {
 import { createTRPCReact } from "@trpc/react-query";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import SuperJSON from "superjson";
-import { useAppStore } from "@/store";
 import type { AppRouter } from "../../../backend/src/routers";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -18,12 +17,7 @@ const links = [
   loggerLink({ enabled: () => import.meta.env.DEV }),
 
   // This actually sends the request
-  httpBatchLink({
-    url: "/api/trpc",
-    headers: () => ({
-      "x-org-id": useAppStore.getState().org?.id ?? "",
-    }),
-  }),
+  httpBatchLink({ url: "/api/trpc" }),
 ] satisfies TRPCLink<AppRouter>[];
 
 /** Initialize tRPC React Query integration */

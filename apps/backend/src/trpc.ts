@@ -59,9 +59,7 @@ const authMiddleware = t.middleware(async ({ ctx, next }) => {
     include: {
       User: {
         include: {
-          Memberships: {
-            include: { Role: true },
-          },
+          Role: true,
         },
       },
     },
@@ -71,82 +69,37 @@ const authMiddleware = t.middleware(async ({ ctx, next }) => {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  return next({
-    ctx: {
-      ...ctx,
-      session,
-    },
-  });
-});
-
-const orgMiddleware = authMiddleware.unstable_pipe(async ({ ctx, next }) => {
-  const orgId = ctx.req.header("x-org-id")?.trim();
-
-  if (!orgId) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "x-org-id must be defined in the headers",
-    });
-  }
-
-  const orgMembership = ctx.session.User.Memberships.find(
-    (m) => m.orgId === orgId,
-  );
-
-  if (!orgMembership) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: `You aren't a member of Org #${orgId}`,
-    });
-  }
-
-  const role = orgMembership.Role;
-  const org = await ctx.prisma.organization.findUnique({
-    where: { id: orgMembership.orgId },
-  });
-
-  if (!org) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: `Org #${orgMembership.orgId} not found`,
-    });
-  }
-
-  if (!org.isActive) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: `Org ${org.name} is inactive`,
-    });
-  }
-
   // Check the available permissions
   let availablePermissions: UserPermissions[] = [];
 
-  if (orgMembership.roleType === "owner") {
+  if (session.User.roleType === "owner") {
     // Set all permissions
     availablePermissions = AllPermissions;
   } else {
     // Check what permissions are assigned to the role
-    const parsedPerms = permissionSchema.safeParse(role?.permissions);
+    const parsedPerms = permissionSchema.safeParse(
+      session.User.Role?.permissions,
+    );
     availablePermissions = parsedPerms.success ? parsedPerms.data : [];
   }
 
   return next({
     ctx: {
       ...ctx,
-      org,
+      session,
       permissions: availablePermissions,
-      membership: orgMembership,
     },
   });
 });
 
 const permissionMiddleware = (
   permissions: UserPermissions[] = [],
-  mode: "every" | "some" = "every",
+  require: "every" | "some" = "every",
 ) =>
-  orgMiddleware.unstable_pipe(({ ctx, next }) => {
-    const hasPermission = permissions[mode]((p) => ctx.permissions.includes(p));
+  authMiddleware.unstable_pipe(({ ctx, next }) => {
+    const hasPermission = permissions[require]((p) =>
+      ctx.permissions.includes(p),
+    );
 
     if (hasPermission) {
       return next({ ctx });
@@ -167,9 +120,6 @@ export const publicProcedure = t.procedure;
 
 /** Requires user to be logged in */
 export const authProcedure = t.procedure.use(authMiddleware);
-
-/** Requires x-org-id to be mentioned */
-export const orgProcedure = t.procedure.use(orgMiddleware);
 
 /** Requires user to have the specified permissions to proceed */
 export const permissionProcedure = (

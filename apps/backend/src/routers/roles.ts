@@ -12,7 +12,7 @@ export const rolesRouter = router({
   list: permissionProcedure([UserPermissions["ROLE:READ"]])
     .input(paginationSchema)
     .query(async ({ input, ctx }) => {
-      const where: Prisma.RoleWhereInput = { orgId: ctx.org.id };
+      const where: Prisma.RoleWhereInput = {};
 
       if (input.search) {
         where.name = {
@@ -50,7 +50,6 @@ export const rolesRouter = router({
         data: {
           name: input.name,
           permissions: input.permissions,
-          orgId: ctx.org.id,
         },
       });
 
@@ -69,7 +68,7 @@ export const rolesRouter = router({
         where: { id: input.roleId },
       });
 
-      if (!role || role.orgId !== ctx.org.id) {
+      if (!role) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
@@ -94,11 +93,6 @@ export const rolesRouter = router({
       if (!role) {
         // Assume it was already deleted
         return null;
-      }
-
-      if (role.orgId !== ctx.org.id) {
-        // Cannot delete another org's role
-        throw new TRPCError({ code: "NOT_FOUND" });
       }
 
       await ctx.prisma.role.delete({

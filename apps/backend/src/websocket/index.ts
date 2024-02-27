@@ -20,17 +20,6 @@ export function CreateWebsocketServer(server: Server) {
       return;
     }
 
-    /** Fetch the Org on the basis of hostname */
-    const domain = await prisma.domain.findUnique({
-      where: { domain: hostName },
-    });
-
-    if (!domain) {
-      socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
-      socket.destroy(new Error(`Unknown hostname: ${hostName}`));
-      return;
-    }
-
     if (!url) {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
       socket.destroy(new Error("url not specified"));
@@ -49,13 +38,7 @@ export function CreateWebsocketServer(server: Server) {
       }
 
       const chargingStation = await prisma.chargingStation.findUnique({
-        where: {
-          orgId_urlName: {
-            urlName,
-            orgId: domain.orgId,
-          },
-        },
-        include: { Org: true },
+        where: { urlName },
       });
 
       if (!chargingStation) {

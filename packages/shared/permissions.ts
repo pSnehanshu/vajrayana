@@ -4,7 +4,6 @@ import { z } from "zod";
  * List of available permissions
  */
 export enum UserPermissions {
-  "ORG:READ" = 1,
   "ORG:UPDATE" = 2,
   "MEMBER:READ" = 3,
   "MEMBER:ADD" = 4,
@@ -38,8 +37,7 @@ Object.values(UserPermissions).forEach((ev) => {
 export const permissionSchema = z.nativeEnum(UserPermissions).array();
 
 export const PermissionDescriptions: Record<UserPermissions, string> = {
-  [UserPermissions["ORG:READ"]]: "Can fetch organization details",
-  [UserPermissions["ORG:UPDATE"]]: "Can update organization details",
+  [UserPermissions["ORG:UPDATE"]]: "Can update organization settings",
   [UserPermissions["MEMBER:READ"]]: "Can fetch list of members",
   [UserPermissions["MEMBER:ADD"]]: "Can invite new members",
   [UserPermissions["MEMBER:REMOVE"]]: "Can remove existing members",

@@ -7,7 +7,7 @@ import { Topbar } from "@/components/layout/topbar";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 export function GlobalLayout({ children }: { children: ReactNode }) {
-  const isLoggedIn = useAppStore((s) => !!(s.user?.id && s.org?.id));
+  const isLoggedIn = useAppStore((s) => !!s.user);
 
   const isOpen = useMobileMenuStore((s) => s.isOpen);
   const setOpen = useMobileMenuStore((s) => s.setOpen);
