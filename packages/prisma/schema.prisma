@@ -97,7 +97,7 @@ model Connector {
   typeId          String?
   Type            ConnectorType?  @relation(fields: [typeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   status          ConnectorStatus @default(Unavailable)
-  statusUpdatedAt DateTime        @default(now())
+  statusUpdatedAt DateTime        @default(now()) @db.Timestamptz()
 
   @@id([stationId, evseNum, sn])
 }
@@ -168,7 +168,7 @@ model Transaction {
 
 model TransactionEvent {
   eventType          TxStateEnum
-  timestamp          DateTime
+  timestamp          DateTime               @db.Timestamptz()
   triggerReason      TriggerReasonEnumType
   seqNo              Int                    @db.SmallInt
   offline            Boolean                @default(false)
@@ -256,7 +256,7 @@ model MeterSampledValue {
   Station        ChargingStation    @relation(fields: [stationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   txId           String?            @db.Uuid
   Tx             Transaction?       @relation(fields: [txId], references: [serverId], onDelete: Cascade, onUpdate: Cascade)
-  timestamp      DateTime
+  timestamp      DateTime           @db.Timestamptz()
   value          Float
   context        String             @default("Sample.Periodic")
   measurand      String             @default("Energy.Active.Import.Register")
@@ -285,7 +285,7 @@ model NotifyEvent {
   id                   String                    @default(uuid()) @db.Uuid
   stationId            String                    @db.Uuid
   Station              ChargingStation           @relation(fields: [stationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  timestamp            DateTime
+  timestamp            DateTime                  @db.Timestamptz()
   tbc                  Boolean                   @default(false)
   seqNo                Int                       @db.SmallInt
   localEventId         Int
