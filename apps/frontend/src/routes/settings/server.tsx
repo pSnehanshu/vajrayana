@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { IoSaveOutline } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import { Input } from "@/components/ui/input";
@@ -29,9 +29,10 @@ export const Route = createFileRoute("/settings/server")({
 });
 
 function OrgSettings() {
-  const [{ settings }, settingsQuery] = trpcRQ.settings.get.useSuspenseQuery({
+  const [{ settings }] = trpcRQ.settings.get.useSuspenseQuery({
     keys: "all",
   });
+  const utils = trpcRQ.useUtils();
 
   return (
     <Table>
@@ -53,7 +54,7 @@ function OrgSettings() {
             key={setting.key}
             setting={setting}
             currentValue={settings.get(setting.key)?.value}
-            triggerRefresh={settingsQuery.refetch}
+            triggerRefresh={utils.settings.get.invalidate}
           />
         ))}
       </TableBody>
@@ -64,7 +65,7 @@ function OrgSettings() {
 interface SingleSettingProps {
   setting: KeyDescription;
   currentValue: string | undefined;
-  triggerRefresh?: () => void;
+  triggerRefresh: () => void;
 }
 function SingleSetting({
   setting,
@@ -73,6 +74,7 @@ function SingleSetting({
 }: SingleSettingProps) {
   const [isEditMode, setEditMode] = useState(false);
   const [unsavedVal, setUnsavedVal] = useState(currentValue);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const settingSetMutation = trpcRQ.settings.set.useMutation({
     onSuccess() {
@@ -86,23 +88,34 @@ function SingleSetting({
     },
   });
 
+  function handleSave(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    settingSetMutation.mutate({
+      key: setting.key,
+      value: unsavedVal ?? "",
+    });
+  }
+
   return (
     <TableRow key={setting.key}>
       <TableCell>{setting.name}</TableCell>
 
       <TableCell className="text-center">
         {isEditMode ? (
-          <Input
-            value={unsavedVal}
-            onChange={(e) => setUnsavedVal(e.target.value)}
-            autoFocus
-          />
+          <form ref={formRef} onSubmit={handleSave}>
+            <Input
+              value={unsavedVal}
+              onChange={(e) => setUnsavedVal(e.target.value)}
+              autoFocus
+            />
+          </form>
         ) : (
           <span>{currentValue ?? "-"}</span>
         )}
       </TableCell>
 
-      <TableCell className="flex justify-between space-x-1">
+      <TableCell className="flex justify-end space-x-1">
         {isEditMode ? (
           <>
             <TooltipProvider>
@@ -110,12 +123,7 @@ function SingleSetting({
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
-                    onClick={() =>
-                      settingSetMutation.mutate({
-                        key: setting.key,
-                        value: unsavedVal ?? "",
-                      })
-                    }
+                    onClick={() => formRef.current?.requestSubmit()}
                     isLoading={settingSetMutation.isLoading}
                   >
                     <IoSaveOutline />

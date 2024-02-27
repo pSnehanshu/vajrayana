@@ -68,7 +68,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           {isLoading ? (
             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
           ) : null}
-          {children}
+          {size === "icon" && isLoading ? null : children}
         </>
       </Comp>
     );

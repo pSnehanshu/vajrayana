@@ -1,16 +1,24 @@
 import { useAppStore, useMobileMenuStore } from "@/store";
 import { Sidebar } from "@/components/layout/sidebar";
 import { cn } from "@/lib/utils";
-import { type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Toaster } from "sonner";
 import { Topbar } from "@/components/layout/topbar";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { trpcRQ } from "@/lib/trpc";
 
 export function GlobalLayout({ children }: { children: ReactNode }) {
   const isLoggedIn = useAppStore((s) => !!s.user);
 
   const isOpen = useMobileMenuStore((s) => s.isOpen);
   const setOpen = useMobileMenuStore((s) => s.setOpen);
+
+  // Dynamically set page title to server name
+  const nameQuery = trpcRQ.settings.get.useQuery({ keys: ["name"] });
+  const name = nameQuery.data?.settings.get("name")?.value;
+  useEffect(() => {
+    window.document.title = name ?? "ZigBolt";
+  }, [name]);
 
   return (
     <>
