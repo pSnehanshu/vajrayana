@@ -1,12 +1,14 @@
 import { z } from "zod";
 import _ from "lodash";
 import { Prisma } from "@zigbolt/prisma";
-import { UserPermissions, permissionSchema } from "@zigbolt/shared";
+import {
+  ArrayElement,
+  UserPermissions,
+  permissionSchema,
+} from "@zigbolt/shared";
 import { permissionProcedure, router } from "../trpc";
 import { paginationSchema } from "../utils/schemas";
 import { TRPCError } from "@trpc/server";
-
-type ArrayElement<T> = T extends (infer U)[] ? U : never;
 
 export const rolesRouter = router({
   list: permissionProcedure([UserPermissions["ROLE:READ"]])

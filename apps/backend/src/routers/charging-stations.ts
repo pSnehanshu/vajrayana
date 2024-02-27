@@ -1,11 +1,9 @@
-import { UserPermissions } from "@zigbolt/shared";
+import { ArrayElement, UserPermissions } from "@zigbolt/shared";
 import { permissionProcedure, router } from "../trpc";
 import { z } from "zod";
 import { paginationSchema } from "../utils/schemas";
 import { Prisma } from "@zigbolt/prisma";
 import { TRPCError } from "@trpc/server";
-
-type ArrayElement<T> = T extends (infer U)[] ? U : never;
 
 export const chargingStationsRouter = router({
   list: permissionProcedure([UserPermissions["CS:READ"]])

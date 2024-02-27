@@ -7,6 +7,9 @@
   "scripts": {
     "build": "tsc && cpy package.json dist"
   },
+  "dependencies": {
+    "@zigbolt/prisma": "*"
+  },
   "devDependencies": {
     "cpy-cli": "^5.0.0",
     "typescript": "^5.3.3"

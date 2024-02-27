@@ -18,9 +18,9 @@ function Settings() {
     <>
       <Tabs value={split} className="w-full max-w-[800px] mx-auto">
         <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4">
-          {/* <TabsTrigger value="org" asChild>
-            <Link to="/settings/org">Organization</Link>
-          </TabsTrigger> */}
+          <TabsTrigger value="server" asChild>
+            <Link to="/settings/server">Server</Link>
+          </TabsTrigger>
 
           <TabsTrigger value="members" asChild>
             <Link to="/settings/members">Members</Link>
@@ -36,9 +36,9 @@ function Settings() {
         </TabsList>
 
         <div className="p-2 mt-2">
-          {/* <TabsContent value="org">
+          <TabsContent value="server">
             <Outlet />
-          </TabsContent> */}
+          </TabsContent>
 
           <TabsContent value="members">
             <Outlet />
