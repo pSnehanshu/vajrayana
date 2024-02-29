@@ -81,8 +81,17 @@ interface FileButtonProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 const FileButton = React.forwardRef<HTMLInputElement, FileButtonProps>(
   ({ render: Render, className, ...props }, ref) => {
-    const handleClick = () =>
-      props.id && document.getElementById(props.id)?.click();
+    const localRef = React.useRef<HTMLInputElement>(null);
+
+    const handleClick = () => {
+      if (props.id) {
+        document.getElementById(props.id)?.click();
+      } else if (ref && "current" in ref) {
+        ref.current?.click();
+      } else {
+        localRef.current?.click();
+      }
+    };
 
     return (
       <div className={className}>
@@ -93,7 +102,12 @@ const FileButton = React.forwardRef<HTMLInputElement, FileButtonProps>(
             Choose file
           </Button>
         )}
-        <input {...props} ref={ref} type="file" className="hidden" />
+        <input
+          {...props}
+          ref={ref ?? localRef}
+          type="file"
+          className="hidden"
+        />
       </div>
     );
   },

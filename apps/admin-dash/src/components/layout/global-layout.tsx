@@ -14,7 +14,7 @@ export function GlobalLayout({ children }: { children: ReactNode }) {
   const setOpen = useMobileMenuStore((s) => s.setOpen);
 
   // Dynamically set page title to server name
-  const nameQuery = trpcRQ.settings.get.useQuery({ keys: ["name"] });
+  const nameQuery = trpcRQ.settings.getPublic.useQuery({ keys: ["name"] });
   const name = nameQuery.data?.settings.get("name")?.value;
   useEffect(() => {
     window.document.title = name ?? "ZigBolt";
