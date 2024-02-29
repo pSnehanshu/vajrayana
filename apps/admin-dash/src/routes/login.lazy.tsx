@@ -44,9 +44,17 @@ function Login() {
   const { formState } = form;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await login(values.email, values.password);
-    toast("Login succesfull!");
-    navigate({ to: "/" });
+    try {
+      await login(values.email, values.password);
+      toast("Login succesfull!");
+      navigate({ to: "/" });
+    } catch (error) {
+      toast(
+        <span className="text-destructive">
+          Login failed, either your email or password is incorrect
+        </span>,
+      );
+    }
   }
 
   return (
