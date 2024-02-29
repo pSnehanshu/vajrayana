@@ -17,7 +17,7 @@ export function GlobalLayout({ children }: { children: ReactNode }) {
   const nameQuery = trpcRQ.settings.getPublic.useQuery({ keys: ["name"] });
   const name = nameQuery.data?.settings.get("name")?.value;
   useEffect(() => {
-    window.document.title = name ?? "ZigBolt";
+    if (name) window.document.title = name;
   }, [name]);
 
   return (

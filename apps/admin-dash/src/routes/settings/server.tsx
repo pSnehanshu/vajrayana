@@ -245,7 +245,7 @@ function TextSetting(props: SettingItemProps) {
   if (props.isEditMode) {
     return (
       <Input
-        value={props.value}
+        value={props.unsavedValue}
         onChange={(e) => props.onChange(e.target.value)}
         autoFocus
       />
