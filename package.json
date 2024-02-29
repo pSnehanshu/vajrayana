@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev:b": "yarn workspace @zigbolt/backend dev",
-    "dev:d": "yarn workspace @zigbolt/frontend dev",
+    "dev:d": "yarn workspace @zigbolt/admin-dash dev",
     "dev": "run-p dev:b dev:d",
     "prisma": "yarn workspace @zigbolt/prisma prisma",
     "pretty": "prettier . -w",

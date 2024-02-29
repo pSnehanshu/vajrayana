@@ -19,14 +19,14 @@ ADD . .
 RUN yarn install && \
   yarn prisma generate && \
   # Build admin frontend
-  yarn workspace @zigbolt/frontend build
+  yarn workspace @zigbolt/admin-dash build
 
 
 # DEPLOY STAGE
 FROM base
 
 # Copy admin frontend built artifacts
-COPY --from=build /var/www/zigbolt/apps/frontend/dist /var/www/html/admin
+COPY --from=build /var/www/zigbolt/apps/admin-dash/dist /var/www/html/admin
 
 # Copy node_modules
 COPY --from=build /var/www/zigbolt/node_modules /var/www/zigbolt/node_modules
@@ -35,7 +35,7 @@ COPY --from=build /var/www/zigbolt/node_modules /var/www/zigbolt/node_modules
 COPY . .
 
 # Remove the frontend dir
-RUN rm -rf ./apps/frontend; \
+RUN rm -rf ./apps/admin-dash; \
   yarn prisma generate; \
   # Setup nginx configs and SSL certs
   mv ./docker-assets/nginx.conf /etc/nginx/nginx.conf; \

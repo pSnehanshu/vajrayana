@@ -3,4 +3,4 @@ reset.d.ts
 **/build/
 **/dist/
 tmp
-apps/frontend/src/routeTree.gen.ts
+apps/admin-dash/src/routeTree.gen.ts
