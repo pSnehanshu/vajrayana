@@ -18,15 +18,15 @@ ADD . .
 # Install all dependencies
 RUN yarn install && \
   yarn prisma generate && \
-  # Build frontend
+  # Build admin frontend
   yarn workspace @zigbolt/frontend build
 
 
 # DEPLOY STAGE
 FROM base
 
-# Copy frontend built artifacts
-COPY --from=build /var/www/zigbolt/apps/frontend/dist /var/www/html
+# Copy admin frontend built artifacts
+COPY --from=build /var/www/zigbolt/apps/frontend/dist /var/www/html/admin
 
 # Copy node_modules
 COPY --from=build /var/www/zigbolt/node_modules /var/www/zigbolt/node_modules
@@ -44,7 +44,9 @@ RUN rm -rf ./apps/frontend; \
   mv ./docker-assets/nginx.key /etc/nginx/certs/nginx.key; \
   # Make the script executable
   mv ./docker-assets/start.sh ./start.sh; \
-  chmod +x ./start.sh
+  chmod +x ./start.sh; \
+  # This file will redirect to /portal
+  mv ./docker-assets/redirect-to-portal.html /var/www/html/index.html
 
 EXPOSE 80
 EXPOSE 443
