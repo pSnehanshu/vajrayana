@@ -46,7 +46,7 @@ RUN rm -rf ./apps/admin-dash; \
   mv ./docker-assets/start.sh ./start.sh; \
   chmod +x ./start.sh; \
   # This file will redirect to /portal
-  mv ./docker-assets/redirect-to-portal.html /var/www/html/index.html; \
+  mv ./docker-assets/index-redirect.html /var/www/html/index.html; \
   # Copy custom error pages
   mv ./docker-assets/404.html /var/www/html/404.html; \
   # Ensure nginx config is valid
