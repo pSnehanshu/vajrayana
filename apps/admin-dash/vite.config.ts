@@ -19,9 +19,6 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
-    target: "es2015",
-    sourcemap: true,
-  },
+  build: { target: "es2015" },
   base: "./",
 });

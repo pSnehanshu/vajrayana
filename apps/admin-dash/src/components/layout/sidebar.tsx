@@ -109,7 +109,7 @@ export function Sidebar({
   async function handleLogout() {
     await logout();
     toast("You have been logged out");
-    window.location.href = "/";
+    window.location.href = import.meta.env.BASE_URL;
   }
 
   return (
