@@ -129,6 +129,7 @@ export function Sidebar({
               <li key={i}>
                 <Link
                   to={item.link}
+                  params={{}}
                   className={cn(
                     buttonVariants({ variant: "ghost" }),
                     "w-full justify-start",
