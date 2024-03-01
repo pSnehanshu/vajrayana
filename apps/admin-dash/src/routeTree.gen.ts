@@ -26,22 +26,22 @@ import { Route as SettingsAccountImport } from './routes/settings/account'
 const SettingsRoute = SettingsImport.update({
   path: '/settings',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/settings.lazy').then((d) => d.Route))
+} as any)
 
 const ProfileRoute = ProfileImport.update({
   path: '/profile',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/profile.lazy').then((d) => d.Route))
+} as any)
 
 const LoginRoute = LoginImport.update({
   path: '/login',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/login.lazy').then((d) => d.Route))
+} as any)
 
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any)
 
 const SettingsIndexRoute = SettingsIndexImport.update({
   path: '/',
