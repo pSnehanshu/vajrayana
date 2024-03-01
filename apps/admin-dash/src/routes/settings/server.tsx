@@ -15,7 +15,6 @@ import { Button, FileButton } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { FormEvent, useRef, useState, useMemo } from "react";
@@ -127,63 +126,57 @@ function SingleSetting({
       <TableCell className="flex justify-end space-x-1">
         {isEditMode ? (
           <>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    onClick={() => formRef.current?.requestSubmit()}
-                    isLoading={settingSetMutation.isLoading}
-                  >
-                    <IoSaveOutline />
-                  </Button>
-                </TooltipTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  onClick={() => formRef.current?.requestSubmit()}
+                  isLoading={settingSetMutation.isLoading}
+                >
+                  <IoSaveOutline />
+                </Button>
+              </TooltipTrigger>
 
-                <TooltipContent>
-                  <p>Save changes</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+              <TooltipContent>
+                <p>Save changes</p>
+              </TooltipContent>
+            </Tooltip>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setEditMode(false);
-                      setUnsavedVal(currentValue);
-                    }}
-                  >
-                    <IoClose />
-                  </Button>
-                </TooltipTrigger>
-
-                <TooltipContent>
-                  <p>Cancel</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </>
-        ) : (
-          <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setEditMode(true)}
+                  onClick={() => {
+                    setEditMode(false);
+                    setUnsavedVal(currentValue);
+                  }}
                 >
-                  <CiEdit />
+                  <IoClose />
                 </Button>
               </TooltipTrigger>
 
               <TooltipContent>
-                <p>Change the value</p>
+                <p>Cancel</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </>
+        ) : (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setEditMode(true)}
+              >
+                <CiEdit />
+              </Button>
+            </TooltipTrigger>
+
+            <TooltipContent>
+              <p>Change the value</p>
+            </TooltipContent>
+          </Tooltip>
         )}
       </TableCell>
     </TableRow>

@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import { Topbar } from "@/components/layout/topbar";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { trpcRQ } from "@/lib/trpc";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 export function GlobalLayout({ children }: { children: ReactNode }) {
   const isLoggedIn = useAppStore((s) => !!s.user);
@@ -21,7 +22,7 @@ export function GlobalLayout({ children }: { children: ReactNode }) {
   }, [name]);
 
   return (
-    <>
+    <TooltipProvider delayDuration={0}>
       <div className="grid grid-cols-3 md:grid-cols-5">
         {isLoggedIn && (
           <>
@@ -47,6 +48,6 @@ export function GlobalLayout({ children }: { children: ReactNode }) {
           <Sidebar showLogo={false} className="h-full mt-4" />
         </SheetContent>
       </Sheet>
-    </>
+    </TooltipProvider>
   );
 }

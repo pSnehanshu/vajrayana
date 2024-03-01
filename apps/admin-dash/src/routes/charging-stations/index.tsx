@@ -1,4 +1,4 @@
-import { CopyToClipboard } from "@/components/ui/button";
+import copy from "copy-to-clipboard";
 import {
   Table,
   TableBody,
@@ -7,6 +7,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { RouterOutputs, trpcRQ } from "@/lib/trpc";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import {
@@ -41,13 +46,17 @@ const columns = [
         </Link>
 
         <div className="my-1">
-          <span className="text-xs py-0.5 px-1 font-mono rounded-md text-secondary-foreground bg-secondary">
-            ID: {props.row.original.id}
-          </span>
-          <CopyToClipboard
-            data={props.row.original.id}
-            className="h-6 w-6 translate-y-0.5"
-          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span
+                onClick={() => copy(props.row.original.id)}
+                className="text-xs py-0.5 px-1 cursor-pointer font-mono rounded-md text-secondary-foreground bg-secondary"
+              >
+                ID: {props.row.original.id}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="right">Click to copy</TooltipContent>
+          </Tooltip>
         </div>
       </div>
     ),

@@ -5,12 +5,7 @@ import { ReloadIcon } from "@radix-ui/react-icons";
 import { MdContentCopy } from "react-icons/md";
 import copy from "copy-to-clipboard";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "./tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent } from "./tooltip";
 import { toast } from "sonner";
 
 const buttonVariants = cva(
@@ -142,22 +137,20 @@ const CopyToClipboard = React.forwardRef<
   };
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            {...props}
-            ref={ref}
-            onClick={handleCopy}
-          >
-            <MdContentCopy />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Copy content</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          {...props}
+          ref={ref}
+          onClick={handleCopy}
+        >
+          <MdContentCopy />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Copy content</TooltipContent>
+    </Tooltip>
   );
 });
 CopyToClipboard.displayName = "CopyToClipboard";
