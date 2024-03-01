@@ -1,4 +1,4 @@
-import { ArrayElement, UserPermissions } from "@zigbolt/shared";
+import { UserPermissions } from "@zigbolt/shared";
 import { permissionProcedure, router } from "../trpc";
 import { z } from "zod";
 import { paginationSchema } from "../utils/schemas";
@@ -42,10 +42,7 @@ export const chargingStationsRouter = router({
         ctx.prisma.chargingStation.count({ where }),
       ]);
 
-      const CSMap = new Map<string, ArrayElement<typeof chargingStations>>();
-      chargingStations.forEach((cs) => CSMap.set(cs.id, cs));
-
-      return { stations: CSMap, total };
+      return { stations: chargingStations, total };
     }),
   getById: permissionProcedure([UserPermissions["CS:READ"]])
     .input(

@@ -1426,6 +1426,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/react-table@npm:^8.13.2":
+  version: 8.13.2
+  resolution: "@tanstack/react-table@npm:8.13.2"
+  dependencies:
+    "@tanstack/table-core": 8.13.2
+  peerDependencies:
+    react: ">=16"
+    react-dom: ">=16"
+  checksum: 5a5ae9cf124a19d5b5ba585359fc51e8999d5418df0bdd14acf8e8644355c540d54d7392041ceec514956d54189a1f7bf5a19ec9ae5a27fa93bd556a5b156a75
+  languageName: node
+  linkType: hard
+
 "@tanstack/router-devtools@npm:^1.17.1":
   version: 1.17.1
   resolution: "@tanstack/router-devtools@npm:1.17.1"
@@ -1464,6 +1476,13 @@ __metadata:
   version: 0.1.3
   resolution: "@tanstack/store@npm:0.1.3"
   checksum: 47f6a6d2e0cd7e896eb838f25081761e3fbbc5988b826f54136c23dd00971247d0493117efa4fe3c870df6598c1d48e1d47d1dab959a9b911bae5935dcc01f4b
+  languageName: node
+  linkType: hard
+
+"@tanstack/table-core@npm:8.13.2":
+  version: 8.13.2
+  resolution: "@tanstack/table-core@npm:8.13.2"
+  checksum: 404cb5b1f0976d06c1a560ab895bb85af0846dd2d275a7ab47ca5bb599097b39530cd424259a40668ee6de204b6285fd122cd42b5e501c213a6d464ec45d1f9a
   languageName: node
   linkType: hard
 
@@ -2095,6 +2114,7 @@ __metadata:
     "@radix-ui/react-tooltip": ^1.0.7
     "@tanstack/react-query": 4
     "@tanstack/react-router": ^1.16.6
+    "@tanstack/react-table": ^8.13.2
     "@tanstack/router-devtools": ^1.17.1
     "@tanstack/router-vite-plugin": ^1.16.5
     "@trpc/client": ^10.45.1

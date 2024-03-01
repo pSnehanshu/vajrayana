@@ -23,10 +23,12 @@ import { Route as CustomersImport } from './routes/customers'
 import { Route as ChargingStationsImport } from './routes/charging-stations'
 import { Route as IndexImport } from './routes/index'
 import { Route as SettingsIndexImport } from './routes/settings/index'
+import { Route as ChargingStationsIndexImport } from './routes/charging-stations/index'
 import { Route as SettingsServerImport } from './routes/settings/server'
 import { Route as SettingsRolesImport } from './routes/settings/roles'
 import { Route as SettingsMembersImport } from './routes/settings/members'
 import { Route as SettingsAccountImport } from './routes/settings/account'
+import { Route as ChargingStationsStationIdImport } from './routes/charging-stations/$stationId'
 
 // Create/Update Routes
 
@@ -90,6 +92,11 @@ const SettingsIndexRoute = SettingsIndexImport.update({
   getParentRoute: () => SettingsRoute,
 } as any)
 
+const ChargingStationsIndexRoute = ChargingStationsIndexImport.update({
+  path: '/',
+  getParentRoute: () => ChargingStationsRoute,
+} as any)
+
 const SettingsServerRoute = SettingsServerImport.update({
   path: '/server',
   getParentRoute: () => SettingsRoute,
@@ -108,6 +115,11 @@ const SettingsMembersRoute = SettingsMembersImport.update({
 const SettingsAccountRoute = SettingsAccountImport.update({
   path: '/account',
   getParentRoute: () => SettingsRoute,
+} as any)
+
+const ChargingStationsStationIdRoute = ChargingStationsStationIdImport.update({
+  path: '/$stationId',
+  getParentRoute: () => ChargingStationsRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -158,6 +170,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TransactionsImport
       parentRoute: typeof rootRoute
     }
+    '/charging-stations/$stationId': {
+      preLoaderRoute: typeof ChargingStationsStationIdImport
+      parentRoute: typeof ChargingStationsImport
+    }
     '/settings/account': {
       preLoaderRoute: typeof SettingsAccountImport
       parentRoute: typeof SettingsImport
@@ -174,6 +190,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsServerImport
       parentRoute: typeof SettingsImport
     }
+    '/charging-stations/': {
+      preLoaderRoute: typeof ChargingStationsIndexImport
+      parentRoute: typeof ChargingStationsImport
+    }
     '/settings/': {
       preLoaderRoute: typeof SettingsIndexImport
       parentRoute: typeof SettingsImport
@@ -185,7 +205,10 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
-  ChargingStationsRoute,
+  ChargingStationsRoute.addChildren([
+    ChargingStationsStationIdRoute,
+    ChargingStationsIndexRoute,
+  ]),
   CustomersRoute,
   ExternalPlatformsRoute,
   LoginRoute,
