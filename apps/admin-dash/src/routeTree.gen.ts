@@ -11,9 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TransactionsImport } from './routes/transactions'
+import { Route as TarrifImport } from './routes/tarrif'
 import { Route as SettingsImport } from './routes/settings'
+import { Route as RevenueImport } from './routes/revenue'
+import { Route as ReportsImport } from './routes/reports'
 import { Route as ProfileImport } from './routes/profile'
 import { Route as LoginImport } from './routes/login'
+import { Route as ExternalPlatformsImport } from './routes/external-platforms'
+import { Route as CustomersImport } from './routes/customers'
+import { Route as ChargingStationsImport } from './routes/charging-stations'
 import { Route as IndexImport } from './routes/index'
 import { Route as SettingsIndexImport } from './routes/settings/index'
 import { Route as SettingsServerImport } from './routes/settings/server'
@@ -23,8 +30,28 @@ import { Route as SettingsAccountImport } from './routes/settings/account'
 
 // Create/Update Routes
 
+const TransactionsRoute = TransactionsImport.update({
+  path: '/transactions',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TarrifRoute = TarrifImport.update({
+  path: '/tarrif',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const SettingsRoute = SettingsImport.update({
   path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const RevenueRoute = RevenueImport.update({
+  path: '/revenue',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ReportsRoute = ReportsImport.update({
+  path: '/reports',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -35,6 +62,21 @@ const ProfileRoute = ProfileImport.update({
 
 const LoginRoute = LoginImport.update({
   path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ExternalPlatformsRoute = ExternalPlatformsImport.update({
+  path: '/external-platforms',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CustomersRoute = CustomersImport.update({
+  path: '/customers',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ChargingStationsRoute = ChargingStationsImport.update({
+  path: '/charging-stations',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -76,6 +118,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/charging-stations': {
+      preLoaderRoute: typeof ChargingStationsImport
+      parentRoute: typeof rootRoute
+    }
+    '/customers': {
+      preLoaderRoute: typeof CustomersImport
+      parentRoute: typeof rootRoute
+    }
+    '/external-platforms': {
+      preLoaderRoute: typeof ExternalPlatformsImport
+      parentRoute: typeof rootRoute
+    }
     '/login': {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
@@ -84,8 +138,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileImport
       parentRoute: typeof rootRoute
     }
+    '/reports': {
+      preLoaderRoute: typeof ReportsImport
+      parentRoute: typeof rootRoute
+    }
+    '/revenue': {
+      preLoaderRoute: typeof RevenueImport
+      parentRoute: typeof rootRoute
+    }
     '/settings': {
       preLoaderRoute: typeof SettingsImport
+      parentRoute: typeof rootRoute
+    }
+    '/tarrif': {
+      preLoaderRoute: typeof TarrifImport
+      parentRoute: typeof rootRoute
+    }
+    '/transactions': {
+      preLoaderRoute: typeof TransactionsImport
       parentRoute: typeof rootRoute
     }
     '/settings/account': {
@@ -115,8 +185,13 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
+  ChargingStationsRoute,
+  CustomersRoute,
+  ExternalPlatformsRoute,
   LoginRoute,
   ProfileRoute,
+  ReportsRoute,
+  RevenueRoute,
   SettingsRoute.addChildren([
     SettingsAccountRoute,
     SettingsMembersRoute,
@@ -124,6 +199,8 @@ export const routeTree = rootRoute.addChildren([
     SettingsServerRoute,
     SettingsIndexRoute,
   ]),
+  TarrifRoute,
+  TransactionsRoute,
 ])
 
 /* prettier-ignore-end */

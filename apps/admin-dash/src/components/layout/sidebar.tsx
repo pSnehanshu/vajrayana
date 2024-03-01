@@ -1,7 +1,7 @@
 import { cn, useOrgLogo } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ReactNode, useMemo } from "react";
-import { Link } from "@tanstack/react-router";
+import { FileRoutesByPath, Link } from "@tanstack/react-router";
 import { useAppStore } from "@/store";
 import { toast } from "sonner";
 import { HiDocument } from "react-icons/hi2";
@@ -31,7 +31,7 @@ import { ScrollArea } from "../ui/scroll-area";
 type MenuItem = {
   title: string;
   icon?: ReactNode;
-  link?: string;
+  link?: keyof FileRoutesByPath;
   children?: MenuItem[];
 };
 
@@ -44,7 +44,7 @@ const menu: MenuItem[] = [
   {
     title: "Charging stations",
     icon: <FaChargingStation />,
-    link: "/cs",
+    link: "/charging-stations",
   },
   {
     title: "Transactions",
@@ -64,7 +64,7 @@ const menu: MenuItem[] = [
   {
     title: "External platforms",
     icon: <RiOrganizationChart />,
-    link: "/ext-platforms",
+    link: "/external-platforms",
   },
   {
     title: "Revenue",
