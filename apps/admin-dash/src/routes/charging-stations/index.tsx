@@ -1,3 +1,4 @@
+import { CopyToClipboard } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -43,6 +44,10 @@ const columns = [
           <span className="text-xs py-0.5 px-1 font-mono rounded-md text-secondary-foreground bg-secondary">
             ID: {props.row.original.id}
           </span>
+          <CopyToClipboard
+            data={props.row.original.id}
+            className="h-6 w-6 translate-y-0.5"
+          />
         </div>
       </div>
     ),

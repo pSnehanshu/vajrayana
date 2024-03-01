@@ -2,8 +2,16 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { ReloadIcon } from "@radix-ui/react-icons";
-
+import { MdContentCopy } from "react-icons/md";
+import copy from "copy-to-clipboard";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "./tooltip";
+import { toast } from "sonner";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
@@ -114,4 +122,44 @@ const FileButton = React.forwardRef<HTMLInputElement, FileButtonProps>(
 );
 FileButton.displayName = "FileButton";
 
-export { Button, FileButton, buttonVariants };
+interface CopyToClipboardProps extends ButtonProps {
+  data: string;
+}
+const CopyToClipboard = React.forwardRef<
+  HTMLButtonElement,
+  CopyToClipboardProps
+>(({ data, ...props }, ref) => {
+  const handleCopy = () => {
+    try {
+      copy(data.toString(), {
+        debug: import.meta.env.DEV,
+      });
+      toast("Copied!");
+    } catch (error) {
+      console.error(error);
+      toast("Failed to copy", { className: "text-destructive" });
+    }
+  };
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            {...props}
+            ref={ref}
+            onClick={handleCopy}
+          >
+            <MdContentCopy />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Copy content</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+});
+CopyToClipboard.displayName = "CopyToClipboard";
+
+export { Button, FileButton, CopyToClipboard, buttonVariants };
