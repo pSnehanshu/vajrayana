@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RouterOutputs, trpcRQ } from "@/lib/trpc";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   createColumnHelper,
   flexRender,
@@ -21,6 +21,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrayElement } from "@zigbolt/shared";
+import { CreateChargingStation } from "@/components/CreateChargingStation";
 
 export const Route = createFileRoute("/charging-stations/")({
   component: ChargingStationsList,
@@ -41,7 +42,11 @@ const columns = [
         params={{ stationId: props.row.original.id }}
         className="text-lg hover:underline"
       >
-        {props.getValue()}
+        {props.getValue() || (
+          <span className="text-muted-foreground">
+            {props.row.original.urlName}
+          </span>
+        )}
       </Link>
     ),
   }),
@@ -63,9 +68,7 @@ const columns = [
   }),
   columnHelper.accessor("urlName", {
     header: "URL Name",
-    cell: (props) => (
-      <span className="font-mono">/api/ocpp/{props.getValue()}</span>
-    ),
+    cell: (props) => <span className="font-mono">{props.getValue()}</span>,
   }),
   columnHelper.display({
     id: "hardware",
@@ -81,15 +84,33 @@ const columns = [
 ];
 
 function ChargingStationsList() {
-  const [{ stations: data }] = trpcRQ.stations.list.useSuspenseQuery({});
+  const [{ stations: data }, listQuery] = trpcRQ.stations.list.useSuspenseQuery(
+    {},
+  );
   const table = useReactTable<ChargingStation>({
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
   });
+  const navigate = useNavigate();
 
   return (
     <>
+      <div className="sm:flex justify-between mb-8">
+        <h1 className="text-3xl mb-2 sm:mb-0">Charging stations</h1>
+
+        <CreateChargingStation
+          onCreate={(cs) => {
+            listQuery.refetch();
+
+            navigate({
+              to: "/charging-stations/$stationId",
+              params: { stationId: cs.id },
+            });
+          }}
+        />
+      </div>
+
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

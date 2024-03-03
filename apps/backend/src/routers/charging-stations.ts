@@ -66,4 +66,26 @@ export const chargingStationsRouter = router({
 
       return cs;
     }),
+  create: permissionProcedure([UserPermissions["CS:ADD"]])
+    .input(
+      z.object({
+        friendlyName: z.string().trim().optional(),
+        urlName: z
+          .string()
+          .regex(
+            /^[a-zA-Z0-9*\-_=|@.+]+$/,
+            `This is case-insensitive dataType and can only contain characters from the following character set: a-z, A-Z, 0-9, '*', '-', '_', '=', '+', '|', '@', '.'`,
+          )
+          .max(48),
+        latitude: z.number().optional(),
+        longitude: z.number().optional(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const cs = await ctx.prisma.chargingStation.create({
+        data: input,
+      });
+
+      return cs;
+    }),
 });

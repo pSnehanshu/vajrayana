@@ -13,6 +13,7 @@ export enum UserPermissions {
   "ROLE:WRITE" = 8,
   "ROLE:DELETE" = 9,
   "CS:READ" = 10,
+  "CS:ADD" = 11,
 }
 
 /** Array of all the permissions */
@@ -47,4 +48,5 @@ export const PermissionDescriptions: Record<UserPermissions, string> = {
   [UserPermissions["ROLE:WRITE"]]: "Can edit role (add/remove permissions)",
   [UserPermissions["ROLE:DELETE"]]: "Can delete existing roles",
   [UserPermissions["CS:READ"]]: "Can fetch list of charging stations",
+  [UserPermissions["CS:ADD"]]: "Create/register charging stations",
 };
