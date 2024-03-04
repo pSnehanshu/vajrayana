@@ -19,15 +19,17 @@ import { Route as ReportsImport } from './routes/reports'
 import { Route as ProfileImport } from './routes/profile'
 import { Route as LoginImport } from './routes/login'
 import { Route as ExternalPlatformsImport } from './routes/external-platforms'
-import { Route as CustomersImport } from './routes/customers'
+import { Route as DriversImport } from './routes/drivers'
 import { Route as ChargingStationsImport } from './routes/charging-stations'
 import { Route as IndexImport } from './routes/index'
 import { Route as SettingsIndexImport } from './routes/settings/index'
+import { Route as DriversIndexImport } from './routes/drivers/index'
 import { Route as ChargingStationsIndexImport } from './routes/charging-stations/index'
 import { Route as SettingsServerImport } from './routes/settings/server'
 import { Route as SettingsRolesImport } from './routes/settings/roles'
 import { Route as SettingsMembersImport } from './routes/settings/members'
 import { Route as SettingsAccountImport } from './routes/settings/account'
+import { Route as DriversDriverIdImport } from './routes/drivers/$driverId'
 import { Route as ChargingStationsStationIdImport } from './routes/charging-stations/$stationId'
 
 // Create/Update Routes
@@ -72,8 +74,8 @@ const ExternalPlatformsRoute = ExternalPlatformsImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const CustomersRoute = CustomersImport.update({
-  path: '/customers',
+const DriversRoute = DriversImport.update({
+  path: '/drivers',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -90,6 +92,11 @@ const IndexRoute = IndexImport.update({
 const SettingsIndexRoute = SettingsIndexImport.update({
   path: '/',
   getParentRoute: () => SettingsRoute,
+} as any)
+
+const DriversIndexRoute = DriversIndexImport.update({
+  path: '/',
+  getParentRoute: () => DriversRoute,
 } as any)
 
 const ChargingStationsIndexRoute = ChargingStationsIndexImport.update({
@@ -117,6 +124,11 @@ const SettingsAccountRoute = SettingsAccountImport.update({
   getParentRoute: () => SettingsRoute,
 } as any)
 
+const DriversDriverIdRoute = DriversDriverIdImport.update({
+  path: '/$driverId',
+  getParentRoute: () => DriversRoute,
+} as any)
+
 const ChargingStationsStationIdRoute = ChargingStationsStationIdImport.update({
   path: '/$stationId',
   getParentRoute: () => ChargingStationsRoute,
@@ -134,8 +146,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChargingStationsImport
       parentRoute: typeof rootRoute
     }
-    '/customers': {
-      preLoaderRoute: typeof CustomersImport
+    '/drivers': {
+      preLoaderRoute: typeof DriversImport
       parentRoute: typeof rootRoute
     }
     '/external-platforms': {
@@ -174,6 +186,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChargingStationsStationIdImport
       parentRoute: typeof ChargingStationsImport
     }
+    '/drivers/$driverId': {
+      preLoaderRoute: typeof DriversDriverIdImport
+      parentRoute: typeof DriversImport
+    }
     '/settings/account': {
       preLoaderRoute: typeof SettingsAccountImport
       parentRoute: typeof SettingsImport
@@ -194,6 +210,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChargingStationsIndexImport
       parentRoute: typeof ChargingStationsImport
     }
+    '/drivers/': {
+      preLoaderRoute: typeof DriversIndexImport
+      parentRoute: typeof DriversImport
+    }
     '/settings/': {
       preLoaderRoute: typeof SettingsIndexImport
       parentRoute: typeof SettingsImport
@@ -209,7 +229,7 @@ export const routeTree = rootRoute.addChildren([
     ChargingStationsStationIdRoute,
     ChargingStationsIndexRoute,
   ]),
-  CustomersRoute,
+  DriversRoute.addChildren([DriversDriverIdRoute, DriversIndexRoute]),
   ExternalPlatformsRoute,
   LoginRoute,
   ProfileRoute,

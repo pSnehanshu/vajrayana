@@ -1,4 +1,4 @@
-import copy from "copy-to-clipboard";
+import { CreateDriver } from "@/components/CreateDriver";
 import {
   Table,
   TableBody,
@@ -21,32 +21,26 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrayElement } from "@zigbolt/shared";
-import { CreateChargingStation } from "@/components/CreateChargingStation";
+import copy from "copy-to-clipboard";
 
-export const Route = createFileRoute("/charging-stations/")({
-  component: ChargingStationsList,
+export const Route = createFileRoute("/drivers/")({
+  component: DriversList,
 });
 
-type ChargingStation = ArrayElement<
-  RouterOutputs["stations"]["list"]["stations"]
->;
+type Driver = ArrayElement<RouterOutputs["drivers"]["list"]["drivers"]>;
 
-const columnHelper = createColumnHelper<ChargingStation>();
+const columnHelper = createColumnHelper<Driver>();
 
 const columns = [
-  columnHelper.accessor("friendlyName", {
+  columnHelper.accessor("name", {
     header: "Name",
     cell: (props) => (
       <Link
-        to="/charging-stations/$stationId"
-        params={{ stationId: props.row.original.id }}
+        to="/drivers/$driverId"
+        params={{ driverId: props.row.original.id }}
         className="text-lg hover:underline"
       >
-        {props.getValue() || (
-          <span className="text-muted-foreground">
-            {props.row.original.urlName}
-          </span>
-        )}
+        {props.getValue()}
       </Link>
     ),
   }),
@@ -66,30 +60,16 @@ const columns = [
       </Tooltip>
     ),
   }),
-  columnHelper.accessor("urlName", {
-    header: "URL Name",
-    cell: (props) => <span className="font-mono">{props.getValue()}</span>,
-  }),
-  columnHelper.display({
-    id: "hardware",
-    header: "Hardware info",
-    cell: (props) => (
-      <>
-        <p>Vendor: {props.row.original.vendorName ?? "N/A"}</p>
-        <p>Model: {props.row.original.model ?? "N/A"}</p>
-        <p>S/N: {props.row.original.serialNumber ?? "N/A"}</p>
-      </>
-    ),
-  }),
+  columnHelper.accessor("createdAt", { header: "Registration date and time" }),
 ];
 
-function ChargingStationsList() {
+function DriversList() {
   const navigate = useNavigate();
-  const [{ stations: data }, listQuery] = trpcRQ.stations.list.useSuspenseQuery(
+  const [{ drivers: data }, listQuery] = trpcRQ.drivers.list.useSuspenseQuery(
     {},
   );
 
-  const table = useReactTable<ChargingStation>({
+  const table = useReactTable<Driver>({
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
@@ -98,15 +78,15 @@ function ChargingStationsList() {
   return (
     <>
       <div className="sm:flex justify-between mb-8">
-        <h1 className="text-3xl mb-2 sm:mb-0">Charging stations</h1>
+        <h1 className="text-3xl mb-2 sm:mb-0">Drivers (Customers)</h1>
 
-        <CreateChargingStation
-          onCreate={(cs) => {
+        <CreateDriver
+          onCreate={({ driver }) => {
             listQuery.refetch();
 
             navigate({
-              to: "/charging-stations/$stationId",
-              params: { stationId: cs.id },
+              to: "/drivers/$driverId",
+              params: { driverId: driver.id },
             });
           }}
         />

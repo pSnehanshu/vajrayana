@@ -57,9 +57,9 @@ const menu: MenuItem[] = [
     link: "/tarrif",
   },
   {
-    title: "Customers",
+    title: "Drivers (Customers)",
     icon: <MdOutlineElectricCar className="text-xl -translate-x-1 -mr-1" />,
-    link: "/customers",
+    link: "/drivers",
   },
   {
     title: "External platforms",

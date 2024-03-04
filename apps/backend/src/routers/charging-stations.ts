@@ -45,11 +45,7 @@ export const chargingStationsRouter = router({
       return { stations: chargingStations, total };
     }),
   getById: permissionProcedure([UserPermissions["CS:READ"]])
-    .input(
-      z.object({
-        id: z.string().uuid(),
-      }),
-    )
+    .input(z.object({ id: z.string().uuid() }))
     .query(async ({ input, ctx }) => {
       // Fetch cs
       const cs = await ctx.prisma.chargingStation.findUnique({
