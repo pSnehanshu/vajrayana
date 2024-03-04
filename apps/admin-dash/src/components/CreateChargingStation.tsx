@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { FaPlus } from "react-icons/fa";
 import {
   Dialog,
@@ -27,12 +27,16 @@ import {
   Marker,
   Popup,
   TileLayer,
-  useMapEvent,
+  useMapEvents,
 } from "react-leaflet";
 import { type LatLngLiteral } from "leaflet";
 import { toast } from "sonner";
-import { useState } from "react";
-import { RouterOutputs, trpcRQ } from "@/lib/trpc";
+import { useEffect, useState } from "react";
+import { type RouterOutputs, trpcRQ } from "@/lib/trpc";
+import { Separator } from "@/components/ui/separator";
+import L from "leaflet";
+import { MdGpsFixed } from "react-icons/md";
+import { renderToStaticMarkup } from "react-dom/server";
 
 const formSchema = z.object({
   friendlyName: z.string().trim().optional(),
@@ -93,7 +97,7 @@ export function CreateChargingStation({
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="overflow-auto max-h-screen">
         <DialogHeader>
           <DialogTitle>Create new Charging Station</DialogTitle>
           <DialogDescription>
@@ -101,6 +105,8 @@ export function CreateChargingStation({
             charger to connect to this platform.
           </DialogDescription>
         </DialogHeader>
+
+        <Separator />
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -114,8 +120,9 @@ export function CreateChargingStation({
                     <Input {...field} />
                   </FormControl>
                   <FormDescription>
-                    Your station is supposed to append this at the end of the
-                    OCPP URL when connecting, to help the platform identify it.
+                    Your charging station is supposed to append this to the OCPP
+                    URL when connecting the platform. We use this (alongwith
+                    other parameters) to identify the station.
                   </FormDescription>
 
                   <FormMessage />
@@ -133,8 +140,8 @@ export function CreateChargingStation({
                     <Input {...field} />
                   </FormControl>
                   <FormDescription>
-                    This name will be used to refer to the chargepoint within
-                    the platform
+                    This name will be used to refer to the station within the
+                    platform
                   </FormDescription>
 
                   <FormMessage />
@@ -174,16 +181,38 @@ export function CreateChargingStation({
             </FormItem>
 
             <div className="flex space-x-2">
-              <div>
-                <FormLabel>Latitude</FormLabel>
-                <Input {...form.register("latitude")} />
-              </div>
+              <FormField
+                control={form.control}
+                name="latitude"
+                render={({ field }) => (
+                  <FormItem className="grow">
+                    <FormLabel>Latitude</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
 
-              <div>
-                <FormLabel>Longitude</FormLabel>
-                <Input {...form.register("longitude")} />
-              </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="longitude"
+                render={({ field }) => (
+                  <FormItem className="grow">
+                    <FormLabel>Longitude</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+
+            <Separator />
 
             <DialogFooter className="mt-6">
               <Button type="reset" variant="secondary">
@@ -201,19 +230,60 @@ export function CreateChargingStation({
   );
 }
 
+const GPSBtnControl = L.Control.extend({
+  options: {
+    position: "bottomleft",
+  },
+
+  onAdd: function (map: L.Map) {
+    // Create a container for your button
+    const container = L.DomUtil.create("div", "leaflet-control");
+
+    // Create the button element
+    const button = L.DomUtil.create(
+      "button",
+      buttonVariants({ variant: "outline", size: "sm" }),
+      container,
+    );
+    button.type = "button"; // Otherwise it tries to submit the form
+    button.innerHTML = renderToStaticMarkup(<MdGpsFixed className="size-4" />);
+
+    // Add click event listener to your button
+    L.DomEvent.on(button, "click", (e) => {
+      e.stopPropagation();
+      map.locate({ setView: true, maxZoom: 16 });
+    });
+
+    return container;
+  },
+});
+
 interface CoordsPickerProps {
   point: LatLngLiteral;
   onChange?: (point: LatLngLiteral) => void;
 }
 function CoordsPicker({ point, onChange }: CoordsPickerProps) {
-  useMapEvent("click", (e) => {
-    onChange?.(e.latlng);
+  const map = useMapEvents({
+    click: (e) => onChange?.(e.latlng),
+    locationfound: (e) => onChange?.(e.latlng),
+    locationerror: (err) =>
+      toast(<span className="text-destructive">{err.message}</span>),
   });
+
+  // Mount GPS button
+  useEffect(() => {
+    const gpsBtn = new GPSBtnControl();
+    gpsBtn.addTo(map);
+
+    return () => {
+      map.removeControl(gpsBtn);
+    };
+  }, [map]);
 
   return (
     <>
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Marker position={point}>
