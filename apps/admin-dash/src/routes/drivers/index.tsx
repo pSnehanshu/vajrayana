@@ -22,6 +22,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrayElement } from "@zigbolt/shared";
 import copy from "copy-to-clipboard";
+import { format } from "date-fns";
 
 export const Route = createFileRoute("/drivers/")({
   component: DriversList,
@@ -60,7 +61,14 @@ const columns = [
       </Tooltip>
     ),
   }),
-  columnHelper.accessor("createdAt", { header: "Registration date and time" }),
+  columnHelper.accessor("createdAt", {
+    header: "Registration date and time",
+    cell: (props) => (
+      <time dateTime={props.getValue().toISOString()}>
+        {format(props.getValue(), "dd-LLL-yyyy hh:mm aaa")}
+      </time>
+    ),
+  }),
 ];
 
 function DriversList() {

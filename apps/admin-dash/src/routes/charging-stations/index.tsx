@@ -22,6 +22,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrayElement } from "@zigbolt/shared";
 import { CreateChargingStation } from "@/components/CreateChargingStation";
+import { format } from "date-fns";
 
 export const Route = createFileRoute("/charging-stations/")({
   component: ChargingStationsList,
@@ -79,6 +80,14 @@ const columns = [
         <p>Model: {props.row.original.model ?? "N/A"}</p>
         <p>S/N: {props.row.original.serialNumber ?? "N/A"}</p>
       </>
+    ),
+  }),
+  columnHelper.accessor("createdAt", {
+    header: "Creation date and time",
+    cell: (props) => (
+      <time dateTime={props.getValue().toISOString()}>
+        {format(props.getValue(), "dd-LLL-yyyy hh:mm aaa")}
+      </time>
     ),
   }),
 ];
