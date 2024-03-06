@@ -82,6 +82,8 @@ const columns = [
       </>
     ),
   }),
+  columnHelper.accessor("_count.EVSEs", { header: "EVSEs" }),
+  columnHelper.accessor("_count.Transactions", { header: "Transactions" }),
   columnHelper.accessor("createdAt", {
     header: "Creation date and time",
     cell: (props) => (

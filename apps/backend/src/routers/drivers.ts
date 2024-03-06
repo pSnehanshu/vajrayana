@@ -31,6 +31,13 @@ export const driversRouter = router({
           orderBy: {
             createdAt: "desc",
           },
+          include: {
+            _count: {
+              select: {
+                IdToken: true,
+              },
+            },
+          },
         }),
         ctx.prisma.driver.count({ where }),
       ]);

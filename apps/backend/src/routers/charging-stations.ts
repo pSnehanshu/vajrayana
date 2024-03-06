@@ -38,6 +38,14 @@ export const chargingStationsRouter = router({
           orderBy: {
             createdAt: "desc",
           },
+          include: {
+            _count: {
+              select: {
+                EVSEs: true,
+                Transactions: true,
+              },
+            },
+          },
         }),
         ctx.prisma.chargingStation.count({ where }),
       ]);

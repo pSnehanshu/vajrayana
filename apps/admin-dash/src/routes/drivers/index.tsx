@@ -61,6 +61,9 @@ const columns = [
       </Tooltip>
     ),
   }),
+  columnHelper.accessor("_count.IdToken", {
+    header: "ID Tokens",
+  }),
   columnHelper.accessor("createdAt", {
     header: "Registration date and time",
     cell: (props) => (
