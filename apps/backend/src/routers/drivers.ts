@@ -4,6 +4,7 @@ import { paginationSchema } from "../utils/schemas";
 import { Prisma } from "@zigbolt/prisma";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { v4 as uuid } from "uuid";
 
 export const driversRouter = router({
   list: permissionProcedure([UserPermissions["DRIVER:READ"]])
@@ -51,11 +52,26 @@ export const driversRouter = router({
       return { driver };
     }),
   create: permissionProcedure()
-    .input(z.object({ name: z.string().trim().min(1) }))
+    .input(
+      z.object({
+        name: z.string().trim().min(1),
+        createIdToken: z.boolean().default(true),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
-      const driver = await ctx.prisma.driver.create({
-        data: { name: input.name },
-      });
+      const data: Prisma.DriverCreateInput = {
+        name: input.name,
+      };
+
+      if (input.createIdToken) {
+        data.IdToken = {
+          create: {
+            token: uuid(),
+          },
+        };
+      }
+
+      const driver = await ctx.prisma.driver.create({ data });
 
       return { driver };
     }),
