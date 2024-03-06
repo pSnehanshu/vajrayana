@@ -51,7 +51,7 @@ export const driversRouter = router({
       return { driver };
     }),
   create: permissionProcedure()
-    .input(z.object({ name: z.string().trim() }))
+    .input(z.object({ name: z.string().trim().min(1) }))
     .mutation(async ({ input, ctx }) => {
       const driver = await ctx.prisma.driver.create({
         data: { name: input.name },

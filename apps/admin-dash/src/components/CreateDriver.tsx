@@ -26,7 +26,7 @@ import { type RouterOutputs, trpcRQ } from "@/lib/trpc";
 import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
-  name: z.string().trim(),
+  name: z.string().trim().min(1),
 });
 
 interface CreateDriverProps {
