@@ -1,0 +1,13 @@
+diff --git a/dist/esm/link.js b/dist/esm/link.js
+index b9b64766dabec3ac2fd505fedfddd330c6eccd35..fee51513e8d6cf147712f7223a51da785d49a184 100644
+--- a/dist/esm/link.js
++++ b/dist/esm/link.js
+@@ -143,7 +143,7 @@ function useLinkProps(options) {
+     ...resolvedActiveProps,
+     ...resolvedInactiveProps,
+     ...rest,
+-    href: disabled ? void 0 : next.maskedLocation ? next.maskedLocation.href : next.href,
++    href: '#'+(disabled ? void 0 : next.maskedLocation ? next.maskedLocation.href : next.href),
+     onClick: composeHandlers([onClick, handleClick]),
+     onFocus: composeHandlers([onFocus, handleFocus]),
+     onMouseEnter: composeHandlers([onMouseEnter, handleEnter]),

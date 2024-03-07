@@ -32,5 +32,9 @@
     "lodash-es": "^4.17.21",
     "superjson": "^2.2.1",
     "zod": "^3.22.4"
+  },
+  "resolutions": {
+    "@tanstack/react-router@^1.18.3": "patch:@tanstack/react-router@npm%3A1.18.3#./.yarn/patches/@tanstack-react-router-npm-1.18.3-f0a1aaef8e.patch",
+    "@tanstack/react-router@1.18.3": "patch:@tanstack/react-router@npm%3A1.18.3#./.yarn/patches/@tanstack-react-router-npm-1.18.3-f0a1aaef8e.patch"
   }
 }

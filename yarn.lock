@@ -1409,7 +1409,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-router@npm:1.18.3, @tanstack/react-router@npm:^1.18.3":
+"@tanstack/react-router@npm:1.18.3":
   version: 1.18.3
   resolution: "@tanstack/react-router@npm:1.18.3"
   dependencies:
@@ -1421,6 +1421,21 @@ __metadata:
     react: ">=16"
     react-dom: ">=16"
   checksum: d477354ff816fec90993d1a49cd82d59b31f9555ce28a5b698c47ac6944c5608cd502ce8272fd5bdaafa61ccd7c107d9feee3e7d31aa9dac2f05ab838cc062e0
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-router@patch:@tanstack/react-router@npm%3A1.18.3#./.yarn/patches/@tanstack-react-router-npm-1.18.3-f0a1aaef8e.patch::locator=zigbolt%40workspace%3A.":
+  version: 1.18.3
+  resolution: "@tanstack/react-router@patch:@tanstack/react-router@npm%3A1.18.3#./.yarn/patches/@tanstack-react-router-npm-1.18.3-f0a1aaef8e.patch::version=1.18.3&hash=07c543&locator=zigbolt%40workspace%3A."
+  dependencies:
+    "@tanstack/history": 1.15.13
+    "@tanstack/react-store": ^0.2.1
+    tiny-invariant: ^1.3.1
+    tiny-warning: ^1.0.3
+  peerDependencies:
+    react: ">=16"
+    react-dom: ">=16"
+  checksum: 79f7cd72b00ac73b8db4ea082847caaba186f10f761bc141e20fd172afc9588986e981c31ecb2dd381ab7c9fcd3b028682edd04f45b5a42de9777da32090e7be
   languageName: node
   linkType: hard
 
