@@ -14,5 +14,7 @@ export const SettingsKeyDetails: Record<SettingsKeyEnum, KeyDescription> = {
   logoB64: {
     key: "logoB64",
     name: "Server logo",
+    description:
+      "It may take upto 1 hour for the logo to change due to caching",
   },
 };

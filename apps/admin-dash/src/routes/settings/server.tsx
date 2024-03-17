@@ -108,7 +108,14 @@ function SingleSetting({
 
   return (
     <TableRow key={setting.key}>
-      <TableCell>{setting.name}</TableCell>
+      <TableCell>
+        <p>{setting.name}</p>
+        {setting.description && (
+          <span className="text-muted-foreground text-xs">
+            {setting.description}
+          </span>
+        )}
+      </TableCell>
 
       <TableCell>
         <form ref={formRef} onSubmit={handleSave}>
