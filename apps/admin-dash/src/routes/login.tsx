@@ -10,7 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
-import { useOrgLogo } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -34,7 +33,6 @@ const formSchema = z.object({
 function Login() {
   const navigate = useNavigate();
   const login = useAppStore((s) => s.login);
-  const logo = useOrgLogo();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,7 +62,7 @@ function Login() {
 
   return (
     <div className="flex items-center flex-col my-20">
-      <img src={logo} alt="ZigBolt LOGO" className="max-w-48" />
+      <img src="/api/logo" alt="ZigBolt LOGO" className="max-w-48" />
 
       <h1 className="text-2xl mb-4 font-bold text-center">
         Login to your account

@@ -1,4 +1,4 @@
-import { cn, useOrgLogo } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ReactNode, useMemo } from "react";
 import { FileRoutesByPath, Link } from "@tanstack/react-router";
@@ -95,7 +95,6 @@ export function Sidebar({
   const user = useAppStore((s) => s.user);
   const logout = useAppStore((s) => s.logout);
   const { setTheme, theme } = useTheme();
-  const logo = useOrgLogo();
 
   const emailHash = useMemo(() => {
     if (user?.email) {
@@ -118,7 +117,11 @@ export function Sidebar({
         {showLogo && (
           <div className="row-span-1 p-2">
             <Link to="/">
-              <img src={logo} alt="ZigBolt LOGO" className="h-full m-auto" />
+              <img
+                src="/api/logo"
+                alt="ZigBolt LOGO"
+                className="h-full m-auto"
+              />
             </Link>
           </div>
         )}
