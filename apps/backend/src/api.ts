@@ -34,8 +34,9 @@ api.get("/logo", async (req, res) => {
     });
 
     // Cache for 1 year
-    res.setHeader("Cache-Control", "public, max-age=0");
+    res.setHeader("Cache-Control", "public, max-age=3600, must-revalidate");
     res.setHeader("Last-Modified", updatedAt.toUTCString());
+    res.setHeader("Date", updatedAt.toUTCString());
 
     // Parse the if-modified-since header
     const ifModifiedSince = new Date(req.headers["if-modified-since"] ?? "");
